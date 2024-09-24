@@ -5,7 +5,7 @@ import { Stack } from 'expo-router';
 
 export default function Vehiculos() {
   const vehiculos = [
-    { id: 1, nombre: 'Hyundai Accent' },
+    { id: 1, nombre: 'Hyundai Santa Fé' },
     { id: 2, nombre: 'Honda Odyssey' },
   ];
 
