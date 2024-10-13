@@ -1,0 +1,60 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="397D6C7E-9884-DD5A-237E-1658C410C666" name="Tp_vehiculo">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 02:07:14 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="Id_tp_vehiculo" id="1B6A6B69-BE46-028C-7EEC-4F77108B6638">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 02:07:23 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>30</dataTypePrecision>
+<ownDataTypeParameters>,30,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Nom_tp_vehiculo" id="B06081C1-4868-7611-30D7-F80DFF228BE6">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 02:07:23 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>30</dataTypeSize>
+<ownDataTypeParameters>30,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="B6ABE0C3-7F0A-22BA-6112-C84CC73B024F" name="Tp_vehiculo PK">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 02:08:07 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<shouldEngineer>false</shouldEngineer>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="false"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>1B6A6B69-BE46-028C-7EEC-4F77108B6638</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>
