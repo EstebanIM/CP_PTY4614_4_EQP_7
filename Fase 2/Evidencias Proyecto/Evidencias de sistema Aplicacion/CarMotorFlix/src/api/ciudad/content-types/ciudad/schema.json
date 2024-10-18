@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ciudads",
+  "info": {
+    "singularName": "ciudad",
+    "pluralName": "ciudads",
+    "displayName": "Ciudad",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "cod_ciudad": {
+      "type": "uid",
+      "required": true,
+      "maxLength": 20,
+      "default": "C_00"
+    },
+    "nom_ciudad": {
+      "type": "string",
+      "required": true
+    },
+    "cod_region": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::region.region",
+      "inversedBy": "ciudads"
+    }
+  }
+}
