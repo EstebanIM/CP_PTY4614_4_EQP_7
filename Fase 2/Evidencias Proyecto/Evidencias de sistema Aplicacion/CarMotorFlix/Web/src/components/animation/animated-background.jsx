@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-// Lista de formas posibles
+// Lista de formas posibles, manteniendo un estilo minimalista
 const SHAPES = ["circle", "square", "triangle"];
 
 // Función para generar una forma aleatoria
 const generateShape = (id) => ({
   id,
   shape: SHAPES[Math.floor(Math.random() * SHAPES.length)],
-  size: Math.random() * 50 + 20,
+  size: Math.random() * 40 + 30, // Tamaño más uniforme
   x: Math.random() * 100,
   y: Math.random() * 100,
   rotation: Math.random() * 360,
-  color: `hsl(${Math.random() * 360}, 70%, 70%, 0.3)`,
+  color: `#000000`, // Todo en negro sólido
 });
 
 const AnimatedBackground = () => {
@@ -45,13 +45,13 @@ const AnimatedBackground = () => {
             border: shape.shape !== "circle" ? `2px solid ${shape.color}` : "none",
           }}
           animate={{
-            x: [0, Math.random() * 100 - 50, 0],
-            y: [0, Math.random() * 100 - 50, 0],
+            x: [0, Math.random() * 10 - 5, 0], // Movimientos más sutiles
+            y: [0, Math.random() * 10 - 5, 0],
             rotate: [0, shape.rotation, 0],
-            scale: [1, Math.random() * 0.5 + 0.5, 1],
+            scale: [1, Math.random() * 0.2 + 0.9, 1], // Variaciones más pequeñas en el tamaño
           }}
           transition={{
-            duration: Math.random() * 20 + 10,
+            duration: Math.random() * 8 + 12, // Duraciones largas y suaves
             repeat: Infinity,
             ease: "easeInOut",
           }}

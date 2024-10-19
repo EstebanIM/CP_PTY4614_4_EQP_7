@@ -38,6 +38,9 @@ export default function ResponsiveAuthForm(props) {
       navigate("/verify-email"); // Redirige a la página de verificación de correo
     } else if (mode === "login") {
       onLogin(email, password);
+      // Simulamos que el login fue exitoso y redirigimos al dashboard
+      toast.success("Inicio de sesión exitoso");
+      navigate("/dashboard"); // Redirige al dashboard
     } else if (mode === "reset") {
       if (validateEmail(email)) {
         onResetPassword(email);
