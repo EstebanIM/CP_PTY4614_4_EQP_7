@@ -1,10 +1,10 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import Client from './Client/Client.jsx'
-import './index.css'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './app';  // Importa el componente principal de la aplicación
+import './index.css';     // Importa tus estilos globales
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Client />
+    <App />  {/* Renderizamos la App con las rutas configuradas */}
   </StrictMode>,
-)
+);
