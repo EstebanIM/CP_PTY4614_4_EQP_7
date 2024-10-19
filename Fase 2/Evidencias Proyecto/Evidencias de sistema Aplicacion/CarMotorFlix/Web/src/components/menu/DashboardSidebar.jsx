@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from 'prop-types'; // Importar PropTypes
 import { Button } from "../ui/nadvar/button"; // Asegúrate de que la ruta sea correcta
 import { CarFront, ChevronUp, ChevronDown, Users, Car, File, Store, Bug, X, List, UserPlus } from "lucide-react";
@@ -6,30 +6,47 @@ import { Link } from 'react-router-dom'; // Importar Link de react-router-dom
 import { motion, AnimatePresence } from 'framer-motion'; // Importar framer-motion para las animaciones
 
 const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
-  const [activeMenu, setActiveMenu] = useState(null); // Guardar el menú actualmente abierto
+  // Estado para manejar la visibilidad en pantallas grandes
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768); // Pantallas mayores o iguales a 768px son desktop
 
-  // Función para alternar el estado de los menús
-  const toggleMenu = (menu) => {
-    setActiveMenu((prevMenu) => (prevMenu === menu ? null : menu)); // Si ya está abierto, cierra el menú, si no, ábrelo
+  // Función para manejar el redimensionamiento de la ventana
+  const handleResize = () => {
+    const newIsDesktop = window.innerWidth >= 768;
+    setIsDesktop(newIsDesktop);
+    console.log("Cambio de tamaño de pantalla, es escritorio:", newIsDesktop); // Log para detectar cambio
   };
 
-  // Variantes de animación para la barra lateral
+  useEffect(() => {
+    window.addEventListener('resize', handleResize); // Agregar event listener para redimensionamiento
+    return () => window.removeEventListener('resize', handleResize); // Limpiar event listener al desmontar
+  }, []);
+
+  console.log("Estado del sidebar (sidebarOpen):", sidebarOpen);
+  console.log("Es pantalla grande (isDesktop):", isDesktop); // Log para detectar el estado de la pantalla
+
+  const [activeMenu, setActiveMenu] = useState(null); // Guardar el menú actualmente abierto
+
+  const toggleMenu = (menu) => {
+    console.log(`Toggling menu: ${menu}`);
+    setActiveMenu((prevMenu) => {
+      const newMenu = (prevMenu === menu ? null : menu);
+      console.log(`Nuevo estado del menú ${menu}:`, newMenu);
+      return newMenu;
+    });
+  };
+
   const sidebarVariants = {
     open: { x: 0, transition: { duration: 0.3, ease: "easeInOut" } },
     closed: { x: '-100%', transition: { duration: 0.3, ease: "easeInOut" } },
   };
 
-  // Variantes de la animación para los submenús
-  const submenuVariants = {
-    hidden: { opacity: 0, height: 0, y: -20, transition: { duration: 0.3, ease: "easeInOut" } },
-    visible: { opacity: 1, height: 'auto', y: 0, transition: { duration: 0.3, ease: "easeInOut" } },
-  };
-
   return (
     <motion.aside
-      className="bg-white w-64 md:w-64 md:flex-shrink-0 md:flex md:flex-col p-4 fixed left-0 top-0 bottom-0 z-50 md:relative no-scrollbar"
-      initial={sidebarOpen ? "open" : "closed"}
-      animate={sidebarOpen ? "open" : "closed"}
+      className={`bg-white w-64 md:w-64 md:flex-shrink-0 md:flex md:flex-col p-4 
+      fixed left-0 top-0 bottom-0 z-50 md:relative no-scrollbar 
+      ${isDesktop || sidebarOpen ? 'block' : 'hidden'} md:block`}  // Sidebar siempre visible en desktop
+      initial={sidebarOpen || isDesktop ? "open" : "closed"}  // Inicial abierto en desktop
+      animate={sidebarOpen || isDesktop ? "open" : "closed"}
       variants={sidebarVariants}
     >
       <div className="flex items-center justify-between mb-6">
@@ -37,7 +54,11 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
           <Car className="h-6 w-6 text-primary mr-2" />
           <span className="text-xl font-bold">CarMotorFix</span> 
         </div>
-        <Button variant="ghost" size="icon" className="md:hidden text-black bg-white" onClick={toggleSidebar}>
+        {/* Botón de cerrar solo visible en móviles */}
+        <Button variant="ghost" size="icon" className="md:hidden text-black bg-white" onClick={() => {
+          console.log("Sidebar toggle clicked");
+          toggleSidebar();
+        }}>
           <X className="h-6 w-6" />
         </Button>
       </div>
@@ -59,7 +80,10 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                variants={submenuVariants}
+                variants={{
+                  hidden: { opacity: 0, height: 0 },
+                  visible: { opacity: 1, height: 'auto' }
+                }}
                 className="pl-6 mt-2 space-y-1"
               >
                 <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear auto</Button>
@@ -86,7 +110,10 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                variants={submenuVariants}
+                variants={{
+                  hidden: { opacity: 0, height: 0 },
+                  visible: { opacity: 1, height: 'auto' }
+                }}
                 className="pl-6 mt-2 space-y-1"
               >
                 <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Mecanico</Button>
@@ -113,7 +140,10 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                variants={submenuVariants}
+                variants={{
+                  hidden: { opacity: 0, height: 0 },
+                  visible: { opacity: 1, height: 'auto' }
+                }}
                 className="pl-6 mt-2 space-y-1"
               >
                 <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Ot</Button>
@@ -140,7 +170,10 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                variants={submenuVariants}
+                variants={{
+                  hidden: { opacity: 0, height: 0 },
+                  visible: { opacity: 1, height: 'auto' }
+                }}
                 className="pl-6 mt-2 space-y-1"
               >
                 <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Servicio</Button>
@@ -167,7 +200,10 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                variants={submenuVariants}
+                variants={{
+                  hidden: { opacity: 0, height: 0 },
+                  visible: { opacity: 1, height: 'auto' }
+                }}
                 className="pl-6 mt-2 space-y-1"
               >
                 <Link to="/crear-tienda" className="w-full block">
@@ -198,7 +234,10 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                variants={submenuVariants}
+                variants={{
+                  hidden: { opacity: 0, height: 0 },
+                  visible: { opacity: 1, height: 'auto' }
+                }}
                 className="pl-6 mt-2 space-y-1"
               >
                 <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Comentario</Button>
@@ -224,7 +263,10 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                variants={submenuVariants}
+                variants={{
+                  hidden: { opacity: 0, height: 0 },
+                  visible: { opacity: 1, height: 'auto' }
+                }}
                 className="pl-6 mt-2 space-y-1"
               >
                 <Link to="/crear-dueño" className="w-full block">
