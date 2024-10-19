@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PropTypes from 'prop-types'; // Importar PropTypes
-import { Button } from "../ui/button";
+import { Button } from "../ui/nadvar/button";
 import { Bell, Menu, User, Settings, LogOut } from "lucide-react";
 
 export default function DashboardHeader({ toggleSidebar }) {
