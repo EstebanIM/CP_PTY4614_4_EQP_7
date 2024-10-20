@@ -5,6 +5,7 @@ import Login from './pages/login/login';
 import EmailVerification from './pages/login/Verif';
 import Dashboard from './pages/all/dashboard'; // Importa el componente Dashboard
 import Dashboardadmin from './pages/admin/admin_dashboard';
+import DashboardMecanico from './pages/mecanico/mecanico_dashboard';
 
 function App() {
   return (
@@ -17,7 +18,8 @@ function App() {
           <Route path="/verify-email" element={<EmailVerification />} />
           {/* Ruta para el dashboard */}
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin-dashboard" element={<Dashboardadmin />} /> {/* Nueva ruta para DashboardAdmin */}
+          <Route path="/admin-dashboard" element={<Dashboardadmin />} /> 
+          <Route path="/mecanico-dashboard" element={<DashboardMecanico />} /> 
         </Routes>
       </Router>
 
