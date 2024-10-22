@@ -8,17 +8,53 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { User, Phone, Mail, Lock, Bell, Palette, Eye, EyeOff } from 'lucide-react';
 import DashboardHeader from "../../components/menu/DashboardHeader"; 
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
+import { fetcher } from '../../lib/strApi';
+import { getTokenFromLocalCookie } from '../../lib/cookies';
+import { useEffect } from 'react';
+
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function Component() {
   const [darkMode, setDarkMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); // Estado para controlar el sidebar
   const [userData, setUserData] = useState({
-    nombre: "Ivan",
-    apellido: "Sanhueza",
-    telefono: "123456789",
-    email: "i.sanhueza@duocuc.cl",
+    nombre: "",
+    apellido: "",
+    telefono: "",
+    email: "",
   });
+
+    useEffect(() => {
+      const fetchUserData = async () => {
+        const jwt = getTokenFromLocalCookie();
+        if (jwt) {
+          try {
+            // Obtener datos de la API de Strapi para el correo
+            const userDataResponse = await fetcher(`${STRAPI_URL}/api/users/me?populate=account_id`, {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${jwt}`,
+              },
+            });
+            const accountData = userDataResponse.account_id || []; // Asegúrate de que la respuesta sea un array
+            
+            // Actualizar el estado con los datos obtenidos
+            setUserData({
+              email: userDataResponse.email || "",
+              nombre: accountData?.nombre || "",
+              apellido: accountData?.apellido || "",
+              run: accountData?.run || "", // Cambiar teléfono a RUN
+            });
+          } catch (error) {
+            console.error("Error fetching user data:", error);
+          }
+        }
+      };
+  
+      fetchUserData();
+    }, []);
+
   const [showPasswords, setShowPasswords] = useState({
     contrasenaAnterior: false,
     nuevaContrasena: false,

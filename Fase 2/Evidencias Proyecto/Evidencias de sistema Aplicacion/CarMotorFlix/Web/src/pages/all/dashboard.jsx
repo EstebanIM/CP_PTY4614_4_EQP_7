@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DashboardHeader from "../../components/menu/DashboardHeader"; 
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
+import Client from "../../Client/Client";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -13,18 +14,19 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 md:flex-row">
+    <div className="flex">
       {/* Sidebar */}
       <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Main content area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1">
         {/* Header */}
         <DashboardHeader toggleSidebar={toggleSidebar} />
 
         {/* Aquí puedes agregar contenido adicional */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Bienvenido al Dashboard</h1>
+        <div className="container mx-auto p-4">
+          <h1 className="text-2xl font-bold mb-6">Bienvenido al Dashboard</h1>
+          <Client/>
         </div>
       </div>
     </div>

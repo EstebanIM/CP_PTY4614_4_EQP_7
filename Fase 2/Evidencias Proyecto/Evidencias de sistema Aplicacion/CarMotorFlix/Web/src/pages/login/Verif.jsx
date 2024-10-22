@@ -13,12 +13,11 @@ EmailSentConfirmation.propTypes = {
 };
 
 export default function EmailSentConfirmation({
-  onLogin,
   onResend,
   email,
   className = ""  // Si no se pasa className, usamos un string vacío por defecto
 }) {
-  const [timeRemaining, setTimeRemaining] = useState(60);
+  const [timeRemaining, setTimeRemaining] = useState(30);
   const [canResend, setCanResend] = useState(false);
 
   useEffect(() => {
@@ -66,9 +65,6 @@ export default function EmailSentConfirmation({
             Por favor, revisa tu bandeja de entrada y sigue las instrucciones para completar el proceso.
           </p>
           <div className="flex flex-col space-y-4">
-            <Button onClick={onLogin} className="w-full">
-              Iniciar Sesión
-            </Button>
             <Button
               onClick={handleResend}
               disabled={!canResend}

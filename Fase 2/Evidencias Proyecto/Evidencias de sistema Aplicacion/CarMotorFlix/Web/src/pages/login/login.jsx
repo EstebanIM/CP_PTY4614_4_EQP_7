@@ -1,19 +1,22 @@
 import PropTypes from 'prop-types';
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Importamos el hook para redirigir
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from 'react-toastify';
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import AnimatedBackground from "../../components/animation/animated-background";
+import { supabase } from '../../lib/supabaseClient';
+import { fetcher } from '../../lib/strApi';
+import { setToken } from '../../lib/cookies';
+
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
+const STRAPI_ACCOUNT = import.meta.env.VITE_STRAPI_TOKEN_ACCOUNT;
 
 export default function ResponsiveAuthForm(props) {
   const {
-    onLogin = () => {}, // Valor por defecto para onLogin
-    onRegister = () => {}, // Valor por defecto para onRegister
-    onResetPassword = () => {}, // Valor por defecto para onResetPassword
-    className = "" // Valor por defecto para className
+    className = "" 
   } = props;
 
   const [mode, setMode] = useState("login");
@@ -24,34 +27,149 @@ export default function ResponsiveAuthForm(props) {
   const [surname, setSurname] = useState("");
   const [rut, setRut] = useState("");
 
-  const navigate = useNavigate(); // Hook para redirigir
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    if (mode === "login") {
+      // Lógica de inicio de sesión
+      try {
+        // Primero intenta la autenticación con Strapi
+        const strapiResponse = await fetcher(`${STRAPI_URL}/api/auth/local`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            identifier: email,
+            password,
+          }),
+        });
+        
+        if (strapiResponse.error) {
+          toast.error(strapiResponse.error.message);
+          throw new Error(strapiResponse.error.message);
+        }
 
+        // Establecer el token de Strapi en cookies
+        setToken(strapiResponse);
+
+        // // Ahora intenta la autenticación con Supabase
+        // const { error: supabaseError } = await supabase.auth.signInWithPassword({
+        //   email,
+        //   password,
+        // });
+
+        // if (supabaseError) {
+        //   toast.error(supabaseError.message);
+        //   throw new Error(supabaseError.message);
+        // }
+
+        // Si ambas autenticaciones son exitosas, redirige al usuario
+        navigate("/dashboard");
+        console.log("Inicio de sesión exitoso");
+        console.log("Usuario autenticado en Strapi:", strapiResponse.user);
+        console.log("Usuario autenticado en Supabase:", supabase.auth.user());
+
+      } catch (error) {
+        toast.error("Error durante el inicio de sesión: " + error.message);
+      }
+
+    }
+    
     if (mode === "register") {
       if (!validateForm()) {
         return;
       }
-      onRegister({ name, surname, rut, email, password });
-      toast.success("Registro exitoso");
-      navigate("/verify-email"); // Redirige a la página de verificación de correo
-    } else if (mode === "login") {
-      onLogin(email, password);
-      // Simulamos que el login fue exitoso y redirigimos al dashboard
-      toast.success("Inicio de sesión exitoso");
-      navigate("/dashboard"); // Redirige al dashboard
-    } else if (mode === "reset") {
-      if (validateEmail(email)) {
-        onResetPassword(email);
-        toast.info("Se enviaron las instrucciones de recuperación.");
-      } else {
-        toast.error("Por favor, ingrese un correo válido.");
+  
+      // Generar username a partir del nombre, apellido y una parte del email
+      const generatedUsername = generateUsername(name, surname, email);
+  
+      // Limpiar el RUT antes de enviarlo
+      const cleanedRut = cleanRut(rut); // Aquí limpiamos el RUT
+  
+      // Registro con Strapi
+      try {
+        const strapiResponse = await fetcher(`${STRAPI_URL}/api/auth/local/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            username: generatedUsername, // Usar el username generado
+            password,
+          }),
+        });
+  
+        if (strapiResponse.error) {
+          toast.error(strapiResponse.error.message);
+          throw new Error(strapiResponse.error.message); // Lanzar error para detener el flujo si falla
+        }
+  
+        const userId = strapiResponse.user.id; // Obtener el user_id del usuario registrado en Strapi
+  
+        // Crear cuenta asociada al usuario (Account)
+        const accountResponse = await fetcher(`${STRAPI_URL}/api/accounts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${STRAPI_ACCOUNT}`, // El token JWT del usuario autenticado en Strapi
+          },
+          body: JSON.stringify({
+            data: {
+              nombre: name,
+              apellido: surname,
+              run: cleanedRut, // Usar el RUT limpio
+              user_id: userId, // Asociar el ID del usuario registrado
+            },
+          }),
+        });
+  
+        if (accountResponse.error) {
+          toast.error(accountResponse.error.message);
+          throw new Error(accountResponse.error.message); // Lanzar error si falla la creación de la cuenta
+        }
+  
+        // Si Strapi y la cuenta son exitosos, proceder con Supabase
+        const { data: supabaseData, error: supabaseError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (supabaseError) {
+          toast.error(supabaseError.message);
+          throw new Error(supabaseError.message);
+        }
+        console.log("Usuario registrado en Supabase:", supabaseData.user);
+        console.log("Cuenta creada en Strapi:", accountResponse.data);
+        if (supabaseError) {
+          toast.error(supabaseError.message);
+        } else {
+          toast.success("Registro exitoso, revisa tu correo para confirmar tu cuenta");
+          navigate("/verify-email");
+        }
+      } catch (error) {
+        toast.error("Error durante el registro: " + error.message);
       }
-    }
+      }
+  };
+  
+  // Función para limpiar el RUT y devolver solo los números
+  const cleanRut = (rut) => {
+    // Remover guiones, puntos y dígito verificador (último carácter)
+    return rut.replace(/[^0-9]/g, ''); // Remover todos los caracteres que no sean números
+  };
+    
+  // Función para generar un username único
+  const generateUsername = (name, surname, email) => {
+    const emailPrefix = email.split('@')[0]; // Obtener la parte antes de '@' del correo
+    const usernameBase = `${name.toLowerCase()}_${surname.toLowerCase()}`;
+    
+    // Combinar el nombre, apellido y el prefijo del email
+    return `${usernameBase}_${emailPrefix}`;
   };
 
-  // Validar el formulario de registro
   const validateForm = () => {
     if (!name) {
       toast.error("Por favor, ingrese su nombre.");
@@ -80,24 +198,21 @@ export default function ResponsiveAuthForm(props) {
     return true;
   };
 
-  // Función para validar el formato del RUT
   const validateRut = (rut) => {
     const regex = /^[0-9]{7,8}-[0-9Kk]{1}$/;
     return regex.test(rut);
   };
 
-  // Función para validar el correo electrónico
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
   };
 
-  // Manejar el cambio de valor del RUT y añadir guion automáticamente
   const handleRutChange = (e) => {
-    let value = e.target.value.replace(/[^0-9kK]/g, ""); // Limpiar el input solo para permitir números y "K"
-    if (value.length > 9) value = value.slice(0, 9); // Limitar a 9 caracteres antes de agregar el guion
+    let value = e.target.value.replace(/[^0-9kK]/g, "");
+    if (value.length > 9) value = value.slice(0, 9);
     if (value.length > 1 && !value.includes('-')) {
-      value = value.slice(0, value.length - 1) + '-' + value.slice(value.length - 1); // Agregar guion automáticamente
+      value = value.slice(0, value.length - 1) + '-' + value.slice(value.length - 1);
     }
     setRut(value);
   };
@@ -157,7 +272,7 @@ export default function ResponsiveAuthForm(props) {
                     id="rut"
                     type="text"
                     value={rut}
-                    onChange={handleRutChange} // Usamos la función handleRutChange
+                    onChange={handleRutChange}
                     placeholder="12345678-9"
                     required
                   />
@@ -233,10 +348,6 @@ export default function ResponsiveAuthForm(props) {
   );
 }
 
-// Declaramos los tipos de las props
 ResponsiveAuthForm.propTypes = {
-  onLogin: PropTypes.func,
-  onRegister: PropTypes.func,
-  onResetPassword: PropTypes.func,
   className: PropTypes.string
 };

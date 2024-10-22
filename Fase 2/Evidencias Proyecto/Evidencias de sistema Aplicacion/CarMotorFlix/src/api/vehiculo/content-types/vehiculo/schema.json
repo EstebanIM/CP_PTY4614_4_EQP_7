@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "vehiculos",
+  "info": {
+    "singularName": "vehiculo",
+    "pluralName": "vehiculos",
+    "displayName": "vehiculo",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "patente": {
+      "type": "string",
+      "required": true
+    },
+    "anio": {
+      "type": "date",
+      "required": true
+    },
+    "kilometraje": {
+      "type": "biginteger"
+    },
+    "modelo": {
+      "type": "string"
+    },
+    "motor": {
+      "type": "string",
+      "required": true
+    },
+    "color": {
+      "type": "string",
+      "required": true
+    },
+    "user_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "vehiculo_ids"
+    }
+  }
+}

@@ -1,29 +1,42 @@
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button"; 
 import { Menu, Bell, User, Settings, LogOut } from "lucide-react";
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Importamos Link
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+// import { supabase } from '../../lib/supabaseClient'; // Importar Supabase client
+import { unsetToken } from '../../lib/cookies'; // Importar unsetToken para eliminar cookies
 
-export default function DashboardHeader({ toggleSidebar, handleLogout }) {
+export default function DashboardHeader({ toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
-  // Cerrar el menú desplegable si se hace clic fuera del mismo
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (dropdownOpen && !event.target.closest('.dropdown')) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener('click', handleOutsideClick);
-    return () => {
-      document.removeEventListener('click', handleOutsideClick);
-    };
-  }, [dropdownOpen]);
+  const logout = async () => {
+    try {
+      // Actualizar el estado de autenticación
+      console.log("Cerrando sesión...");
+      // Cerrar sesión en Supabase
+      // const { error } = await supabase.auth.signOut();
+      // if (error) {
+      //   console.error("Error al cerrar sesión en Supabase:", error.message);
+      // }
 
+      // Cerrar sesión en Strapi (Eliminar el token de las cookies)
+      unsetToken(); // Utilizamos unsetToken para eliminar las cookies
+
+      // Redirigir al usuario o actualizar el estado de autenticación
+      navigate('/'); // Redirigir al usuario a la página de inicio
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error.message);
+    }
+  };
+
+  // JSX del componente
   return (
     <header className="bg-white shadow-sm z-10">
       <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -62,7 +75,7 @@ export default function DashboardHeader({ toggleSidebar, handleLogout }) {
 
                 <div
                   className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100"
-                  onClick={handleLogout} // Función para cerrar sesión
+                  onClick={logout} // Llamamos a la función logout
                 >
                   <LogOut className="mr-2 h-4 w-4 inline-block" /> Cerrar Sesión
                 </div>
@@ -77,5 +90,4 @@ export default function DashboardHeader({ toggleSidebar, handleLogout }) {
 
 DashboardHeader.propTypes = {
   toggleSidebar: PropTypes.func.isRequired,
-  handleLogout: PropTypes.func.isRequired, // Función para manejar la salida
 };
