@@ -7,6 +7,7 @@ import Dashboard from './pages/all/dashboard'; // Importa el componente Dashboar
 import Dashboardadmin from './pages/admin/admin_dashboard';
 import DashboardMecanico from './pages/mecanico/mecanico_dashboard';
 import ConfigUsser from './pages/all/config_users';
+import MisVehiculos from './pages/vehiculos/mis-vehiculos'; // Importa la página de Mis Vehículos
 
 function App() {
   return (
@@ -19,9 +20,11 @@ function App() {
           <Route path="/verify-email" element={<EmailVerification />} />
           {/* Ruta para el dashboard */}
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin-dashboard" element={<Dashboardadmin />} /> 
-          <Route path="/mecanico-dashboard" element={<DashboardMecanico />} /> 
-          <Route path="/Config" element={<ConfigUsser />} /> 
+          <Route path="/admin-dashboard" element={<Dashboardadmin />} />
+          <Route path="/mecanico-dashboard" element={<DashboardMecanico />} />
+          <Route path="/Config" element={<ConfigUsser />} />
+          {/* Ruta para Mis Vehículos */}
+          <Route path="/vehiculos/mis-vehiculos" element={<MisVehiculos />} />
         </Routes>
       </Router>
 

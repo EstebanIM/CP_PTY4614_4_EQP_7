@@ -10,7 +10,7 @@ export const Button = React.forwardRef(
 
     // Estilos de variantes del botón
     const variantStyles = clsx({
-      "bg-transparent hover:bg-gray-700": variant === "ghost",
+      "bg-transparent hover:bg-gray-300": variant === "ghost",
       "bg-yellow-500 hover:bg-yellow-600 text-white": variant === "default",
       "bg-red-500 hover:bg-red-600 text-white": variant === "danger",
     });

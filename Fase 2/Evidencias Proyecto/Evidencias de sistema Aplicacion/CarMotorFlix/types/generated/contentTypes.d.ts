@@ -1,78 +1,5 @@
 import type { Struct, Schema } from '@strapi/strapi';
 
-export interface ApiAccountAccount extends Struct.CollectionTypeSchema {
-  collectionName: 'accounts';
-  info: {
-    singularName: 'account';
-    pluralName: 'accounts';
-    displayName: 'account';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    nombre: Schema.Attribute.String & Schema.Attribute.Required;
-    apellido: Schema.Attribute.String & Schema.Attribute.Required;
-    run: Schema.Attribute.Integer & Schema.Attribute.Required;
-    user_id: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    publishedAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::account.account'
-    > &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
-  collectionName: 'vehiculos';
-  info: {
-    singularName: 'vehiculo';
-    pluralName: 'vehiculos';
-    displayName: 'vehiculo';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    patente: Schema.Attribute.String & Schema.Attribute.Required;
-    anio: Schema.Attribute.Date & Schema.Attribute.Required;
-    kilometraje: Schema.Attribute.BigInteger;
-    modelo: Schema.Attribute.String;
-    motor: Schema.Attribute.String & Schema.Attribute.Required;
-    color: Schema.Attribute.String & Schema.Attribute.Required;
-    user_id: Schema.Attribute.Relation<
-      'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    publishedAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::vehiculo.vehiculo'
-    > &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface PluginUploadFile extends Struct.CollectionTypeSchema {
   collectionName: 'files';
   info: {
@@ -572,6 +499,580 @@ export interface PluginUsersPermissionsUser
   };
 }
 
+export interface ApiAccountAccount extends Struct.CollectionTypeSchema {
+  collectionName: 'accounts';
+  info: {
+    singularName: 'account';
+    pluralName: 'accounts';
+    displayName: 'account';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    nombre: Schema.Attribute.String & Schema.Attribute.Required;
+    apellido: Schema.Attribute.String & Schema.Attribute.Required;
+    run: Schema.Attribute.Integer & Schema.Attribute.Required;
+    user_id: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::account.account'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiAdminAdmin extends Struct.CollectionTypeSchema {
+  collectionName: 'admins';
+  info: {
+    singularName: 'admin';
+    pluralName: 'admins';
+    displayName: 'Admin';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    rut: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 10;
+        },
+        number
+      >;
+    prim_nom: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 30;
+      }>;
+    prim_apell: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 30;
+      }>;
+    correo: Schema.Attribute.Email & Schema.Attribute.Required;
+    clave: Schema.Attribute.Password & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::admin.admin'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCatalogoServicioCatalogoServicio
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'catalogo_servicios';
+  info: {
+    singularName: 'catalogo-servicio';
+    pluralName: 'catalogo-servicios';
+    displayName: 'Catalogo_servicio';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    tp_servicio: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    descripcion: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    costserv: Schema.Attribute.Integer & Schema.Attribute.Required;
+    ordentrabajo_catalogoservicio_id: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::catalogo-servicio.catalogo-servicio'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCiudadCiudad extends Struct.CollectionTypeSchema {
+  collectionName: 'ciudads';
+  info: {
+    singularName: 'ciudad';
+    pluralName: 'ciudads';
+    displayName: 'Ciudad';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    cod_ciudad: Schema.Attribute.UID &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 20;
+      }> &
+      Schema.Attribute.DefaultTo<'C_00'>;
+    nom_ciudad: Schema.Attribute.String & Schema.Attribute.Required;
+    cod_region: Schema.Attribute.Relation<'manyToOne', 'api::region.region'>;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::ciudad.ciudad'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiClasificacionOtClasificacionOt
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'clasificacion_ots';
+  info: {
+    singularName: 'clasificacion-ot';
+    pluralName: 'clasificacion-ots';
+    displayName: 'Clasificacion_ot';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    puntuacion: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+          max: 5;
+        },
+        number
+      >;
+    descripcion: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    orden_trabajo_id: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::orden-trabajo.orden-trabajo'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::clasificacion-ot.clasificacion-ot'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiEstadoOtEstadoOt extends Struct.CollectionTypeSchema {
+  collectionName: 'estado_ots';
+  info: {
+    singularName: 'estado-ot';
+    pluralName: 'estado-ots';
+    displayName: 'Estado_ot';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    nom_estado: Schema.Attribute.String & Schema.Attribute.Required;
+    orden_trabajos_id: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::orden-trabajo.orden-trabajo'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::estado-ot.estado-ot'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiMarcaMarca extends Struct.CollectionTypeSchema {
+  collectionName: 'marcas';
+  info: {
+    singularName: 'marca';
+    pluralName: 'marcas';
+    displayName: 'Marca';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    nombre_marca: Schema.Attribute.String & Schema.Attribute.Required;
+    vehiculos_id: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::vehiculo.vehiculo'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::marca.marca'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiMecanicoMecanico extends Struct.CollectionTypeSchema {
+  collectionName: 'mecanicos';
+  info: {
+    singularName: 'mecanico';
+    pluralName: 'mecanicos';
+    displayName: 'Mecanico';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    rut: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 9;
+        },
+        number
+      >;
+    prim_nom: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 30;
+      }>;
+    prim_apell: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 30;
+      }>;
+    correo: Schema.Attribute.Email &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    clave: Schema.Attribute.Password &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    orden_trabajos_id: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::orden-trabajo.orden-trabajo'
+    >;
+    taller_id: Schema.Attribute.Relation<'manyToOne', 'api::taller.taller'>;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::mecanico.mecanico'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiOrdenTrabajoOrdenTrabajo
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'orden_trabajos';
+  info: {
+    singularName: 'orden-trabajo';
+    pluralName: 'orden-trabajos';
+    displayName: 'Orden_Trabajo';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    fechainicio: Schema.Attribute.Date & Schema.Attribute.Required;
+    fecharecepcion: Schema.Attribute.Date & Schema.Attribute.Required;
+    fechaentrega: Schema.Attribute.Date & Schema.Attribute.Required;
+    fechasalida: Schema.Attribute.Date & Schema.Attribute.Required;
+    costo: Schema.Attribute.Integer & Schema.Attribute.Required;
+    vehiculo_id: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::vehiculo.vehiculo'
+    >;
+    estado_ot_id: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::estado-ot.estado-ot'
+    >;
+    ordentrabajo_catalogoservicio_id: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio'
+    >;
+    mecanico_id: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::mecanico.mecanico'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::orden-trabajo.orden-trabajo'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiOrdentrabajoCatalogoservicioOrdentrabajoCatalogoservicio
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'ordentrabajo_catalogoservicios';
+  info: {
+    singularName: 'ordentrabajo-catalogoservicio';
+    pluralName: 'ordentrabajo-catalogoservicios';
+    displayName: 'ordentrabajo_catalogoservicio';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    fecha_inicio: Schema.Attribute.Date & Schema.Attribute.Required;
+    fecha_fin: Schema.Attribute.Date & Schema.Attribute.Required;
+    costo_variable: Schema.Attribute.Integer & Schema.Attribute.Required;
+    catalogo_servicios_id: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::catalogo-servicio.catalogo-servicio'
+    >;
+    orden_trabajos_id: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::orden-trabajo.orden-trabajo'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiRegionRegion extends Struct.CollectionTypeSchema {
+  collectionName: 'regions';
+  info: {
+    singularName: 'region';
+    pluralName: 'regions';
+    displayName: 'Region';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    cod_region: Schema.Attribute.UID &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 20;
+      }> &
+      Schema.Attribute.DefaultTo<'R_00'>;
+    nom_region: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    ciudads: Schema.Attribute.Relation<'oneToMany', 'api::ciudad.ciudad'>;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::region.region'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiTallerTaller extends Struct.CollectionTypeSchema {
+  collectionName: 'talleres';
+  info: {
+    singularName: 'taller';
+    pluralName: 'talleres';
+    displayName: 'Taller';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    nom_taller: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    direcc_taller: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
+    mecanicos_id: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::mecanico.mecanico'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::taller.taller'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiTpVehiculoTpVehiculo extends Struct.CollectionTypeSchema {
+  collectionName: 'tp_vehiculos';
+  info: {
+    singularName: 'tp-vehiculo';
+    pluralName: 'tp-vehiculos';
+    displayName: 'Tp_vehiculo';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    nom_tp_vehiculo: Schema.Attribute.String & Schema.Attribute.Required;
+    vehiculos_id: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::vehiculo.vehiculo'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::tp-vehiculo.tp-vehiculo'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
+  collectionName: 'vehiculos';
+  info: {
+    singularName: 'vehiculo';
+    pluralName: 'vehiculos';
+    displayName: 'vehiculo';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    patente: Schema.Attribute.String & Schema.Attribute.Required;
+    anio: Schema.Attribute.Date & Schema.Attribute.Required;
+    kilometraje: Schema.Attribute.BigInteger;
+    modelo: Schema.Attribute.String;
+    motor: Schema.Attribute.String & Schema.Attribute.Required;
+    color: Schema.Attribute.String & Schema.Attribute.Required;
+    user_id: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    marca_id: Schema.Attribute.Relation<'manyToOne', 'api::marca.marca'>;
+    tp_vehiculo_id: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::tp-vehiculo.tp-vehiculo'
+    >;
+    orden_trabajos_id: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::orden-trabajo.orden-trabajo'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::vehiculo.vehiculo'
+    > &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface AdminPermission extends Struct.CollectionTypeSchema {
   collectionName: 'admin_permissions';
   info: {
@@ -944,8 +1445,6 @@ export interface AdminTransferTokenPermission
 declare module '@strapi/strapi' {
   export module Public {
     export interface ContentTypeSchemas {
-      'api::account.account': ApiAccountAccount;
-      'api::vehiculo.vehiculo': ApiVehiculoVehiculo;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::i18n.locale': PluginI18NLocale;
@@ -956,6 +1455,20 @@ declare module '@strapi/strapi' {
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
+      'api::account.account': ApiAccountAccount;
+      'api::admin.admin': ApiAdminAdmin;
+      'api::catalogo-servicio.catalogo-servicio': ApiCatalogoServicioCatalogoServicio;
+      'api::ciudad.ciudad': ApiCiudadCiudad;
+      'api::clasificacion-ot.clasificacion-ot': ApiClasificacionOtClasificacionOt;
+      'api::estado-ot.estado-ot': ApiEstadoOtEstadoOt;
+      'api::marca.marca': ApiMarcaMarca;
+      'api::mecanico.mecanico': ApiMecanicoMecanico;
+      'api::orden-trabajo.orden-trabajo': ApiOrdenTrabajoOrdenTrabajo;
+      'api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio': ApiOrdentrabajoCatalogoservicioOrdentrabajoCatalogoservicio;
+      'api::region.region': ApiRegionRegion;
+      'api::taller.taller': ApiTallerTaller;
+      'api::tp-vehiculo.tp-vehiculo': ApiTpVehiculoTpVehiculo;
+      'api::vehiculo.vehiculo': ApiVehiculoVehiculo;
       'admin::permission': AdminPermission;
       'admin::user': AdminUser;
       'admin::role': AdminRole;

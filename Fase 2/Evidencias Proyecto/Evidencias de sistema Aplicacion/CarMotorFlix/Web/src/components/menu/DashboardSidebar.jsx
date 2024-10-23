@@ -1,38 +1,28 @@
 import { useState, useEffect } from "react";
-import PropTypes from 'prop-types'; // Importar PropTypes
-import { Button } from "../ui/nadvar/button"; // Asegúrate de que la ruta sea correcta
-import { CarFront, ChevronUp, ChevronDown, Users, Car, File, Store, Bug, X, List, UserPlus } from "lucide-react";
-import { Link } from 'react-router-dom'; // Importar Link de react-router-dom
-import { motion, AnimatePresence } from 'framer-motion'; // Importar framer-motion para las animaciones
+import PropTypes from 'prop-types';
+import { Button } from "../ui/nadvar/button";
+import { CarFront, ChevronUp, ChevronDown, Users, Car, File, Store, Bug, X, List, UserPlus, Home } from "lucide-react"; // Importa el icono Home
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
-  // Estado para manejar la visibilidad en pantallas grandes
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768); // Pantallas mayores o iguales a 768px son desktop
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
-  // Función para manejar el redimensionamiento de la ventana
   const handleResize = () => {
     const newIsDesktop = window.innerWidth >= 768;
     setIsDesktop(newIsDesktop);
-    console.log("Cambio de tamaño de pantalla, es escritorio:", newIsDesktop); // Log para detectar cambio
+    console.log("Cambio de tamaño de pantalla, es escritorio:", newIsDesktop);
   };
 
   useEffect(() => {
-    window.addEventListener('resize', handleResize); // Agregar event listener para redimensionamiento
-    return () => window.removeEventListener('resize', handleResize); // Limpiar event listener al desmontar
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  console.log("Estado del sidebar (sidebarOpen):", sidebarOpen);
-  console.log("Es pantalla grande (isDesktop):", isDesktop); // Log para detectar el estado de la pantalla
-
-  const [activeMenu, setActiveMenu] = useState(null); // Guardar el menú actualmente abierto
+  const [activeMenu, setActiveMenu] = useState(null);
 
   const toggleMenu = (menu) => {
-    console.log(`Toggling menu: ${menu}`);
-    setActiveMenu((prevMenu) => {
-      const newMenu = (prevMenu === menu ? null : menu);
-      console.log(`Nuevo estado del menú ${menu}:`, newMenu);
-      return newMenu;
-    });
+    setActiveMenu((prevMenu) => (prevMenu === menu ? null : menu));
   };
 
   const sidebarVariants = {
@@ -44,27 +34,33 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
     <motion.aside
       className={`bg-white w-64 md:w-64 md:flex-shrink-0 md:flex md:flex-col p-4 
       fixed left-0 top-0 bottom-0 z-50 md:relative no-scrollbar 
-      ${isDesktop || sidebarOpen ? 'block' : 'hidden'} md:block`}  // Sidebar siempre visible en desktop
-      initial={sidebarOpen || isDesktop ? "open" : "closed"}  // Inicial abierto en desktop
+      ${isDesktop || sidebarOpen ? 'block' : 'hidden'} md:block`}
+      initial={sidebarOpen || isDesktop ? "open" : "closed"}
       animate={sidebarOpen || isDesktop ? "open" : "closed"}
       variants={sidebarVariants}
     >
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <Car className="h-6 w-6 text-primary mr-2" />
-          <span className="text-xl font-bold">CarMotorFix</span> 
+          {/* Logo */}
+          <img src="/Logo-carmotorfix.png" alt="Carmotorfix Logo" className="w-10 h-10" />
+          <span className="text-xl font-bold">CarMotorFix</span>
         </div>
-        {/* Botón de cerrar solo visible en móviles */}
-        <Button variant="ghost" size="icon" className="md:hidden text-black bg-white" onClick={() => {
-          console.log("Sidebar toggle clicked");
-          toggleSidebar();
-        }}>
+        <Button variant="ghost" size="icon" className="md:hidden text-black bg-white" onClick={toggleSidebar}>
           <X className="h-6 w-6" />
         </Button>
       </div>
 
       <nav className="space-y-2 overflow-y-auto no-scrollbar">
-        {/* Inventario */}
+        {/* Botón de Inicio */}
+        <div>
+          <Link to="/dashboard" className="w-full block">
+            <Button variant="ghost" className="justify-start flex items-center text-black bg-white">
+              <Home className="mr-2 h-4 w-4 text-black" /> Inicio
+            </Button>
+          </Link>
+        </div>
+
+        {/* Auto */}
         <div>
           <Button
             variant="ghost"
@@ -86,13 +82,14 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
                 }}
                 className="pl-6 mt-2 space-y-1"
               >
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear auto</Button>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver auto</Button>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Modificar auto</Button>
+                <Link to="/vehiculos/mis-vehiculos" className="w-full block">
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Mis Vehículos</Button>
+                </Link>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+
 
         {/* Mecanico */}
         <div>

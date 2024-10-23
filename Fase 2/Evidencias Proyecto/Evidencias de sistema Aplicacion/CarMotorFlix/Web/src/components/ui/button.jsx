@@ -6,7 +6,7 @@ export function Button({ children, variant = "default", className = "", ...props
 
   // Definir las variantes de estilos
   const variants = {
-    default: "bg-black text-white hover:bg-gray-800 focus:ring-black", // Fondo negro y texto blanco
+    default: "bg-black text-white hover:bg-gray-100 focus:ring-black", // Fondo negro y texto blanco
     link: "text-black hover:underline", // Texto negro en estilo 'link'
   };
 

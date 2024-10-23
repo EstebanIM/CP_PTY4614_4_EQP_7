@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "clasificacion_ots",
+  "info": {
+    "singularName": "clasificacion-ot",
+    "pluralName": "clasificacion-ots",
+    "displayName": "Clasificacion_ot"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "puntuacion": {
+      "required": false,
+      "max": 5,
+      "min": 0,
+      "unique": false,
+      "type": "integer"
+    },
+    "descripcion": {
+      "type": "text",
+      "required": true,
+      "maxLength": 200
+    },
+    "orden_trabajo_id": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::orden-trabajo.orden-trabajo"
+    }
+  }
+}

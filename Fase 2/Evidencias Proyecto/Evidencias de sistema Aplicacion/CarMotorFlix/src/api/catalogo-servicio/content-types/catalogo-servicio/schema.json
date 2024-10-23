@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "catalogo_servicios",
+  "info": {
+    "singularName": "catalogo-servicio",
+    "pluralName": "catalogo-servicios",
+    "displayName": "Catalogo_servicio"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "tp_servicio": {
+      "type": "text",
+      "required": true,
+      "maxLength": 40
+    },
+    "descripcion": {
+      "type": "text",
+      "required": true,
+      "maxLength": 200
+    },
+    "costserv": {
+      "type": "integer",
+      "required": true
+    },
+    "ordentrabajo_catalogoservicio_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio",
+      "inversedBy": "catalogo_servicios_id"
+    }
+  }
+}

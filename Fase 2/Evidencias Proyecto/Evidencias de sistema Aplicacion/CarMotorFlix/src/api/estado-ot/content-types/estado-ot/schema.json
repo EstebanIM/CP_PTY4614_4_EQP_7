@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "estado_ots",
+  "info": {
+    "singularName": "estado-ot",
+    "pluralName": "estado-ots",
+    "displayName": "Estado_ot"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nom_estado": {
+      "type": "string",
+      "required": true
+    },
+    "orden_trabajos_id": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::orden-trabajo.orden-trabajo",
+      "mappedBy": "estado_ot_id"
+    }
+  }
+}
