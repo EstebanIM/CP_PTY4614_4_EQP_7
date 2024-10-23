@@ -1,0 +1,59 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orden_trabajos",
+  "info": {
+    "singularName": "orden-trabajo",
+    "pluralName": "orden-trabajos",
+    "displayName": "Orden_Trabajo"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "fechainicio": {
+      "type": "date",
+      "required": true
+    },
+    "fecharecepcion": {
+      "type": "date",
+      "required": true
+    },
+    "fechaentrega": {
+      "type": "date",
+      "required": true
+    },
+    "fechasalida": {
+      "type": "date",
+      "required": true
+    },
+    "costo": {
+      "type": "integer",
+      "required": true
+    },
+    "vehiculo_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::vehiculo.vehiculo",
+      "inversedBy": "orden_trabajos_id"
+    },
+    "estado_ot_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::estado-ot.estado-ot",
+      "inversedBy": "orden_trabajos_id"
+    },
+    "ordentrabajo_catalogoservicio_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio",
+      "inversedBy": "orden_trabajos_id"
+    },
+    "mecanico_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::mecanico.mecanico",
+      "inversedBy": "orden_trabajos_id"
+    }
+  }
+}

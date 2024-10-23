@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "tp_vehiculos",
+  "info": {
+    "singularName": "tp-vehiculo",
+    "pluralName": "tp-vehiculos",
+    "displayName": "Tp_vehiculo",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nom_tp_vehiculo": {
+      "type": "string",
+      "required": true
+    },
+    "vehiculos_id": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::vehiculo.vehiculo",
+      "mappedBy": "tp_vehiculo_id"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "talleres",
+  "info": {
+    "singularName": "taller",
+    "pluralName": "talleres",
+    "displayName": "Taller"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nom_taller": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "direcc_taller": {
+      "type": "string",
+      "required": true,
+      "maxLength": 50
+    },
+    "mecanicos_id": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::mecanico.mecanico",
+      "mappedBy": "taller_id"
+    }
+  }
+}

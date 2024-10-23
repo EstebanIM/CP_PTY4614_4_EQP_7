@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "marcas",
+  "info": {
+    "singularName": "marca",
+    "pluralName": "marcas",
+    "displayName": "Marca"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre_marca": {
+      "type": "string",
+      "required": true
+    },
+    "vehiculos_id": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::vehiculo.vehiculo",
+      "mappedBy": "marca_id"
+    }
+  }
+}

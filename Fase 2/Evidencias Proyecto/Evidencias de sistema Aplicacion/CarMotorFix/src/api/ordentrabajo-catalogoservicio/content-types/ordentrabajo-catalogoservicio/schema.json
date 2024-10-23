@@ -1,0 +1,40 @@
+{
+  "kind": "collectionType",
+  "collectionName": "ordentrabajo_catalogoservicios",
+  "info": {
+    "singularName": "ordentrabajo-catalogoservicio",
+    "pluralName": "ordentrabajo-catalogoservicios",
+    "displayName": "ordentrabajo_catalogoservicio",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "fecha_inicio": {
+      "type": "date",
+      "required": true
+    },
+    "fecha_fin": {
+      "type": "date",
+      "required": true
+    },
+    "costo_variable": {
+      "type": "integer",
+      "required": true
+    },
+    "catalogo_servicios_id": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::catalogo-servicio.catalogo-servicio",
+      "mappedBy": "ordentrabajo_catalogoservicio_id"
+    },
+    "orden_trabajos_id": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::orden-trabajo.orden-trabajo",
+      "mappedBy": "ordentrabajo_catalogoservicio_id"
+    }
+  }
+}
