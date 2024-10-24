@@ -829,7 +829,8 @@ export interface ApiOrdenTrabajoOrdenTrabajo
   info: {
     singularName: 'orden-trabajo';
     pluralName: 'orden-trabajos';
-    displayName: 'Orden_Trabajo';
+    displayName: 'OT';
+    description: '';
   };
   options: {
     draftAndPublish: false;
@@ -878,7 +879,7 @@ export interface ApiOrdentrabajoCatalogoservicioOrdentrabajoCatalogoservicio
   info: {
     singularName: 'ordentrabajo-catalogoservicio';
     pluralName: 'ordentrabajo-catalogoservicios';
-    displayName: 'ordentrabajo_catalogoservicio';
+    displayName: 'OT_CatalogoServicio';
     description: '';
   };
   options: {

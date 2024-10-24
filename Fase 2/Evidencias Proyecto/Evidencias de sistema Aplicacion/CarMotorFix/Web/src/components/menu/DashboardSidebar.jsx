@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button";
-import { CarFront, ChevronUp, ChevronDown, Users, Car, File, Store, Bug, X, List, UserPlus, Home } from "lucide-react"; // Importa el icono Home
+import { ChevronUp, ChevronDown, Users, CarFront, File, Store, Bug, X, List, UserPlus, Home } from "lucide-react"; // Importa el icono Home
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
+const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
   const handleResize = () => {
@@ -53,7 +53,7 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
       <nav className="space-y-2 overflow-y-auto no-scrollbar">
         {/* Botón de Inicio */}
         <div>
-          <Link to="/dashboard" className="w-full block">
+          <Link to="/inicio" className="w-full block">
             <Button variant="ghost" className="justify-start flex items-center text-black bg-white">
               <Home className="mr-2 h-4 w-4 text-black" /> Inicio
             </Button>
@@ -62,228 +62,235 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar }) => {
 
         {/* Auto */}
         <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center text-black bg-white"
-            onClick={() => toggleMenu("inventory")}
-          >
-            <CarFront className="mr-2 h-4 w-4 text-black" /> Auto
-            {activeMenu === "inventory" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
-          </Button>
-          <AnimatePresence>
-            {activeMenu === "inventory" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={{
-                  hidden: { opacity: 0, height: 0 },
-                  visible: { opacity: 1, height: 'auto' }
-                }}
-                className="pl-6 mt-2 space-y-1"
-              >
-                <Link to="/vehiculos/mis-vehiculos" className="w-full block">
-                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Mis Vehículos</Button>
-                </Link>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <Link to="/dashboard" className="w-full block">
+            <Button variant="ghost" className="justify-start flex items-center text-black bg-white">
+              <CarFront className="mr-2 h-4 w-4" />Mis Vehículos
+            </Button>
+          </Link>
         </div>
 
 
         {/* Mecanico */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center text-black bg-white"
-            onClick={() => toggleMenu("users")}
-          >
-            <Users className="mr-2 h-4 w-4 text-black" /> Mecanico
-            {activeMenu === "users" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
-          </Button>
-          <AnimatePresence>
-            {activeMenu === "users" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={{
-                  hidden: { opacity: 0, height: 0 },
-                  visible: { opacity: 1, height: 'auto' }
-                }}
-                className="pl-6 mt-2 space-y-1"
-              >
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Mecanico</Button>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Mecanico</Button>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Modificar Mecanico</Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        {userRole === "Admin" ? (
+          <div>
+            <Button
+              variant="ghost"
+              className="w-full justify-start flex items-center text-black bg-white"
+              onClick={() => toggleMenu("users")}
+            >
+              <Users className="mr-2 h-4 w-4 text-black" /> Mecanico
+              {activeMenu === "users" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
+            </Button>
+            <AnimatePresence>
+              {activeMenu === "users" && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={{
+                    hidden: { opacity: 0, height: 0 },
+                    visible: { opacity: 1, height: 'auto' }
+                  }}
+                  className="pl-6 mt-2 space-y-1"
+                >
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Mecanico</Button>
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Mecanico</Button>
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Modificar Mecanico</Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <>
+          </>
+        )}
 
         {/* Orden de Compra */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center text-black bg-white"
-            onClick={() => toggleMenu("qr")}
-          >
-            <File className="mr-2 h-4 w-4 text-black" /> Orden de Compra
-            {activeMenu === "qr" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
-          </Button>
-          <AnimatePresence>
-            {activeMenu === "qr" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={{
-                  hidden: { opacity: 0, height: 0 },
-                  visible: { opacity: 1, height: 'auto' }
-                }}
-                className="pl-6 mt-2 space-y-1"
-              >
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Ot</Button>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Eliminar Ot</Button>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver OT</Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
+        {userRole === "Admin" ? (
+          <div>
+            <Button
+              variant="ghost"
+              className="w-full justify-start flex items-center text-black bg-white"
+              onClick={() => toggleMenu("qr")}
+            >
+              <File className="mr-2 h-4 w-4 text-black" /> Orden de Compra
+              {activeMenu === "qr" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
+            </Button>
+            <AnimatePresence>
+              {activeMenu === "qr" && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={{
+                    hidden: { opacity: 0, height: 0 },
+                    visible: { opacity: 1, height: 'auto' }
+                  }}
+                  className="pl-6 mt-2 space-y-1"
+                >
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Ot</Button>
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Eliminar Ot</Button>
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver OT</Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <>
+          </>
+        )}
         {/* Servicio */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center text-black bg-white"
-            onClick={() => toggleMenu("rack")}
-          >
-            <List className="mr-2 h-4 w-4 text-black" /> Servicio
-            {activeMenu === "rack" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
-          </Button>
-          <AnimatePresence>
-            {activeMenu === "rack" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={{
-                  hidden: { opacity: 0, height: 0 },
-                  visible: { opacity: 1, height: 'auto' }
-                }}
-                className="pl-6 mt-2 space-y-1"
-              >
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Servicio</Button>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Modificar Servicio</Button>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Servicio</Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
+        {userRole === "Admin" ? (
+          <div>
+            <Button
+              variant="ghost"
+              className="w-full justify-start flex items-center text-black bg-white"
+              onClick={() => toggleMenu("rack")}
+            >
+              <List className="mr-2 h-4 w-4 text-black" /> Servicio
+              {activeMenu === "rack" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
+            </Button>
+            <AnimatePresence>
+              {activeMenu === "rack" && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={{
+                    hidden: { opacity: 0, height: 0 },
+                    visible: { opacity: 1, height: 'auto' }
+                  }}
+                  className="pl-6 mt-2 space-y-1"
+                >
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Servicio</Button>
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Modificar Servicio</Button>
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Servicio</Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <>
+          </>
+        )}
         {/* Taller */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center text-black bg-white"
-            onClick={() => toggleMenu("tienda")}
-          >
-            <Store className="mr-2 h-4 w-4 text-black" /> Taller
-            {activeMenu === "tienda" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
-          </Button>
-          <AnimatePresence>
-            {activeMenu === "tienda" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={{
-                  hidden: { opacity: 0, height: 0 },
-                  visible: { opacity: 1, height: 'auto' }
-                }}
-                className="pl-6 mt-2 space-y-1"
-              >
-                <Link to="/crear-tienda" className="w-full block">
-                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Taller</Button>
-                </Link>
-                <Link to="/ver-tienda" className="w-full block">
-                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Taller</Button>
-                </Link>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Modificar Taller</Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        {userRole === "Admin" ? (
+          <div>
+            <Button
+              variant="ghost"
+              className="w-full justify-start flex items-center text-black bg-white"
+              onClick={() => toggleMenu("tienda")}
+            >
+              <Store className="mr-2 h-4 w-4 text-black" /> Taller
+              {activeMenu === "tienda" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
+            </Button>
+            <AnimatePresence>
+              {activeMenu === "tienda" && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={{
+                    hidden: { opacity: 0, height: 0 },
+                    visible: { opacity: 1, height: 'auto' }
+                  }}
+                  className="pl-6 mt-2 space-y-1"
+                >
+                  <Link to="/crear-tienda" className="w-full block">
+                    <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Taller</Button>
+                  </Link>
+                  <Link to="/ver-tienda" className="w-full block">
+                    <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Taller</Button>
+                  </Link>
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Modificar Taller</Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <>
+          </>
+        )}
 
         {/* Bugs */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center text-black bg-white"
-            onClick={() => toggleMenu("bugs")}
-          >
-            <Bug className="mr-2 h-4 w-4 text-black" /> Bugs
-            {activeMenu === "bugs" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
-          </Button>
-          <AnimatePresence>
-            {activeMenu === "bugs" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={{
-                  hidden: { opacity: 0, height: 0 },
-                  visible: { opacity: 1, height: 'auto' }
-                }}
-                className="pl-6 mt-2 space-y-1"
-              >
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Comentario</Button>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Bugs</Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
+        {userRole === "Admin" ? (
+          <div>
+            <Button
+              variant="ghost"
+              className="w-full justify-start flex items-center text-black bg-white"
+              onClick={() => toggleMenu("bugs")}
+            >
+              <Bug className="mr-2 h-4 w-4 text-black" /> Bugs
+              {activeMenu === "bugs" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
+            </Button>
+            <AnimatePresence>
+              {activeMenu === "bugs" && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={{
+                    hidden: { opacity: 0, height: 0 },
+                    visible: { opacity: 1, height: 'auto' }
+                  }}
+                  className="pl-6 mt-2 space-y-1"
+                >
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Comentario</Button>
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Bugs</Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <>
+          </>
+        )}
         {/* Dueños */}
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full justify-start flex items-center text-black bg-white"
-            onClick={() => toggleMenu("duenos")}
-          >
-            <UserPlus className="mr-2 h-4 w-4 text-black" /> Admin
-            {activeMenu === "duenos" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
-          </Button>
-          <AnimatePresence>
-            {activeMenu === "duenos" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={{
-                  hidden: { opacity: 0, height: 0 },
-                  visible: { opacity: 1, height: 'auto' }
-                }}
-                className="pl-6 mt-2 space-y-1"
-              >
-                <Link to="/crear-dueño" className="w-full block">
-                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Admin</Button>
-                </Link>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Admin</Button>
-                <Button variant="ghost" className="w-full justify-start text-black bg-white">Modificar Admin</Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        {userRole === "Admin" ? (
+          <div>
+            <Button
+              variant="ghost"
+              className="w-full justify-start flex items-center text-black bg-white"
+              onClick={() => toggleMenu("duenos")}
+            >
+              <UserPlus className="mr-2 h-4 w-4 text-black" /> Admin
+              {activeMenu === "duenos" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
+            </Button>
+            <AnimatePresence>
+              {activeMenu === "duenos" && (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={{
+                    hidden: { opacity: 0, height: 0 },
+                    visible: { opacity: 1, height: 'auto' }
+                  }}
+                  className="pl-6 mt-2 space-y-1"
+                >
+                  <Link to="/crear-dueño" className="w-full block">
+                    <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Admin</Button>
+                  </Link>
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Admin</Button>
+                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Modificar Admin</Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <>
+          </>
+        )}
       </nav>
-    </motion.aside>
+    </motion.aside >
   );
 };
 
 // Definición de PropTypes
 DashboardSidebar.propTypes = {
   sidebarOpen: PropTypes.bool.isRequired,  // Validamos que sidebarOpen sea un booleano
-  toggleSidebar: PropTypes.func.isRequired // Validamos que toggleSidebar sea una función
+  toggleSidebar: PropTypes.func.isRequired, // Validamos que toggleSidebar sea una función
+  userRole: PropTypes.string // Validamos que userRole
 };
 
 export default DashboardSidebar;

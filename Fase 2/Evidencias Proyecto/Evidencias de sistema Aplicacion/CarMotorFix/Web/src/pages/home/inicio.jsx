@@ -3,7 +3,7 @@ import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import { FaTools, FaUsers, FaFileInvoiceDollar } from "react-icons/fa"; // Ejemplo usando React Icons
 
-export default function Dashboard() {
+export default function Inicio() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Función para alternar el estado del sidebar
