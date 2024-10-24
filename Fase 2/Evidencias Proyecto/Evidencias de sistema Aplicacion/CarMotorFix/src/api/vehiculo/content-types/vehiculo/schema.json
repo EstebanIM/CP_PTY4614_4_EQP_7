@@ -16,10 +16,6 @@
       "type": "string",
       "required": true
     },
-    "anio": {
-      "type": "date",
-      "required": true
-    },
     "kilometraje": {
       "type": "biginteger"
     },
@@ -57,6 +53,11 @@
       "relation": "oneToMany",
       "target": "api::orden-trabajo.orden-trabajo",
       "mappedBy": "vehiculo_id"
+    },
+    "anio": {
+      "type": "integer",
+      "required": true,
+      "min": 1886
     }
   }
 }
