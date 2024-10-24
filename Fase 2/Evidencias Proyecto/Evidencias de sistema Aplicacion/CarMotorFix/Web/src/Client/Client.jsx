@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { fetcher } from '../lib/strApi';
 import { getTokenFromLocalCookie } from '../lib/cookies';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate para redirigir
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
-  const [isAdding, setIsAdding] = useState(false); // Estado para manejar el formulario de agregar auto
+  const [isAdding, setIsAdding] = useState(false);
   const [newVehiculo, setNewVehiculo] = useState({
     modelo: '',
     patente: '',
@@ -14,6 +15,7 @@ function Client() {
     color: ''
   });
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
+  const navigate = useNavigate(); // Inicializa useNavigate para redirecciones
 
   useEffect(() => {
     const fetchVehiculos = async () => {
@@ -23,14 +25,13 @@ function Client() {
           const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=vehiculo_ids`, {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${jwt}`,          
+              Authorization: `Bearer ${jwt}`,
             },
           });
 
-          
           const vehiculoIds = response.vehiculo_ids || [];
-            setVehiculos(vehiculoIds);
-          
+          setVehiculos(vehiculoIds);
+
         } catch (error) {
           console.error('Error fetching vehicles:', error);
         }
@@ -42,14 +43,13 @@ function Client() {
 
   const handleChange = (e) => {
     setNewVehiculo({ ...newVehiculo, [e.target.name.toLowerCase()]: e.target.value });
-  };  
+  };
 
   const handleAddVehiculo = async (e) => {
     e.preventDefault();
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
       try {
-        // Convierte el año a un formato de fecha ISO
         const formattedAnio = new Date(newVehiculo.anio).toISOString();
         const vehiculoData = {
           data: {
@@ -61,7 +61,7 @@ function Client() {
             color: newVehiculo.color
           }
         };
-  
+
         const response2 = await fetcher(`${STRAPI_URL}/api/vehiculos`, {
           method: 'POST',
           headers: {
@@ -70,38 +70,36 @@ function Client() {
           },
           body: JSON.stringify(vehiculoData),
         });
-  
-        // Actualiza la lista de vehículos
+
         setVehiculos([...vehiculos, response2.data]);
-        // Resetea el formulario
         setNewVehiculo({ modelo: '', patente: '', kilometraje: '', motor: '', color: '', anio: '' });
-        setIsAdding(false); // Cierra el formulario
-  
-        console.log('Vehicle added:', response2.data);
+        setIsAdding(false);
       } catch (error) {
         console.error('Error adding vehicle:', error);
       }
     }
   };
-  
 
-  // Función para formatear la patente
+  // Función para redirigir al detalle del vehículo
+  const handleViewVehiculo = (vehiculo) => {
+    navigate(`/vehiculos/detalle-vehiculo/${vehiculo.id}`);
+  };
+
   const formatPatente = (patente) => {
     const letras = patente.substring(0, 4);
     const numeros = patente.substring(4);
 
     if (letras.length === 4 && numeros.length === 2) {
-      return `${letras}-${numeros}`; // Formato YYYY-YY
+      return `${letras}-${numeros}`;
     } else if (letras.length === 2 && numeros.length === 4) {
-      return `${numeros}-${letras}`; // Formato YY-YYYY
+      return `${numeros}-${letras}`;
     } else {
-      return patente; // Retorna patente original si no cumple con los formatos
+      return patente;
     }
   };
 
-  // Función para formatear el año
   const formatAnio = (anio) => {
-    return new Date(anio).getFullYear(); // Asegura que se obtenga solo el año
+    return new Date(anio).getFullYear();
   };
 
   return (
@@ -113,15 +111,14 @@ function Client() {
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-2xl font-semibold leading-none tracking-tight">Mis Autos</h3>
-            <button 
-              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700" 
+            <button
+              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
               onClick={() => setIsAdding(!isAdding)}
             >
               {isAdding ? 'Cancelar' : 'Agregar'}
             </button>
           </div>
 
-          {/* Mensaje cuando no hay vehículos */}
           {vehiculos.length === 0 ? (
             <div className="text-center text-gray-500 mt-4">
               <h4 className="text-xl">No tienes vehículos registrados.</h4>
@@ -144,13 +141,18 @@ function Client() {
                   {vehiculos.map((vehiculo) => (
                     <tr key={vehiculo.id} className="cursor-pointer hover:bg-gray-100">
                       <td className="px-6 py-4 whitespace-nowrap">
-                      {vehiculo.modelo}
+                        {vehiculo.modelo}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {formatPatente(vehiculo.patente)} - {formatAnio(vehiculo.anio)}
                       </td>
                       <td className="px-6 py-4 font-medium">
-                        <button className="text-blue-600 hover:underline">Ver</button>
+                        <button
+                          className="text-blue-600 hover:underline"
+                          onClick={() => handleViewVehiculo(vehiculo)}
+                        >
+                          Ver
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -163,55 +165,55 @@ function Client() {
           {isAdding && (
             <form onSubmit={handleAddVehiculo} className="mt-4">
               <div className="grid gap-4">
-                <input 
-                  type="text" 
-                  name="modelo" 
-                  placeholder="Modelo" 
+                <input
+                  type="text"
+                  name="modelo"
+                  placeholder="Modelo"
                   value={newVehiculo.modelo}
                   onChange={handleChange}
                   required
                   className="p-2 border rounded"
                 />
-                <input 
-                  type="text" 
-                  name="patente" 
-                  placeholder="Patente" 
+                <input
+                  type="text"
+                  name="patente"
+                  placeholder="Patente"
                   value={newVehiculo.patente}
                   onChange={handleChange}
                   required
                   className="p-2 border rounded"
                 />
-                <input 
-                  type="date" 
-                  name="anio" 
-                  placeholder="Año" 
+                <input
+                  type="date"
+                  name="anio"
+                  placeholder="Año"
                   value={newVehiculo.anio}
                   onChange={handleChange}
                   required
                   className="p-2 border rounded"
                 />
-                <input 
-                  type="number" 
-                  name="kilometraje" 
-                  placeholder="Kilometraje" 
+                <input
+                  type="number"
+                  name="kilometraje"
+                  placeholder="Kilometraje"
                   value={newVehiculo.kilometraje}
                   onChange={handleChange}
                   required
                   className="p-2 border rounded"
                 />
-                <input 
-                  type="text" 
-                  name="motor" 
-                  placeholder="motor" 
+                <input
+                  type="text"
+                  name="motor"
+                  placeholder="motor"
                   value={newVehiculo.motor}
                   onChange={handleChange}
                   required
                   className="p-2 border rounded"
                 />
-                <input 
-                  type="text" 
-                  name="color" 
-                  placeholder="color" 
+                <input
+                  type="text"
+                  name="color"
+                  placeholder="color"
                   value={newVehiculo.color}
                   onChange={handleChange}
                   required

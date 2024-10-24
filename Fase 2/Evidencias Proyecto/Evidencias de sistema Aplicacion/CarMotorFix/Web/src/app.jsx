@@ -8,6 +8,7 @@ import Dashboardadmin from './pages/admin/admin_dashboard';
 import DashboardMecanico from './pages/mecanico/mecanico_dashboard';
 import ConfigUsser from './pages/all/config_users';
 import MisVehiculos from './pages/vehiculos/mis-vehiculos'; // Importa la página de Mis Vehículos
+import DetalleVehiculo from './pages/vehiculos/detalle-vehiculo'; // Ruta a la página de detalles
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/Config" element={<ConfigUsser />} />
           {/* Ruta para Mis Vehículos */}
           <Route path="/vehiculos/mis-vehiculos" element={<MisVehiculos />} />
+          <Route path="/vehiculos/detalle-vehiculo/:id" element={<DetalleVehiculo />} />
         </Routes>
       </Router>
 
