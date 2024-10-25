@@ -16,6 +16,11 @@
       "type": "string",
       "required": true
     },
+    "anio": {
+      "type": "integer",
+      "required": true,
+      "min": 1886
+    },
     "kilometraje": {
       "type": "biginteger"
     },
@@ -38,26 +43,15 @@
     },
     "marca_id": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "api::marca.marca",
-      "inversedBy": "vehiculos_id"
+      "inversedBy": "vehiculo_id"
     },
     "tp_vehiculo_id": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "api::tp-vehiculo.tp-vehiculo",
-      "inversedBy": "vehiculos_id"
-    },
-    "orden_trabajos_id": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::orden-trabajo.orden-trabajo",
-      "mappedBy": "vehiculo_id"
-    },
-    "anio": {
-      "type": "integer",
-      "required": true,
-      "min": 1886
+      "inversedBy": "vehiculo_id"
     }
   }
 }

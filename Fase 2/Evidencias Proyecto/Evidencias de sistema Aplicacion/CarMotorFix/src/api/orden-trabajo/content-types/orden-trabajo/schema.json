@@ -32,12 +32,6 @@
       "type": "integer",
       "required": true
     },
-    "vehiculo_id": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::vehiculo.vehiculo",
-      "inversedBy": "orden_trabajos_id"
-    },
     "estado_ot_id": {
       "type": "relation",
       "relation": "manyToOne",

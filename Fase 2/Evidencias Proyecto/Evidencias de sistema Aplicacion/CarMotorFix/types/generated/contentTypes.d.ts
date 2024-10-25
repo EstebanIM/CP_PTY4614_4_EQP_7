@@ -746,8 +746,8 @@ export interface ApiMarcaMarca extends Struct.CollectionTypeSchema {
   };
   attributes: {
     nombre_marca: Schema.Attribute.String & Schema.Attribute.Required;
-    vehiculos_id: Schema.Attribute.Relation<
-      'oneToMany',
+    vehiculo_id: Schema.Attribute.Relation<
+      'oneToOne',
       'api::vehiculo.vehiculo'
     >;
     createdAt: Schema.Attribute.DateTime;
@@ -841,10 +841,6 @@ export interface ApiOrdenTrabajoOrdenTrabajo
     fechaentrega: Schema.Attribute.Date & Schema.Attribute.Required;
     fechasalida: Schema.Attribute.Date & Schema.Attribute.Required;
     costo: Schema.Attribute.Integer & Schema.Attribute.Required;
-    vehiculo_id: Schema.Attribute.Relation<
-      'manyToOne',
-      'api::vehiculo.vehiculo'
-    >;
     estado_ot_id: Schema.Attribute.Relation<
       'manyToOne',
       'api::estado-ot.estado-ot'
@@ -1007,8 +1003,8 @@ export interface ApiTpVehiculoTpVehiculo extends Struct.CollectionTypeSchema {
   };
   attributes: {
     nom_tp_vehiculo: Schema.Attribute.String & Schema.Attribute.Required;
-    vehiculos_id: Schema.Attribute.Relation<
-      'oneToMany',
+    vehiculo_id: Schema.Attribute.Relation<
+      'oneToOne',
       'api::vehiculo.vehiculo'
     >;
     createdAt: Schema.Attribute.DateTime;
@@ -1040,7 +1036,14 @@ export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
   };
   attributes: {
     patente: Schema.Attribute.String & Schema.Attribute.Required;
-    anio: Schema.Attribute.Date & Schema.Attribute.Required;
+    anio: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1886;
+        },
+        number
+      >;
     kilometraje: Schema.Attribute.BigInteger;
     modelo: Schema.Attribute.String;
     motor: Schema.Attribute.String & Schema.Attribute.Required;
@@ -1049,14 +1052,10 @@ export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
-    marca_id: Schema.Attribute.Relation<'manyToOne', 'api::marca.marca'>;
+    marca_id: Schema.Attribute.Relation<'oneToOne', 'api::marca.marca'>;
     tp_vehiculo_id: Schema.Attribute.Relation<
-      'manyToOne',
+      'oneToOne',
       'api::tp-vehiculo.tp-vehiculo'
-    >;
-    orden_trabajos_id: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::orden-trabajo.orden-trabajo'
     >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
