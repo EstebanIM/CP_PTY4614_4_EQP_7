@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { fetcher } from '../lib/strApi';
 import { getTokenFromLocalCookie } from '../lib/cookies';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate para redirigir
+import Cookies from 'js-cookie';
+import { ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [newVehiculo, setNewVehiculo] = useState({
+    marca_id: '',
+    tp_vehiculo_id: '',
     modelo: '',
     patente: '',
     anio: '',
@@ -14,12 +18,15 @@ function Client() {
     motor: '',
     color: ''
   });
-  const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
+
+  const [marcas, setMarcas] = useState([]);
+  const [tiposVehiculo, setTiposVehiculo] = useState([]);
   const navigate = useNavigate(); // Inicializa useNavigate para redirecciones
+  const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
   useEffect(() => {
+    const jwt = getTokenFromLocalCookie();
     const fetchVehiculos = async () => {
-      const jwt = getTokenFromLocalCookie();
       if (jwt) {
         try {
           const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=vehiculo_ids`, {
@@ -30,7 +37,9 @@ function Client() {
           });
 
           const vehiculoIds = response.vehiculo_ids || [];
-          setVehiculos(vehiculoIds);
+          const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
+          setVehiculos(validVehiculoIds);
+
 
         } catch (error) {
           console.error('Error fetching vehicles:', error);
@@ -38,6 +47,40 @@ function Client() {
       }
     };
 
+    const fetchMarcas = async () => {
+      if (jwt) {
+        try {
+          const response = await fetcher(`${STRAPI_URL}/api/marcas`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+          setMarcas(response.data);
+        } catch (error) {
+          console.error('Error fetching marcas:', error);
+        }
+      }
+    };
+
+    const fetchTiposVehiculo = async () => {
+      if (jwt) {
+        try {
+          const response = await fetcher(`${STRAPI_URL}/api/tp-vehiculos`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+          setTiposVehiculo(response.data);
+        } catch (error) {
+          console.error('Error fetching tipos vehiculo:', error);
+        }
+      }
+    };
+
+    fetchMarcas();
+    fetchTiposVehiculo();
     fetchVehiculos();
   }, [STRAPI_URL]);
 
@@ -50,19 +93,21 @@ function Client() {
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
       try {
-        const formattedAnio = new Date(newVehiculo.anio).toISOString();
         const vehiculoData = {
           data: {
+            user_id: Cookies.get('user_id'),
+            marca_id: newVehiculo.marca_id,
+            tp_vehiculo_id: newVehiculo.tp_vehiculo_id,
             modelo: newVehiculo.modelo,
             patente: newVehiculo.patente,
-            anio: formattedAnio,
+            anio: newVehiculo.anio,
             kilometraje: Number(newVehiculo.kilometraje),
             motor: newVehiculo.motor,
             color: newVehiculo.color
           }
         };
 
-        const response2 = await fetcher(`${STRAPI_URL}/api/vehiculos`, {
+        const response = await fetcher(`${STRAPI_URL}/api/vehiculos`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -71,8 +116,17 @@ function Client() {
           body: JSON.stringify(vehiculoData),
         });
 
-        setVehiculos([...vehiculos, response2.data]);
-        setNewVehiculo({ modelo: '', patente: '', kilometraje: '', motor: '', color: '', anio: '' });
+        setVehiculos([...vehiculos, response.data]);
+        setNewVehiculo({
+          patente: '',
+          anio: '',
+          kilometraje: '',
+          modelo: '',
+          motor: '',
+          color: '',
+          marca_id: '',
+          tp_vehiculo_id: ''
+        });
         setIsAdding(false);
       } catch (error) {
         console.error('Error adding vehicle:', error);
@@ -82,8 +136,9 @@ function Client() {
 
   // Función para redirigir al detalle del vehículo
   const handleViewVehiculo = (vehiculo) => {
-    navigate(`/vehiculos/detalle-vehiculo/${vehiculo.id}`);
+    navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
   };
+
 
   const formatPatente = (patente) => {
     const letras = patente.substring(0, 4);
@@ -92,14 +147,10 @@ function Client() {
     if (letras.length === 4 && numeros.length === 2) {
       return `${letras}-${numeros}`;
     } else if (letras.length === 2 && numeros.length === 4) {
-      return `${numeros}-${letras}`;
+      return `${letras}-${numeros}`;
     } else {
       return patente;
     }
-  };
-
-  const formatAnio = (anio) => {
-    return new Date(anio).getFullYear();
   };
 
   return (
@@ -134,25 +185,23 @@ function Client() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Patente - Año
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {vehiculos.map((vehiculo) => (
-                    <tr key={vehiculo.id} className="cursor-pointer hover:bg-gray-100">
+                  {vehiculos.filter(vehiculo => vehiculo && vehiculo.id).map((vehiculo) => (
+                    <tr
+                      key={vehiculo.id}
+                      onClick={() => handleViewVehiculo(vehiculo)}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {vehiculo.modelo}
+                        {vehiculo.marca ? `${vehiculo.marca} - ${vehiculo.modelo}` : 'Marca desconocida'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {formatPatente(vehiculo.patente)} - {formatAnio(vehiculo.anio)}
+                        {vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible'} - {vehiculo.anio || 'Año no disponible'}
                       </td>
-                      <td className="px-6 py-4 font-medium">
-                        <button
-                          className="text-blue-600 hover:underline"
-                          onClick={() => handleViewVehiculo(vehiculo)}
-                        >
-                          Ver
-                        </button>
+                      <td className="px-6 py-4 font-medium text-right pr-4">
+                        <ArrowRight className="inline-block" />
                       </td>
                     </tr>
                   ))}
@@ -165,6 +214,30 @@ function Client() {
           {isAdding && (
             <form onSubmit={handleAddVehiculo} className="mt-4">
               <div className="grid gap-4">
+                <select
+                  name="tp_vehiculo_id"
+                  value={newVehiculo.tp_vehiculo_id}
+                  onChange={handleChange}
+                  required
+                  className="p-2 border rounded"
+                >
+                  <option value="">Seleccione Tipo</option>
+                  {tiposVehiculo.map((tipo) => (
+                    <option key={tipo.id} value={tipo.id}>{tipo.nom_tp_vehiculo}</option>
+                  ))}
+                </select>
+                <select
+                  name="marca_id"
+                  value={newVehiculo.marca_id}
+                  onChange={handleChange}
+                  required
+                  className="p-2 border rounded"
+                >
+                  <option value="">Seleccione Marca</option>
+                  {marcas.map((marca) => (
+                    <option key={marca.id} value={marca.id}>{marca.nombre_marca}</option>
+                  ))}
+                </select>
                 <input
                   type="text"
                   name="modelo"
