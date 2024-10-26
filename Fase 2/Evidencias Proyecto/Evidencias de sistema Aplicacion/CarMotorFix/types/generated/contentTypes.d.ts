@@ -930,7 +930,7 @@ export interface ApiRegionRegion extends Struct.CollectionTypeSchema {
     nom_region: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
-        maxLength: 40;
+        maxLength: 80;
       }>;
     ciudads: Schema.Attribute.Relation<'oneToMany', 'api::ciudad.ciudad'>;
     createdAt: Schema.Attribute.DateTime;
