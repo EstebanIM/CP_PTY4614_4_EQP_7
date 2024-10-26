@@ -630,7 +630,7 @@ export interface ApiCiudadCiudad extends Struct.CollectionTypeSchema {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     cod_ciudad: Schema.Attribute.UID &
@@ -918,7 +918,7 @@ export interface ApiRegionRegion extends Struct.CollectionTypeSchema {
     description: '';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     cod_region: Schema.Attribute.UID &
