@@ -22,7 +22,7 @@
       "type": "string",
       "required": true,
       "unique": false,
-      "maxLength": 40
+      "maxLength": 80
     },
     "ciudads": {
       "type": "relation",
