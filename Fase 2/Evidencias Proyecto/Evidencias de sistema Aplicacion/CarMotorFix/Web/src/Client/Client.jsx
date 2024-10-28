@@ -29,7 +29,7 @@ function Client() {
     const fetchVehiculos = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=vehiculo_ids`, {
+          const response = await fetcher(`${STRAPI_URL}/api/users/me?populate[vehiculo_ids][populate][marca_id][fields][0]=nombre_marca`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
@@ -38,8 +38,8 @@ function Client() {
 
           const vehiculoIds = response.vehiculo_ids || [];
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
-          setVehiculos(validVehiculoIds);
 
+          setVehiculos(validVehiculoIds);
 
         } catch (error) {
           console.error('Error fetching vehicles:', error);
@@ -73,6 +73,7 @@ function Client() {
             },
           });
           setTiposVehiculo(response.data);
+
         } catch (error) {
           console.error('Error fetching tipos vehiculo:', error);
         }
@@ -179,11 +180,14 @@ function Client() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead>
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Marca - Modelo
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Marca
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Patente - Año
+                      Modelo
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Patente
                     </th>
                   </tr>
                 </thead>
@@ -195,10 +199,13 @@ function Client() {
                       className="cursor-pointer hover:bg-gray-100"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {vehiculo.marca ? `${vehiculo.marca} - ${vehiculo.modelo}` : 'Marca desconocida'}
+                        {vehiculo.marca_id ? `${vehiculo.marca_id.nombre_marca}` : 'Marca desconocida'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible'} - {vehiculo.anio || 'Año no disponible'}
+                        {vehiculo.modelo || 'Modelo no disponible'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible'}
                       </td>
                       <td className="px-6 py-4 font-medium text-right pr-4">
                         <ArrowRight className="inline-block" />
