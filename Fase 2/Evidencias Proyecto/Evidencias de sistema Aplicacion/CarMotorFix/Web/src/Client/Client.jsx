@@ -40,7 +40,7 @@ function Client() {
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
 
           setVehiculos(validVehiculoIds);
-
+          console.log(jwt)
         } catch (error) {
           console.error('Error fetching vehicles:', error);
         }
@@ -96,7 +96,7 @@ function Client() {
       try {
         const vehiculoData = {
           data: {
-            user_id: Cookies.get('user_id'),
+            user_id: Cookies.get('id'),
             marca_id: newVehiculo.marca_id,
             tp_vehiculo_id: newVehiculo.tp_vehiculo_id,
             modelo: newVehiculo.modelo,
@@ -264,7 +264,7 @@ function Client() {
                   className="p-2 border rounded"
                 />
                 <input
-                  type="date"
+                  type="numeric"
                   name="anio"
                   placeholder="Año"
                   value={newVehiculo.anio}
