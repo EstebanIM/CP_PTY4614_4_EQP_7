@@ -33,3 +33,10 @@ export const validateRut = (rutCompleto) => {
 
   return calculatedDv === digitoVerificador.toUpperCase();
 };
+export function validateEmail(email) {
+  // Expresión regular básica para validar un correo electrónico
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+  // Devuelve true si el correo es válido, false si no lo es
+  return re.test(String(email).toLowerCase());
+}
