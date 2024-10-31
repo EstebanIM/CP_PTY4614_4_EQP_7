@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
-import DashboardSidebar from '../../components/menu/DashboardSidebar'; 
-import DashboardHeader from '../../components/menu/DashboardHeader';  
-import { useNavigate } from 'react-router-dom';
+import DashboardSidebar from '../../components/menu/DashboardSidebar';
+import DashboardHeader from '../../components/menu/DashboardHeader';
 import { Button } from '../../components/ui/button';
 
 function DetalleVehiculo() {
@@ -15,36 +14,36 @@ function DetalleVehiculo() {
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchVehiculo = async () => {
-            if (id) {
-                const jwt = getTokenFromLocalCookie();
-                if (jwt) {
-                    try {
-                        const response = await fetcher(`${STRAPI_URL}/api/vehiculos/${id}`, {
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${jwt}`,
-                            },
-                        });
-                        setVehiculo(response.data);
-                        setEditData(response.data);
-                    } catch (error) {
-                        console.error('Error fetching vehicle details:', error);
-                    }
+    const fetchVehiculo = useCallback(async () => {
+        if (id) {
+            const jwt = getTokenFromLocalCookie();
+            if (jwt) {
+                try {
+                    const response = await fetcher(`${STRAPI_URL}/api/vehiculos/${id}?populate[marca_id][fields][0]=nombre_marca&populate[tp_vehiculo_id][fields][0]=nom_tp_vehiculo`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${jwt}`,
+                        },
+                    });
+                    setVehiculo(response.data);
+                    setEditData(response.data);
+                } catch (error) {
+                    console.error('Error fetching vehicle details:', error);
                 }
             }
-        };
-
-        fetchVehiculo();
+        }
     }, [id, STRAPI_URL]);
+
+    useEffect(() => {
+        fetchVehiculo();
+    }, [fetchVehiculo])
 
     const handleBack = () => {
         navigate('/dashboard'); 
     };
 
     const handleEditClick = () => {
-        setIsEditing(true); // Habilita el modo de edición
+        setIsEditing(true);
     };
 
     const handleInputChange = (e) => {
@@ -57,19 +56,39 @@ function DetalleVehiculo() {
 
     const handleSave = async () => {
         const jwt = getTokenFromLocalCookie();
+        const changes = Object.keys(editData).reduce((acc, key) => {
+            if (editData[key] !== vehiculo[key]) {
+                acc[key] = editData[key];
+            }
+            return acc;
+        }, {});
+
+        if (Object.keys(changes).length === 0) {
+            console.log("No hay cambios para guardar.");
+            setIsEditing(false);
+            return;
+        }
+
         try {
-            const response = await fetcher(`${STRAPI_URL}/api/vehiculos/${id}`, {
+            const response = await fetch(`${STRAPI_URL}/api/vehiculos/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${jwt}`,
                 },
-                body: JSON.stringify({ data: editData }),
+                body: JSON.stringify({ data: changes }),
             });
-            setVehiculo(response.data); // Actualiza los datos del vehículo
-            setIsEditing(false); // Sale del modo de edición
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error en la actualización:', errorData);
+                return;
+            }
+
+            await fetchVehiculo(); // Recargar datos completos, incluyendo la marca
+            setIsEditing(false);
         } catch (error) {
-            console.error('Error updating vehicle:', error);
+            console.error('Error al actualizar el vehículo:', error);
         }
     };
 
@@ -88,13 +107,7 @@ function DetalleVehiculo() {
                 <div className="p-6 flex-col">
                     {/* Botón Volver y Nombre del Vehículo */}
                     <div className="flex justify-between items-center mb-4">
-                        <Button
-                            onClick={handleBack}
-                            variant="outline" 
-                            size="md"
-                        >
-                            Volver
-                        </Button>
+                        <Button onClick={handleBack} variant="outline" size="md">Volver</Button>
                         <h1 className="text-4xl font-bold text-black text-center w-full">{vehiculo.modelo}</h1>
                     </div>
 
@@ -102,22 +115,14 @@ function DetalleVehiculo() {
                     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                         {!isEditing ? (
                             <div className="grid grid-cols-3 gap-4 text-sm mb-4">
-                                <p><strong>Kilometraje:</strong> {vehiculo.kilometraje}</p>
-                                <p><strong>Marca:</strong> {vehiculo.marca}</p>
-                                <p><strong>Patente:</strong> {vehiculo.patente}</p>
+                                <p><strong>Marca:</strong> {vehiculo.marca_id?.nombre_marca || 'Sin marca'}</p>
                                 <p><strong>Modelo:</strong> {vehiculo.modelo}</p>
+                                <p><strong>Patente:</strong> {vehiculo.patente}</p>
                                 <p><strong>Color:</strong> {vehiculo.color}</p>
                                 <p><strong>Motor:</strong> {vehiculo.motor}</p>
-
-                                {/* Botón Modificar */}
+                                <p><strong>Kilometraje:</strong> {vehiculo.kilometraje}</p>
                                 <div className="col-span-3 flex justify-start">
-                                    <Button
-                                        onClick={handleEditClick}
-                                        variant="default"
-                                        size="md"
-                                    >
-                                        Modificar
-                                    </Button>
+                                    <Button onClick={handleEditClick} variant="default" size="md">Modificar</Button>
                                 </div>
                             </div>
                         ) : (
@@ -128,7 +133,7 @@ function DetalleVehiculo() {
                                 </div>
                                 <div>
                                     <label><strong>Marca:</strong></label>
-                                    <p className="w-full p-2 border rounded bg-gray-100">{editData.marca}</p>
+                                    <p className="w-full p-2 border rounded bg-gray-100">{editData.marca_id?.nombre_marca || 'Sin marca'}</p>
                                 </div>
                                 <div>
                                     <label><strong>Patente:</strong></label>
@@ -140,37 +145,16 @@ function DetalleVehiculo() {
                                 </div>
                                 <div>
                                     <label><strong>Color:</strong></label>
-                                    <input
-                                        type="text"
-                                        name="color"
-                                        value={editData.color}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 border rounded"
-                                    />
+                                    <input type="text" name="color" value={editData.color} onChange={handleInputChange} className="w-full p-2 border rounded" />
                                 </div>
                                 <div>
                                     <label><strong>Motor:</strong></label>
-                                    <input
-                                        type="text"
-                                        name="motor"
-                                        value={editData.motor}
-                                        onChange={handleInputChange}
-                                        className="w-full p-2 border rounded"
-                                    />
+                                    <input type="text" name="motor" value={editData.motor} onChange={handleInputChange} className="w-full p-2 border rounded" />
                                 </div>
-
-                                {/* Botón Guardar */}
                                 <div className="col-span-3 flex justify-start">
-                                    <Button
-                                        onClick={handleSave}
-                                        variant="default"
-                                        size="md"
-                                    >
-                                        Guardar
-                                    </Button>
+                                    <Button onClick={handleSave} variant="default" size="md">Guardar</Button>
                                 </div>
                             </div>
-
                         )}
                     </div>
 

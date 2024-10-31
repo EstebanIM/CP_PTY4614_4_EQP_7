@@ -21,7 +21,7 @@ function Client() {
 
   const [marcas, setMarcas] = useState([]);
   const [tiposVehiculo, setTiposVehiculo] = useState([]);
-  const navigate = useNavigate(); // Inicializa useNavigate para redirecciones
+  const navigate = useNavigate();
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
   useEffect(() => {
