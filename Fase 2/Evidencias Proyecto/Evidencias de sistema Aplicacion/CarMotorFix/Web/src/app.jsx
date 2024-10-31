@@ -1,23 +1,22 @@
 //Imports de las bibliotecas 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify'; 
-import 'react-toastify/dist/ReactToastify.css'; 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 //imports de las protecciones
 import { AuthProvider } from './context/AuthContext';
-import PrivateRoute from './private'; 
-
-
+import PrivateRoute from './private';
 
 //Imports de las paginas 
 import Login from './pages/login/login';
 import EmailVerification from './pages/login/Verif';
-import Inicio from './pages/home/inicio'; 
+import Inicio from './pages/home/inicio';
 import Dashboardadmin from './pages/admin/admin_dashboard';
 import DashboardMecanico from './pages/mecanico/mecanico_dashboard';
 import ConfigUsser from './pages/config/config_users';
-import DetalleVehiculo from './pages/vehiculos/detalle-vehiculo'; 
-import Dashboard from './pages/home/dashboard'; 
+import DetalleVehiculo from './pages/vehiculos/detalle-vehiculo';
+import Dashboard from './pages/home/dashboard';
+
 function App() {
   return (
     <AuthProvider>

@@ -10,9 +10,6 @@ export const setToken = (data) => {
     Cookies.set('documentId', data.user.documentId);
     Cookies.set('jwt', data.jwt);
 
-    // if (Cookies.get('username')) {
-    //     Router.reload('/');
-    // }
 };
 
 export const unsetToken = () => {
