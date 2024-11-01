@@ -11,6 +11,7 @@ import { handleRutChange } from '../../utils/rutHandler';
 import { validateRut, validateEmail } from '../../utils/validation_rut';
 import { Button } from '../../components/ui/button';
 import PropTypes from 'prop-types';
+import LoadingComponent from '../../components/animation/loading'; // Asegúrate de que la ruta sea correcta
 
 export default function ResponsiveAuthForm({ className = "" }) {
   const [mode, setMode] = useState("login");
@@ -20,11 +21,13 @@ export default function ResponsiveAuthForm({ className = "" }) {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [rut, setRut] = useState("");
+  const [loading, setLoading] = useState(false); // Estado de carga
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Iniciar la animación de carga
     try {
       if (mode === "login") {
         await login(email, password);
@@ -37,6 +40,8 @@ export default function ResponsiveAuthForm({ className = "" }) {
       }
     } catch (error) {
       toast.error("Error: " + error.message);
+    } finally {
+      setLoading(false); // Detener la animación de carga
     }
   };
 
@@ -53,6 +58,10 @@ export default function ResponsiveAuthForm({ className = "" }) {
     visible: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: -50 }
   };
+
+  if (loading) {
+    return <LoadingComponent />; // Mostrar el componente de carga
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20 relative overflow-hidden">
@@ -81,7 +90,6 @@ export default function ResponsiveAuthForm({ className = "" }) {
                 setEmail={setEmail}
                 password={password}
                 setPassword={setPassword}
-                handleSubmit={handleSubmit}
               />
             )}
 
@@ -99,12 +107,11 @@ export default function ResponsiveAuthForm({ className = "" }) {
                 setSurname={setSurname}
                 rut={rut}
                 handleRutChange={(e) => handleRutChange(e, setRut)}
-                handleSubmit={handleSubmit}
               />
             )}
 
             {mode === "reset" && (
-              <ResetPasswordForm email={email} setEmail={setEmail} handleSubmit={handleSubmit} />
+              <ResetPasswordForm email={email} setEmail={setEmail} />
             )}
 
             <div className="flex justify-between text-sm">

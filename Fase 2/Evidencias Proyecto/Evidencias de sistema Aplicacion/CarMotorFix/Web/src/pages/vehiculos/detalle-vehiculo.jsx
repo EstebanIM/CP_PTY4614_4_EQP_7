@@ -5,6 +5,8 @@ import { getTokenFromLocalCookie } from '../../lib/cookies';
 import DashboardSidebar from '../../components/menu/DashboardSidebar';
 import DashboardHeader from '../../components/menu/DashboardHeader';
 import { Button } from '../../components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
+import LoadingComponent from '../../components/animation/loading';
 
 function DetalleVehiculo() {
     const { id } = useParams();
@@ -36,7 +38,7 @@ function DetalleVehiculo() {
 
     useEffect(() => {
         fetchVehiculo();
-    }, [fetchVehiculo])
+    }, [fetchVehiculo]);
 
     const handleBack = () => {
         navigate('/dashboard'); 
@@ -85,48 +87,43 @@ function DetalleVehiculo() {
                 return;
             }
 
-            await fetchVehiculo(); // Recargar datos completos, incluyendo la marca
+            await fetchVehiculo();
             setIsEditing(false);
         } catch (error) {
             console.error('Error al actualizar el vehículo:', error);
         }
     };
 
-    if (!vehiculo) return <p className="text-center text-lg text-gray-600">Cargando detalles del vehículo...</p>;
+    if (!vehiculo) return <LoadingComponent />;
 
     return (
-        <div className="flex h-screen bg-gray-100">
-            {/* Sidebar */}
+        <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
             <DashboardSidebar />
 
             <div className="flex-1 flex flex-col">
-                {/* Header */}
                 <DashboardHeader />
 
-                {/* Contenido principal */}
-                <div className="p-6 flex-col">
-                    {/* Botón Volver y Nombre del Vehículo */}
-                    <div className="flex justify-between items-center mb-4">
-                        <Button onClick={handleBack} variant="outline" size="md">Volver</Button>
-                        <h1 className="text-4xl font-bold text-black text-center w-full">{vehiculo.modelo}</h1>
+                <div className="p-4 sm:p-6 flex flex-col">
+                    <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+                        <Button onClick={handleBack} variant="outline" size="md" className="mb-2 sm:mb-0">Volver</Button>
+                        <h1 className="text-2xl sm:text-4xl font-bold text-black text-center sm:w-full">{vehiculo.modelo}</h1>
                     </div>
 
-                    {/* Cuadro de información del vehículo */}
-                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
                         {!isEditing ? (
-                            <div className="grid grid-cols-3 gap-4 text-sm mb-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-4">
                                 <p><strong>Marca:</strong> {vehiculo.marca_id?.nombre_marca || 'Sin marca'}</p>
                                 <p><strong>Modelo:</strong> {vehiculo.modelo}</p>
                                 <p><strong>Patente:</strong> {vehiculo.patente}</p>
                                 <p><strong>Color:</strong> {vehiculo.color}</p>
                                 <p><strong>Motor:</strong> {vehiculo.motor}</p>
                                 <p><strong>Kilometraje:</strong> {vehiculo.kilometraje}</p>
-                                <div className="col-span-3 flex justify-start">
+                                <div className="col-span-full flex justify-start">
                                     <Button onClick={handleEditClick} variant="default" size="md">Modificar</Button>
                                 </div>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-3 gap-4 text-sm mb-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-4">
                                 <div>
                                     <label><strong>Kilometraje:</strong></label>
                                     <p className="w-full p-2 border rounded bg-gray-100">{editData.kilometraje}</p>
@@ -151,38 +148,37 @@ function DetalleVehiculo() {
                                     <label><strong>Motor:</strong></label>
                                     <input type="text" name="motor" value={editData.motor} onChange={handleInputChange} className="w-full p-2 border rounded" />
                                 </div>
-                                <div className="col-span-3 flex justify-start">
+                                <div className="col-span-full flex justify-start">
                                     <Button onClick={handleSave} variant="default" size="md">Guardar</Button>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* Historial de Mantenimiento */}
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h3 className="text-xl font-semibold mb-4">Historial de Mantenimiento</h3>
-                        <table className="w-full text-left table-auto border-collapse">
-                            <thead>
-                                <tr className="bg-gray-100">
-                                    <th className="border px-4 py-2">#</th>
-                                    <th className="border px-4 py-2">Fecha</th>
-                                    <th className="border px-4 py-2">Tipo de mantención</th>
-                                    <th className="border px-4 py-2">Detalle de la mantención</th>
-                                    <th className="border px-4 py-2">Valor</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto">
+                        <h3 className="text-lg sm:text-xl font-semibold mb-4">Historial de Mantenimiento</h3>
+                        <Table className="min-w-full">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>#</TableHead>
+                                    <TableHead>Fecha</TableHead>
+                                    <TableHead>Tipo de mantención</TableHead>
+                                    <TableHead>Detalle de la mantención</TableHead>
+                                    <TableHead>Valor</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
                                 {vehiculo.historialMantenimiento && vehiculo.historialMantenimiento.map((mantenimiento, index) => (
-                                    <tr key={index}>
-                                        <td className="border px-4 py-2">{index + 1}</td>
-                                        <td className="border px-4 py-2">{mantenimiento.fecha}</td>
-                                        <td className="border px-4 py-2">{mantenimiento.tipo}</td>
-                                        <td className="border px-4 py-2">{mantenimiento.detalle}</td>
-                                        <td className="border px-4 py-2">{mantenimiento.valor}</td>
-                                    </tr>
+                                    <TableRow key={index}>
+                                        <TableCell>{index + 1}</TableCell>
+                                        <TableCell>{mantenimiento.fecha}</TableCell>
+                                        <TableCell>{mantenimiento.tipo}</TableCell>
+                                        <TableCell>{mantenimiento.detalle}</TableCell>
+                                        <TableCell>{mantenimiento.valor}</TableCell>
+                                    </TableRow>
                                 ))}
-                            </tbody>
-                        </table>
+                            </TableBody>
+                        </Table>
                     </div>
                 </div>
             </div>

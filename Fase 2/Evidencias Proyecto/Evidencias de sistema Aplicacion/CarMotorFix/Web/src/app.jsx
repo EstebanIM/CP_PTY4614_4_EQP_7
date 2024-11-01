@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './private';
 
-//Imports de las paginas 
+//Imports de las paginas
 import Login from './pages/login/login';
 import EmailVerification from './pages/login/Verif';
 import Inicio from './pages/home/inicio';
