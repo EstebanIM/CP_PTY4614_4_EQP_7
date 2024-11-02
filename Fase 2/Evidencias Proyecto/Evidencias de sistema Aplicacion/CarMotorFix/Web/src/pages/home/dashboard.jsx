@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
-import Client from "../../Client/Client";
-import { fetcher } from '../../lib/strApi'; // Asumiendo que tienes una función para obtener el token y hacer fetch
-import { getTokenFromLocalCookie } from '../../lib/cookies'; // Asumiendo que tienes una función para obtener el token y hacer fetch
+
+import Client from "../Client/Client";
+import Mecanico_dashboard from "../mecanico/mecanico_dashboard";
+import Admin_dashboard from "../admin/admin_dashboard";
+
+import { fetcher } from '../../lib/strApi';
+import { getTokenFromLocalCookie } from '../../lib/cookies';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -37,6 +41,34 @@ export default function MisVehiculos() {
         fetchUserRole(); // Llama a la función para obtener el rol cuando el componente se monte
     }, []);
 
+    const renderComponentByRole = (role) => {
+        switch (role) {
+            case "Authenticated":
+                return (
+                    <>
+                        <h1 className="text-2xl font-bold mb-6">Mis Vehículos</h1>
+                        <Client />
+                    </>
+                );
+            case "Mechanic":
+                return (
+                    <>
+                        <h1 className="text-2xl font-bold mb-6">Dashboard de Mantenimiento de Autos</h1>
+                        <Mecanico_dashboard />
+                    </>
+                );
+            case "Admin":
+                return (
+                    <>
+                        <h1 className="text-2xl font-bold mb-6">Dashboard de Mantenimiento de Autos</h1>
+                        <Admin_dashboard />
+                    </>
+                );
+            default:
+                return <p>No tienes acceso a esta sección.</p>;
+        }
+    };
+
     return (
         <div className="flex h-screen">
             {/* Sidebar */}
@@ -49,10 +81,10 @@ export default function MisVehiculos() {
 
                 {/* Main content */}
                 <div className="container mx-auto p-4">
-                    <h1 className="text-2xl font-bold mb-6">Mis Vehículos</h1>
 
                     {/* Contenido del cliente modular */}
-                    {userRole === "Authenticated" ? <Client /> : <p>No tienes acceso a esta sección.</p>}
+                    {renderComponentByRole(userRole)}
+
                 </div>
             </div>
         </div>

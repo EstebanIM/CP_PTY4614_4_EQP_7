@@ -1,18 +1,10 @@
-import { useState } from "react";
 import { motion } from "framer-motion"; // For animations
-import DashboardHeader from "../../components/menu/DashboardHeader"; // Header component
-import DashboardSidebar from "../../components/menu/DashboardSidebar"; // Sidebar component
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
 import { Button } from "../../components/ui/button"; // Imported Button component
 import { ChevronRight } from "lucide-react"; // Icon library
 
 const DashboardAutos = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
 
   // Datos para los autos registrados
   const autos = [
@@ -47,16 +39,8 @@ const DashboardAutos = () => {
 
   return (
     <div className="flex">
-      {/* Sidebar */}
-      <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-
-      {/* Main content */}
-      <div className="flex-1">
-        {/* Header */}
-        <DashboardHeader toggleSidebar={toggleSidebar} />
 
         <div className="container mx-auto p-4">
-          <h1 className="text-2xl font-bold mb-6">Dashboard de Mantenimiento de Autos</h1>
 
           {/* Estadísticas principales con animación */}
           <motion.div
@@ -193,7 +177,6 @@ const DashboardAutos = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

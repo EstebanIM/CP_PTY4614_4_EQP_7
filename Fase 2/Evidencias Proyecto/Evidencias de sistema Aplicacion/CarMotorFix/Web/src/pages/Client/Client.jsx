@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { fetcher } from '../lib/strApi';
-import { getTokenFromLocalCookie } from '../lib/cookies';
+import { fetcher } from '../../lib/strApi';
+import { getTokenFromLocalCookie } from '../../lib/cookies';
 import Cookies from 'js-cookie';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
