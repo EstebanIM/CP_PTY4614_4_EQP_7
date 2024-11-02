@@ -1,0 +1,88 @@
+[
+    {
+        "categoria": "Mantenimiento preventivo",
+        "opciones": [
+            "Cambio de aceite",
+            "Revisión de frenos",
+            "Inspección de neumáticos"
+        ]
+    },
+    {
+        "categoria": "Reparaciones mecánicas",
+        "opciones": [
+            "Reparación de motores",
+            "Reparación de transmisiones",
+            "Reparación del sistema de suspensión"
+        ]
+    },
+    {
+        "categoria": "Servicios eléctricos",
+        "opciones": [
+            "Diagnóstico y reparación de sistemas eléctricos",
+            "Reemplazo de baterías",
+            "Reparación de alternadores y arranques"
+        ]
+    },
+    {
+        "categoria": "Servicios de carrocería",
+        "opciones": [
+            "Reparación de abolladuras",
+            "Pintura de vehículos",
+            "Reemplazo de paneles"
+        ]
+    },
+    {
+        "categoria": "Alineación y balanceo",
+        "opciones": [
+            "Alineación de dirección",
+            "Balanceo de neumáticos"
+        ]
+    },
+    {
+        "categoria": "Reparación de sistemas de escape",
+        "opciones": [
+            "Sustitución de silenciadores",
+            "Reparación de fugas en el sistema de escape"
+        ]
+    },
+    {
+        "categoria": "Diagnóstico computarizado",
+        "opciones": [
+            "Uso de escáneres para diagnosticar problemas electrónicos y mecánicos"
+        ]
+    },
+    {
+        "categoria": "Reparación de sistemas de climatización",
+        "opciones": [
+            "Recarga de aire acondicionado",
+            "Reparación de calefacción y ventilación"
+        ]
+    },
+    {
+        "categoria": "Servicios de frenos",
+        "opciones": [
+            "Cambio de pastillas y discos",
+            "Revisión del líquido de frenos"
+        ]
+    },
+    {
+        "categoria": "Sustitución de piezas",
+        "opciones": [
+            "Reemplazo de correas",
+            "Filtros y otros componentes"
+        ]
+    },
+    {
+        "categoria": "Reparación de transmisión",
+        "opciones": [
+            "Diagnóstico y reparación de cajas de cambios automáticas y manuales"
+        ]
+    },
+    {
+        "categoria": "Mantenimiento de sistemas de combustible",
+        "opciones": [
+            "Limpieza de inyectores",
+            "Reemplazo de bombas de combustible"
+        ]
+    }
+]

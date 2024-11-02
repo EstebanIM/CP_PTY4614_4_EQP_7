@@ -2,16 +2,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
-import { LoginForm } from '../../components/forms/logins'; // Asegúrate de tener el archivo logins.js
-import { RegisterForm } from '../../components/forms/register'; // Asegúrate de tener el archivo register.js
-import { ResetPasswordForm } from '../../components/forms/reset'; // Asegúrate de tener el archivo reset.js
+import { LoginForm } from '../../components/forms/logins';
+import { RegisterForm } from '../../components/forms/register';
+import { ResetPasswordForm } from '../../components/forms/reset';
 import AnimatedBackground from '../../components/animation/animated-background';
 import { login, register } from '../../services/authService';
 import { handleRutChange } from '../../utils/rutHandler';
 import { validateRut, validateEmail } from '../../utils/validation_rut';
 import { Button } from '../../components/ui/button';
 import PropTypes from 'prop-types';
-import LoadingComponent from '../../components/animation/loading'; // Asegúrate de que la ruta sea correcta
+import LoadingComponent from '../../components/animation/loading';
 
 export default function ResponsiveAuthForm({ className = "" }) {
   const [mode, setMode] = useState("login");
@@ -21,13 +21,13 @@ export default function ResponsiveAuthForm({ className = "" }) {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [rut, setRut] = useState("");
-  const [loading, setLoading] = useState(false); // Estado de carga
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Iniciar la animación de carga
+    setLoading(true);
     try {
       if (mode === "login") {
         await login(email, password);

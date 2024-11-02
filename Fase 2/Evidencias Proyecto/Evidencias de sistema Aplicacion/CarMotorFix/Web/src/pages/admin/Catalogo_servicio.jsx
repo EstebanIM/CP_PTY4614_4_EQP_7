@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import opcionesServicios from '../../lib/servicios.json';
 
 function Servicios() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,6 +15,7 @@ function Servicios() {
     const [servicios, setServicios] = useState([]);
     const [isAdding, setIsAdding] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState('');
     const [newServicio, setNewServicio] = useState({
         tp_servicio: '',
         descripcion: '',
@@ -21,65 +23,9 @@ function Servicios() {
         ordentrabajo_catalogoservicio_id: ''
     });
 
-    // Función para alternar el estado del sidebar
-    const toggleSidebar = () => {
-        console.log("Cambiando estado del sidebar. Estado actual:", sidebarOpen);
-        setSidebarOpen(!sidebarOpen); // Cambia el estado a su opuesto
-        console.log("Nuevo estado del sidebar:", !sidebarOpen);
-    };
+    const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
-
-    const opcionesServicios = [
-        {
-            categoria: "Mantenimiento preventivo",
-            opciones: ["Cambio de aceite", "Revisión de frenos", "Inspección de neumáticos"]
-        },
-        {
-            categoria: "Reparaciones mecánicas",
-            opciones: ["Reparación de motores", "Reparación de transmisiones", "Reparación del sistema de suspensión"]
-        },
-        {
-            categoria: "Servicios eléctricos",
-            opciones: ["Diagnóstico y reparación de sistemas eléctricos", "Reemplazo de baterías", "Reparación de alternadores y arranques"]
-        },
-        {
-            categoria: "Servicios de carrocería",
-            opciones: ["Reparación de abolladuras", "Pintura de vehículos", "Reemplazo de paneles"]
-        },
-        {
-            categoria: "Alineación y balanceo",
-            opciones: ["Alineación de dirección", "Balanceo de neumáticos"]
-        },
-        {
-            categoria: "Reparación de sistemas de escape",
-            opciones: ["Sustitución de silenciadores", "Reparación de fugas en el sistema de escape"]
-        },
-        {
-            categoria: "Diagnóstico computarizado",
-            opciones: ["Uso de escáneres para diagnosticar problemas electrónicos y mecánicos"]
-        },
-        {
-            categoria: "Reparación de sistemas de climatización",
-            opciones: ["Recarga de aire acondicionado", "Reparación de calefacción y ventilación"]
-        },
-        {
-            categoria: "Servicios de frenos",
-            opciones: ["Cambio de pastillas y discos", "Revisión del líquido de frenos"]
-        },
-        {
-            categoria: "Sustitución de piezas",
-            opciones: ["Reemplazo de correas, filtros y otros componentes"]
-        },
-        {
-            categoria: "Reparación de transmisión",
-            opciones: ["Diagnóstico y reparación de cajas de cambios automáticas y manuales"]
-        },
-        {
-            categoria: "Mantenimiento de sistemas de combustible",
-            opciones: ["Limpieza de inyectores", "Reemplazo de bombas de combustible"]
-        },
-    ];
 
     useEffect(() => {
         const fetchServicios = async () => {
@@ -104,6 +50,15 @@ function Servicios() {
 
     const handleChange = (e) => {
         setNewServicio({ ...newServicio, [e.target.name]: e.target.value });
+    };
+
+    const handleCategoryChange = (e) => {
+        setSelectedCategory(e.target.value); 
+        setNewServicio({ ...newServicio, tp_servicio: '' }); 
+    };
+
+    const handleOptionChange = (e) => {
+        setNewServicio({ ...newServicio, tp_servicio: e.target.value }); 
     };
 
     const handleAddServicio = async (e) => {
@@ -140,6 +95,7 @@ function Servicios() {
 
                 setServicios([...servicios, response.data]);
                 setNewServicio({ tp_servicio: '', descripcion: '', costserv: '', ordentrabajo_catalogoservicio_id: '' });
+                setSelectedCategory(''); 
                 setIsAdding(false);
             } catch (error) {
                 console.error('Error adding service:', error);
@@ -149,7 +105,6 @@ function Servicios() {
         }
     };
 
-    // Función para redirigir al detalle del servicio
     const handleViewServicio = (id) => {
         navigate(`/admin/detalle-servicio/${id}`);
     };
@@ -188,7 +143,6 @@ function Servicios() {
                                         {servicios.map((servicio) => (
                                             <TableRow key={servicio.id} className="hover:bg-gray-100">
                                                 <TableCell>{servicio.tp_servicio || 'Sin especificar'}</TableCell>
-                                                {/* Muestra solo una parte de la descripción */}
                                                 <TableCell>{servicio.descripcion.slice(0, 30) + '...'}</TableCell>
                                                 <TableCell>${servicio.costserv || 'N/A'}</TableCell>
                                                 <TableCell className="px-6 py-4 font-medium text-right pr-4">
@@ -206,26 +160,38 @@ function Servicios() {
 
                         {isAdding && (
                             <form onSubmit={handleAddServicio} className="mt-4">
-
                                 <div className="grid gap-4">
                                     <select
-                                        name="tp_servicio"
-                                        value={newServicio.tp_servicio}
-                                        onChange={handleChange}
+                                        value={selectedCategory}
+                                        onChange={handleCategoryChange}
                                         required
                                         className="p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     >
-                                        <option value="" className="text-gray-500">Seleccione un tipo de servicio</option>
+                                        <option value="" className="text-gray-500">Seleccione una categoría</option>
                                         {opcionesServicios.map((categoria) => (
-                                            <optgroup key={categoria.categoria} label={categoria.categoria} className="text-gray-700 font-semibold">
-                                                {categoria.opciones.map((opcion) => (
-                                                    <option key={opcion} value={opcion} className="text-gray-600 hover:bg-gray-100 p-1">
-                                                        {opcion}
-                                                    </option>
-                                                ))}
-                                            </optgroup>
+                                            <option key={categoria.categoria} value={categoria.categoria}>
+                                                {categoria.categoria}
+                                            </option>
                                         ))}
                                     </select>
+
+                                    {selectedCategory && (
+                                        <select
+                                            name="tp_servicio"
+                                            value={newServicio.tp_servicio}
+                                            onChange={handleOptionChange}
+                                            required
+                                            className="p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            <option value="" className="text-gray-500">Seleccione un tipo de servicio</option>
+                                            {opcionesServicios.find(cat => cat.categoria === selectedCategory)?.opciones.map((opcion) => (
+                                                <option key={opcion} value={opcion}>
+                                                    {opcion}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
+
                                     <input
                                         type="text"
                                         name="descripcion"
