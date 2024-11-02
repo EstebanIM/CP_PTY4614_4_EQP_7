@@ -16,6 +16,8 @@ import DashboardMecanico from './pages/mecanico/mecanico_dashboard';
 import ConfigUsser from './pages/config/config_users';
 import DetalleVehiculo from './pages/vehiculos/detalle-vehiculo';
 import Dashboard from './pages/home/dashboard';
+import Catalogo_servicio from './pages/admin/Catalogo_servicio';
+import Detalle_servicio from './pages/admin/detalle-servicio';
 
 function App() {
   return (
@@ -48,6 +50,22 @@ function App() {
             element={
               <PrivateRoute>
                 <Dashboardadmin />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/catalogo_servicio"
+            element={
+              <PrivateRoute>
+                <Catalogo_servicio />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/detalle-servicio/:id"
+            element={
+              <PrivateRoute>
+                <Detalle_servicio />
               </PrivateRoute>
             }
           />
