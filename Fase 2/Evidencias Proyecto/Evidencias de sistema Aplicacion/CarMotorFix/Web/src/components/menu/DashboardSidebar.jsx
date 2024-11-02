@@ -105,35 +105,15 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
           </>
         )}
 
-        {/* Orden de Compra */}
-        {userRole === "Admin" ? (
+        {/* Orden de Trabajo */}
+        {userRole === "Mechanic" || userRole === "Admin" ? (
           <div>
             <Button
               variant="ghost"
-              className="w-full justify-start flex items-center text-black bg-white"
-              onClick={() => toggleMenu("qr")}
+              className="justify-start flex items-center text-black bg-white"
             >
-              <File className="mr-2 h-4 w-4 text-black" /> Orden de Compra
-              {activeMenu === "qr" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
+              <File className="mr-2 h-4 w-4 text-black" /> Orden de Trabajo
             </Button>
-            <AnimatePresence>
-              {activeMenu === "qr" && (
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  variants={{
-                    hidden: { opacity: 0, height: 0 },
-                    visible: { opacity: 1, height: 'auto' }
-                  }}
-                  className="pl-6 mt-2 space-y-1"
-                >
-                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Ot</Button>
-                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Eliminar Ot</Button>
-                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver OT</Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         ) : (
           <>
