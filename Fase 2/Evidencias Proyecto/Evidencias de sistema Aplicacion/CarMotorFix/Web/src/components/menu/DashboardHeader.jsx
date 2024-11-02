@@ -16,10 +16,13 @@ export default function DashboardHeader({ toggleSidebar }) {
   const logout = async () => {
     try {
       console.log("Cerrando sesión...");
-      
+
       // Eliminar cookies de autenticación
       unsetToken();
-      
+
+      // Eliminar caché del navegador (localStorage o sessionStorage)
+      localStorage.clear(); // O utiliza sessionStorage.clear() si prefieres
+
       // Redirigir al usuario a la página de inicio
       navigate('/');
     } catch (error) {
