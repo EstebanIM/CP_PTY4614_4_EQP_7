@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
 import Cookies from 'js-cookie';
-import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import VehiculosTabla from '../../components/VehiculosTabla';
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
@@ -140,7 +140,6 @@ function Client() {
     navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
   };
 
-
   const formatPatente = (patente) => {
     const letras = patente.substring(0, 4);
     const numeros = patente.substring(4);
@@ -153,6 +152,29 @@ function Client() {
       return patente;
     }
   };
+
+  const columns = [
+    {
+      header: "Marca",
+      key: "marca",
+      render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida',
+    },
+    {
+      header: "Modelo",
+      key: "modelo",
+      render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible',
+    },
+    {
+      header: "Patente",
+      key: "patente",
+      render: (vehiculo) => vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible',
+    },
+    {
+      header: "Año",
+      key: "anio",
+      render: (vehiculo) => vehiculo.anio || 'Año no disponible',
+    },
+  ];
 
   return (
     <div className='container mx-auto p-4'>
@@ -177,43 +199,7 @@ function Client() {
             </div>
           ) : (
             <div>
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead>
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Marca
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Modelo
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Patente
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {vehiculos.filter(vehiculo => vehiculo && vehiculo.id).map((vehiculo) => (
-                    <tr
-                      key={vehiculo.id}
-                      onClick={() => handleViewVehiculo(vehiculo)}
-                      className="cursor-pointer hover:bg-gray-100"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {vehiculo.marca_id ? `${vehiculo.marca_id.nombre_marca}` : 'Marca desconocida'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {vehiculo.modelo || 'Modelo no disponible'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible'}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-right pr-4">
-                        <ArrowRight className="inline-block" />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <VehiculosTabla vehiculos={vehiculos} handleViewVehiculo={handleViewVehiculo} columns={columns} />
             </div>
           )}
 
