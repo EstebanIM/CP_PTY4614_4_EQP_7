@@ -31,6 +31,8 @@ export default function MisVehiculos() {
                 });
 
                 setUserRole(response.role.name); // Guarda el nombre del rol en el estado
+                console.log("User role:", response);
+                
             } catch (error) {
                 console.error("Error fetching user role:", error);
             }

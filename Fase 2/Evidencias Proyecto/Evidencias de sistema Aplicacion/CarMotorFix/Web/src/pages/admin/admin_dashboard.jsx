@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion"; // Import framer-motion
 import PropTypes from "prop-types"; // Import PropTypes for type-checking
-import DashboardHeader from "../../components/menu/DashboardHeader"; // Importar el header del dashboard
-import DashboardSidebar from "../../components/menu/DashboardSidebar"; // Importar el sidebar del dashboard
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
 import { ChevronRight } from "lucide-react"; // Asegúrate de tener lucide-react instalado
@@ -56,12 +54,7 @@ CountUpCard.propTypes = {
 };
 
 const DashboardAdmin = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // Control del sidebar
   const [activeTab, setActiveTab] = useState("autos"); // Manejo de estado para Tabs
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen); // Alternar sidebar
-  };
 
   // Datos para los autos registrados
   const autos = [
@@ -100,13 +93,9 @@ const DashboardAdmin = () => {
 
   return (
     <div className="flex">
-      {/* Sidebar */}
-      <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* Contenido principal */}
       <div className="flex-1">
-        {/* Header */}
-        <DashboardHeader toggleSidebar={toggleSidebar} />
 
         <div className="container mx-auto p-4">
           <h1 className="text-2xl font-bold mb-6">Dashboard de Administrador</h1>
