@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
-export default function Component() {
+export default function Config() {
   const [darkMode, setDarkMode] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); // Estado para controlar el sidebar

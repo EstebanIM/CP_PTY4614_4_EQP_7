@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import { FaTools, FaUsers, FaFileInvoiceDollar } from "react-icons/fa"; // Ejemplo usando React Icons
+import { fetcher } from '../../lib/strApi';
+import { getTokenFromLocalCookie } from '../../lib/cookies';
+
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function Inicio() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userRole, setUserRole] = useState(null); // Para guardar el rol del usuario
 
   // Función para alternar el estado del sidebar
   const toggleSidebar = () => {
@@ -13,10 +18,34 @@ export default function Inicio() {
     console.log("Nuevo estado del sidebar:", !sidebarOpen);
   };
 
+  const fetchUserRole = async () => {
+    const jwt = getTokenFromLocalCookie(); // Obtener el JWT
+    if (jwt) {
+        try {
+            const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${jwt}`,
+                },
+            });
+
+            setUserRole(response.role.name); // Guarda el nombre del rol en el estado
+            console.log("User role:", response);
+            
+        } catch (error) {
+            console.error("Error fetching user role:", error);
+        }
+    }
+  };
+
+  useEffect(() => {
+    fetchUserRole(); // Llama a la función para obtener el rol cuando el componente se monte
+  }, []);
+
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+      <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col">

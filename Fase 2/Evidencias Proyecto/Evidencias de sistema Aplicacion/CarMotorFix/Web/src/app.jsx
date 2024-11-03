@@ -13,7 +13,7 @@ import EmailVerification from './pages/login/Verif';
 import Inicio from './pages/home/inicio';
 import Dashboardadmin from './pages/admin/admin_dashboard';
 import DashboardMecanico from './pages/mecanico/mecanico_dashboard';
-import ConfigUsser from './pages/config/config_users';
+import Config from './pages/config/config';
 import DetalleVehiculo from './pages/vehiculos/detalle-vehiculo';
 import Dashboard from './pages/home/dashboard';
 import Catalogo_servicio from './pages/admin/Catalogo_servicio';
@@ -78,10 +78,10 @@ function App() {
             }
           />
           <Route
-            path="/Config"
+            path="/config"
             element={
               <PrivateRoute>
-                <ConfigUsser />
+                <Config />
               </PrivateRoute>
             }
           />

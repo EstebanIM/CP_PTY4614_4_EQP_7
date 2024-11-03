@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button";
-import { ChevronUp, ChevronDown, Users, CarFront, File, Store, Bug, X, List, UserPlus, Home } from "lucide-react"; // Importa el icono Home
+import { ChevronUp, ChevronDown, Users, CarFront, File, Store, Bug, X, List, Home } from "lucide-react"; // Importa el icono Home
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -225,42 +225,7 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
           <>
           </>
         )}
-        {/* Dueños */}
-        {userRole === "Admin" ? (
-          <div>
-            <Button
-              variant="ghost"
-              className="w-full justify-start flex items-center text-black bg-white"
-              onClick={() => toggleMenu("duenos")}
-            >
-              <UserPlus className="mr-2 h-4 w-4 text-black" /> Admin
-              {activeMenu === "duenos" ? <ChevronUp className="ml-auto h-4 w-4 text-black" /> : <ChevronDown className="ml-auto h-4 w-4 text-black" />}
-            </Button>
-            <AnimatePresence>
-              {activeMenu === "duenos" && (
-                <motion.div
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  variants={{
-                    hidden: { opacity: 0, height: 0 },
-                    visible: { opacity: 1, height: 'auto' }
-                  }}
-                  className="pl-6 mt-2 space-y-1"
-                >
-                  <Link to="/crear-dueño" className="w-full block">
-                    <Button variant="ghost" className="w-full justify-start text-black bg-white">Crear Admin</Button>
-                  </Link>
-                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Ver Admin</Button>
-                  <Button variant="ghost" className="w-full justify-start text-black bg-white">Modificar Admin</Button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        ) : (
-          <>
-          </>
-        )}
+
       </nav>
     </motion.aside >
   );
