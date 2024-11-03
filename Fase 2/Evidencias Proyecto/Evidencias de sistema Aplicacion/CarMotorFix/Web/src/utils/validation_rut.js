@@ -1,3 +1,5 @@
+import { toast } from 'react-toastify';
+
 // Función para limpiar el RUT eliminando puntos y guiones
 const cleanRut = (rut) => {
   return rut.replace(/[^0-9kK]/g, '').toUpperCase();
@@ -20,9 +22,10 @@ const calculateDv = (rut) => {
   return remainder.toString();
 };
 
-// Función para validar el RUT
+// Función para validar el RUT y mostrar mensaje si es incorrecto
 export const validateRut = (rutCompleto) => {
   if (!/^[0-9]+-[0-9kK]{1}$/.test(rutCompleto)) {
+    toast.error("Formato de RUT incorrecto. Ejemplo: 20438333-6");
     return false; // Validar que el formato sea correcto
   }
 
@@ -31,8 +34,15 @@ export const validateRut = (rutCompleto) => {
 
   const calculatedDv = calculateDv(cleanRutStr);
 
-  return calculatedDv === digitoVerificador.toUpperCase();
+  if (calculatedDv !== digitoVerificador.toUpperCase()) {
+    toast.error("RUT inválido. Por favor, ingrese un RUT válido.");
+    return false;
+  }
+
+  return true;
 };
+
+// Función para validar el correo electrónico
 export function validateEmail(email) {
   // Expresión regular básica para validar un correo electrónico
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

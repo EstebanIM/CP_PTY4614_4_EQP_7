@@ -22,6 +22,14 @@ export default function ResponsiveAuthForm({ className = "" }) {
   const [surname, setSurname] = useState("");
   const [rut, setRut] = useState("");
   const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordRules, setPasswordRules] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    specialChar: false,
+  });
 
   const navigate = useNavigate();
 
@@ -41,16 +49,54 @@ export default function ResponsiveAuthForm({ className = "" }) {
     } catch (error) {
       toast.error("Error: " + error.message);
     } finally {
-      setLoading(false); // Detener la animación de carga
+      setLoading(false);
     }
   };
 
   const validateForm = () => {
-    if (!name || !surname || !validateRut(rut) || !validateEmail(email) || !password || password !== confirmPassword) {
+    if (!name || !surname || !validateRut(rut) || !validateEmail(email) || !password || password !== confirmPassword || passwordStrength < 3) {
       toast.error("Por favor, llena todos los campos correctamente.");
       return false;
     }
+
+    // Verificar las reglas de la contraseña y mostrar mensajes específicos de error si no cumple las reglas
+    const unmetRules = getUnmetPasswordRules(passwordRules);
+    if (unmetRules.length > 0) {
+      toast.error(`Contraseña no segura. Te recomendamos que: ${unmetRules.join(", ")}`);
+      return false;
+    }
+
     return true;
+  };
+
+  const getUnmetPasswordRules = (rules) => {
+    const unmet = [];
+    if (!rules.length) unmet.push("tenga al menos 8 caracteres");
+    if (!rules.uppercase) unmet.push("contenga al menos una letra mayúscula");
+    if (!rules.lowercase) unmet.push("contenga al menos una letra minúscula");
+    if (!rules.number) unmet.push("incluya al menos un número");
+    if (!rules.specialChar) unmet.push("incluya al menos un carácter especial (!@#$%^&*)");
+    return unmet;
+  };
+
+  const validatePassword = (password) => {
+    const rules = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /[0-9]/.test(password),
+      specialChar: /[!@#$%^&*]/.test(password),
+    };
+
+    setPasswordRules(rules);
+    const passedRules = Object.values(rules).filter(Boolean).length;
+    setPasswordStrength(passedRules);
+  };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    validatePassword(newPassword);
   };
 
   const formVariants = {
@@ -60,7 +106,7 @@ export default function ResponsiveAuthForm({ className = "" }) {
   };
 
   if (loading) {
-    return <LoadingComponent />; // Mostrar el componente de carga
+    return <LoadingComponent />;
   }
 
   return (
@@ -98,7 +144,7 @@ export default function ResponsiveAuthForm({ className = "" }) {
                 email={email}
                 setEmail={setEmail}
                 password={password}
-                setPassword={setPassword}
+                setPassword={handlePasswordChange}
                 confirmPassword={confirmPassword}
                 setConfirmPassword={setConfirmPassword}
                 name={name}
@@ -107,6 +153,7 @@ export default function ResponsiveAuthForm({ className = "" }) {
                 setSurname={setSurname}
                 rut={rut}
                 handleRutChange={(e) => handleRutChange(e, setRut)}
+                passwordStrength={passwordStrength}
               />
             )}
 
