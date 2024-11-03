@@ -34,11 +34,12 @@ function Servicios() {
                 try {
                     const response = await fetcher(`${STRAPI_URL}/api/catalogo-servicios`, {
                         headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${jwt}`,
+                            'Content-Type': 'application/json'
                         },
                     });
                     setServicios(response.data || []);
+                    console.log(response.data);
+                    
                 } catch (error) {
                     console.error('Error fetching services:', error);
                 }
@@ -105,8 +106,8 @@ function Servicios() {
         }
     };
 
-    const handleViewServicio = (id) => {
-        navigate(`/admin/detalle-servicio/${id}`);
+    const handleViewServicio = (documentId) => {
+        navigate(`/admin/detalle-servicio/${documentId}`);
     };
 
     return (
@@ -148,7 +149,7 @@ function Servicios() {
                                                 <TableCell className="px-6 py-4 font-medium text-right pr-4">
                                                     <ArrowRight
                                                         className="inline-block cursor-pointer"
-                                                        onClick={() => handleViewServicio(servicio.id)}
+                                                        onClick={() => handleViewServicio(servicio.documentId)}
                                                     />
                                                 </TableCell>
                                             </TableRow>

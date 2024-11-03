@@ -11,8 +11,6 @@ import PrivateRoute from './private';
 import Login from './pages/login/login';
 import EmailVerification from './pages/login/Verif';
 import Inicio from './pages/home/inicio';
-import Dashboardadmin from './pages/admin/admin_dashboard';
-import DashboardMecanico from './pages/mecanico/mecanico_dashboard';
 import Config from './pages/config/config';
 import DetalleVehiculo from './pages/vehiculos/detalle-vehiculo';
 import Dashboard from './pages/home/dashboard';
@@ -46,14 +44,6 @@ function App() {
             }
           />
           <Route
-            path="/admin-dashboard"
-            element={
-              <PrivateRoute>
-                <Dashboardadmin />
-              </PrivateRoute>
-            }
-          />
-          <Route
             path="/catalogo_servicio"
             element={
               <PrivateRoute>
@@ -66,14 +56,6 @@ function App() {
             element={
               <PrivateRoute>
                 <Detalle_servicio />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/mecanico-dashboard"
-            element={
-              <PrivateRoute>
-                <DashboardMecanico />
               </PrivateRoute>
             }
           />

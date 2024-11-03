@@ -62,7 +62,7 @@ export default function MisVehiculos() {
             case "Admin":
                 return (
                     <>
-                        <h1 className="text-2xl font-bold mb-6">Dashboard de Mantenimiento de Autos</h1>
+                        <h1 className="text-2xl font-bold mb-6">Dashboard de Administrador</h1>
                         <Admin_dashboard />
                     </>
                 );

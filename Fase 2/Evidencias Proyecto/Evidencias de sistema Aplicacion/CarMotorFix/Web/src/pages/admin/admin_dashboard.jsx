@@ -4,10 +4,17 @@ import PropTypes from "prop-types"; // Import PropTypes for type-checking
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
 import { ChevronRight } from "lucide-react"; // Asegúrate de tener lucide-react instalado
+import { fetcher } from "../../lib/strApi";
+import { getTokenFromLocalCookie } from "../../lib/cookies";
+import VehiculosTabla from "../../components/VehiculosTabla";
+import { useNavigate } from "react-router-dom";
+
+const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 // Helper function for counting animation
 const useCountUp = (targetValue, duration) => {
   const [count, setCount] = useState(0);
+
 
   useEffect(() => {
     const start = Date.now();
@@ -55,13 +62,75 @@ CountUpCard.propTypes = {
 
 const DashboardAdmin = () => {
   const [activeTab, setActiveTab] = useState("autos"); // Manejo de estado para Tabs
+  const [vehiculos, setVehiculos] = useState([]);
+  const navigate = useNavigate();
 
-  // Datos para los autos registrados
-  const autos = [
-    { marca: "Honda Odyssey", patente: "XY-2789", ano: "2010", ultimoServicio: "15-05-2023" },
-    { marca: "Hyundai Accent", patente: "ABCD-12", ano: "2011", ultimoServicio: "25-05-2024" },
-    { marca: "Nissan Skyline", patente: "IJKL-56", ano: "2000", ultimoServicio: "15-06-2024" },
+  useEffect(() => {
+    const jwt = getTokenFromLocalCookie();
+    const fetchVehiculos = async () => {
+      if (jwt) {
+        try {
+          const response = await fetcher(`${STRAPI_URL}/api/vehiculos`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+
+          const vehiculoIds = response.vehiculo_ids || [];
+          const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
+
+          setVehiculos(validVehiculoIds);
+          console.log(jwt)
+        } catch (error) {
+          console.error('Error fetching vehicles:', error);
+        }
+      }
+    };
+
+    fetchVehiculos();
+  }, []);
+
+  const handleViewVehiculo = (vehiculo) => {
+    navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
+  };
+
+  const formatPatente = (patente) => {
+    const letras = patente.substring(0, 4);
+    const numeros = patente.substring(4);
+
+    if (letras.length === 4 && numeros.length === 2) {
+      return `${letras}-${numeros}`;
+    } else if (letras.length === 2 && numeros.length === 4) {
+      return `${letras}-${numeros}`;
+    } else {
+      return patente;
+    }
+  };
+
+  const columns = [
+    {
+      header: "Marca",
+      key: "marca",
+      render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida',
+    },
+    {
+      header: "Modelo",
+      key: "modelo",
+      render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible',
+    },
+    {
+      header: "Patente",
+      key: "patente",
+      render: (vehiculo) => vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible',
+    },
+    {
+      header: "Año",
+      key: "anio",
+      render: (vehiculo) => vehiculo.anio || 'Año no disponible',
+    },
   ];
+
 
   // Datos para las cotizaciones pendientes
   const cotizaciones = [
@@ -98,7 +167,6 @@ const DashboardAdmin = () => {
       <div className="flex-1">
 
         <div className="container mx-auto p-4">
-          <h1 className="text-2xl font-bold mb-6">Dashboard de Administrador</h1>
 
           {/* Estadísticas principales con animación */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -153,22 +221,7 @@ const DashboardAdmin = () => {
                           <TableHead></TableHead>
                         </TableRow>
                       </TableHeader>
-                      <TableBody>
-                        {autos.map((car, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{car.marca}</TableCell>
-                            <TableCell>{car.patente}</TableCell>
-                            <TableCell>{car.ano}</TableCell>
-                            <TableCell>{car.ultimoServicio}</TableCell>
-                            <TableCell>
-                              <button className="flex items-center text-sm">
-                                Ver
-                                <ChevronRight className="h-4 w-4 ml-1" />
-                              </button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
+                        <VehiculosTabla vehiculos={vehiculos} handleViewVehiculo={handleViewVehiculo} columns={columns} />
                     </Table>
                   </CardContent>
                 </Card>
