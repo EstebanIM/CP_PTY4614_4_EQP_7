@@ -1,21 +1,48 @@
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button"; 
 import { Menu, Bell, User, Settings, LogOut } from "lucide-react";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { unsetToken } from '../../lib/cookies';
+import { fetcher } from '../../lib/strApi';
+import { getTokenFromLocalCookie } from '../../lib/cookies';
 
 export default function DashboardHeader({ toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
+  const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
+  
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const jwt = getTokenFromLocalCookie();
+      if (jwt) {
+        try {
+          const response = await fetcher(`${STRAPI_URL}/api/users/me?populate[account_id][fields][0]=nombre`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+          setUserName(response.account_id.nombre);
+          
+        } catch (error) {
+          console.error('Error fetching user:', error);
+        }
+      }
+    };
+
+    fetchUser();
+  }, [STRAPI_URL]);
 
   const logout = async () => {
     try {
-      console.log("Cerrando sesión...");
+      // console.log("Cerrando sesión...");
 
       // Eliminar cookies de autenticación
       unsetToken();
@@ -50,7 +77,7 @@ export default function DashboardHeader({ toggleSidebar }) {
             </Button>
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-20">
-                <div className="px-4 py-2 text-sm font-medium text-gray-700">Mi Cuenta</div>
+                <div className="px-4 py-2 text-sm font-medium text-gray-700">Mi Cuenta ({userName})</div>
                 <div className="border-t border-gray-200"></div>
                 <Link
                   to="/Config"

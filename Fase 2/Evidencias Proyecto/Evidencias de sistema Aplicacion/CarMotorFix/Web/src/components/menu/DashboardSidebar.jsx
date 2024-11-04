@@ -11,7 +11,7 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
   const handleResize = () => {
     const newIsDesktop = window.innerWidth >= 768;
     setIsDesktop(newIsDesktop);
-    console.log("Cambio de tamaño de pantalla, es escritorio:", newIsDesktop);
+    // console.log("Cambio de tamaño de pantalla, es escritorio:", newIsDesktop);
   };
 
   useEffect(() => {

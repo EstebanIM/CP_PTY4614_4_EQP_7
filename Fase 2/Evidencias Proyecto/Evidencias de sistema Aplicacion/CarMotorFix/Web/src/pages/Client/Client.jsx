@@ -40,7 +40,6 @@ function Client() {
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
 
           setVehiculos(validVehiculoIds);
-          console.log(jwt)
         } catch (error) {
           console.error('Error fetching vehicles:', error);
         }
