@@ -1,45 +1,44 @@
 import { useState, useEffect } from "react";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
-import { FaTools, FaUsers, FaFileInvoiceDollar } from "react-icons/fa"; // Ejemplo usando React Icons
+import { FaTools, FaUsers, FaFileInvoiceDollar } from "react-icons/fa";
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
+import ConsejoAutoDelDia from '../../components/mensaje/mensajedia';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function Inicio() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [userRole, setUserRole] = useState(null); // Para guardar el rol del usuario
+  const [userRole, setUserRole] = useState(null);
 
-  // Función para alternar el estado del sidebar
   const toggleSidebar = () => {
     console.log("Cambiando estado del sidebar. Estado actual:", sidebarOpen);
-    setSidebarOpen(!sidebarOpen); // Cambia el estado a su opuesto
+    setSidebarOpen(!sidebarOpen);
     console.log("Nuevo estado del sidebar:", !sidebarOpen);
   };
 
   const fetchUserRole = async () => {
-    const jwt = getTokenFromLocalCookie(); // Obtener el JWT
+    const jwt = getTokenFromLocalCookie();
     if (jwt) {
-        try {
-            const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${jwt}`,
-                },
-            });
+      try {
+        const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
 
-            setUserRole(response.role.name); // Guarda el nombre del rol en el estado
-            console.log("User role:", response);
-            
-        } catch (error) {
-            console.error("Error fetching user role:", error);
-        }
+        setUserRole(response.role.name);
+        console.log("User role:", response);
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+      }
     }
   };
 
   useEffect(() => {
-    fetchUserRole(); // Llama a la función para obtener el rol cuando el componente se monte
+    fetchUserRole();
   }, []);
 
   return (
@@ -65,26 +64,28 @@ export default function Inicio() {
 
           {/* Funciones de la App */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-center mt-8">
-            {/* Función 1: Gestión de Órdenes */}
             <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg">
-              <FaTools className="text-4xl text-blue-500 mb-4" /> {/* Ícono */}
+              <FaTools className="text-4xl text-blue-500 mb-4" />
               <h2 className="text-xl font-semibold mb-2">Gestión de Órdenes</h2>
               <p className="text-gray-600">Administra las órdenes de trabajo de manera eficiente.</p>
             </div>
 
-            {/* Función 2: Comunicación con Clientes */}
             <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg">
-              <FaUsers className="text-4xl text-green-500 mb-4" /> {/* Ícono */}
+              <FaUsers className="text-4xl text-green-500 mb-4" />
               <h2 className="text-xl font-semibold mb-2">Comunicación con Clientes</h2>
               <p className="text-gray-600">Mejora la comunicación entre los mecánicos y los clientes.</p>
             </div>
 
-            {/* Función 3: Facturación y Pagos */}
             <div className="flex flex-col items-center bg-white p-6 rounded-lg shadow-lg">
-              <FaFileInvoiceDollar className="text-4xl text-red-500 mb-4" /> {/* Ícono */}
+              <FaFileInvoiceDollar className="text-4xl text-red-500 mb-4" />
               <h2 className="text-xl font-semibold mb-2">Facturación y Pagos</h2>
               <p className="text-gray-600">Gestiona las facturas y los pagos de manera sencilla.</p>
             </div>
+          </div>
+
+          {/* Consejo del Día */}
+          <div className="mt-8"> {/* Añadir margen superior */}
+            <ConsejoAutoDelDia /> {/* Muestra el consejo del día aquí */}
           </div>
         </div>
       </div>
