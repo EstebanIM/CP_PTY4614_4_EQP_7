@@ -55,6 +55,12 @@
       "relation": "oneToMany",
       "target": "api::catalogo-servicio.catalogo-servicio",
       "mappedBy": "ot"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "ot"
     }
   }
 }

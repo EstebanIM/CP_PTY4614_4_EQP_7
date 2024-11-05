@@ -483,6 +483,10 @@ export interface PluginUsersPermissionsUser
       'oneToMany',
       'api::vehiculo.vehiculo'
     >;
+    ot: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::orden-trabajo.orden-trabajo'
+    >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -857,6 +861,10 @@ export interface ApiOrdenTrabajoOrdenTrabajo
     catalogo_servicios: Schema.Attribute.Relation<
       'oneToMany',
       'api::catalogo-servicio.catalogo-servicio'
+    >;
+    user: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
     >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;

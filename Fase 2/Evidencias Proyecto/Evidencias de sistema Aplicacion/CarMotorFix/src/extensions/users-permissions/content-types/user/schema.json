@@ -76,6 +76,12 @@
       "relation": "oneToMany",
       "target": "api::vehiculo.vehiculo",
       "mappedBy": "user_id"
+    },
+    "ot": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::orden-trabajo.orden-trabajo",
+      "mappedBy": "user"
     }
   }
 }
