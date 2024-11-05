@@ -117,7 +117,7 @@ function Servicios() {
                 <DashboardHeader toggleSidebar={toggleSidebar} />
                 <div className="container mx-auto p-4">
                     <h1 className="text-2xl font-bold mb-4">Servicios Disponibles</h1>
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 w-full max-w-3xl">
+                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 w-full">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-2xl font-semibold leading-none tracking-tight">Lista de Servicios</h3>
                             <Button onClick={() => setIsAdding(!isAdding)}>
@@ -144,7 +144,7 @@ function Servicios() {
                                         {servicios.map((servicio) => (
                                             <TableRow key={servicio.id} className="hover:bg-gray-100">
                                                 <TableCell>{servicio.tp_servicio || 'Sin especificar'}</TableCell>
-                                                <TableCell>{servicio.descripcion.slice(0, 30) + '...'}</TableCell>
+                                                <TableCell>{servicio.descripcion}</TableCell>
                                                 <TableCell>${servicio.costserv || 'N/A'}</TableCell>
                                                 <TableCell className="px-6 py-4 font-medium text-right pr-4">
                                                     <ArrowRight
