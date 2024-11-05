@@ -3,7 +3,7 @@ import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import VehiculosTabla from '../../components/VehiculosTabla';
+import Tablas from '../../components/Tablas';
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
@@ -282,7 +282,7 @@ function Client() {
             </div>
           ) : (
             <div>
-              <VehiculosTabla vehiculos={vehiculos} handleViewVehiculo={handleViewVehiculo} columns={columns} />
+              <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
             </div>
           )}
 
@@ -449,7 +449,7 @@ function Client() {
           )}
 
           <div>
-            <VehiculosTabla vehiculos={OT} handleViewVehiculo={handleViewVehiculo} columns={columns2} />
+            <Tablas servicio={OT} handleViewTabla={handleViewVehiculo} columns={columns2} />
           </div>
         </div>
 

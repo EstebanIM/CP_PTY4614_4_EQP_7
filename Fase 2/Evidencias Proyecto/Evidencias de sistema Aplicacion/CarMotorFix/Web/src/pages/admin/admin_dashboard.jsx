@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { ChevronRight } from "lucide-react"; // Asegúrate de tener lucide-react instalado
 import { fetcher } from "../../lib/strApi";
 import { getTokenFromLocalCookie } from "../../lib/cookies";
-import VehiculosTabla from "../../components/VehiculosTabla";
+import Tablas from "../../components/Tablas";
 import { useNavigate } from "react-router-dom";
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
@@ -221,7 +221,7 @@ const DashboardAdmin = () => {
                           <TableHead></TableHead>
                         </TableRow>
                       </TableHeader>
-                        <VehiculosTabla vehiculos={vehiculos} handleViewVehiculo={handleViewVehiculo} columns={columns} />
+                        <Tablas vehiculos={vehiculos} handleViewVehiculo={handleViewVehiculo} columns={columns} />
                     </Table>
                   </CardContent>
                 </Card>

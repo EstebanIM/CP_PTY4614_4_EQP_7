@@ -1,9 +1,9 @@
 import { ArrowRight } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-const VehiculosTabla = ({
-    vehiculos,
-    handleViewVehiculo,
+const Tablas = ({
+    servicio,
+    handleViewTabla,
     columns
 }) => {
     return (
@@ -19,15 +19,15 @@ const VehiculosTabla = ({
                 </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-                {vehiculos.map((vehiculo) => (
+                {servicio.map((servicio) => (
                     <tr
-                        key={vehiculo.id}
-                        onClick={() => handleViewVehiculo(vehiculo)}
+                        key={servicio.id}
+                        onClick={() => handleViewTabla(servicio)}
                         className="cursor-pointer hover:bg-gray-100"
                     >
                         {columns.map((column) => (
                             <td key={column.key} className="px-6 py-4 whitespace-nowrap">
-                                {column.render ? column.render(vehiculo) : vehiculo[column.key]}
+                                {column.render ? column.render(servicio) : servicio[column.key]}
                             </td>
                         ))}
                         <td className="px-6 py-4 font-medium text-right pr-4">
@@ -39,9 +39,9 @@ const VehiculosTabla = ({
         </table>
     );
 };
-VehiculosTabla.propTypes = {
-    vehiculos: PropTypes.arrayOf(PropTypes.object).isRequired,
-    handleViewVehiculo: PropTypes.func.isRequired,
+Tablas.propTypes = {
+    servicio: PropTypes.arrayOf(PropTypes.object).isRequired,
+    handleViewTabla: PropTypes.func.isRequired,
     columns: PropTypes.arrayOf(
         PropTypes.shape({
             header: PropTypes.string.isRequired,
@@ -51,4 +51,4 @@ VehiculosTabla.propTypes = {
     ).isRequired
 };
 
-export default VehiculosTabla;
+export default Tablas;
