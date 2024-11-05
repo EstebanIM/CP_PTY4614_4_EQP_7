@@ -34,7 +34,7 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::orden-trabajo.orden-trabajo",
-      "mappedBy": "ordentrabajo_catalogoservicio_id"
+      "mappedBy": "OT_catalogoservicio_id"
     }
   }
 }

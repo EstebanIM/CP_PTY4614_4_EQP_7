@@ -3,11 +3,17 @@ import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import VehiculosTabla from '../../components/VehiculosTabla';
+import Tablas from '../../components/Tablas';
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
+  const [totalServicios, setTotalServicios] = useState(0);
+  const [servicios, setServicios] = useState([]);
+  const [marcas, setMarcas] = useState([]);
+  const [tiposVehiculo, setTiposVehiculo] = useState([]);
+  const [OT, SetOT] = useState([]);
+  const navigate = useNavigate();
   const [newVehiculo, setNewVehiculo] = useState({
     marca_id: '',
     tp_vehiculo_id: '',
@@ -19,9 +25,6 @@ function Client() {
     color: ''
   });
 
-  const [marcas, setMarcas] = useState([]);
-  const [tiposVehiculo, setTiposVehiculo] = useState([]);
-  const navigate = useNavigate();
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
   useEffect(() => {
@@ -40,6 +43,7 @@ function Client() {
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
 
           setVehiculos(validVehiculoIds);
+
         } catch (error) {
           console.error('Error fetching vehicles:', error);
         }
@@ -79,10 +83,55 @@ function Client() {
       }
     };
 
+    const fetchServicios = async () => {
+      try {
+        const response = await fetcher(`${STRAPI_URL}/api/catalogo-servicios`, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        });
+        setServicios(response.data || []);
+        console.log('servicios:', response.data);
+
+      } catch (error) {
+        console.error('Error fetching servicios:', error);
+      }
+    };
+
+    const fetchOT = async () => {
+      if (jwt) {
+        try {
+          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate=*`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+          SetOT(response.data || []);
+          console.log('ordenes de trabajo:', response.data);
+        } catch (error) {
+          console.error('Error fetching OT:', error);
+        }
+      }
+    };
+
+    fetchOT();
+    fetchServicios();
     fetchMarcas();
     fetchTiposVehiculo();
     fetchVehiculos();
   }, [STRAPI_URL]);
+
+  const handleServicioSelect = (e, servicio) => {
+    if (e.target.checked) {
+      // Si el servicio es seleccionado, suma el costo al total
+      setTotalServicios((prevTotal) => prevTotal + servicio.costserv);
+    } else {
+      // Si se deselecciona, resta el costo del total
+      setTotalServicios((prevTotal) => prevTotal - servicio.costserv);
+    }
+  };
+
 
   const handleChange = (e) => {
     setNewVehiculo({ ...newVehiculo, [e.target.name.toLowerCase()]: e.target.value });
@@ -175,11 +224,46 @@ function Client() {
     },
   ];
 
+  const columns2 = [
+    {
+      header: "Servicio",
+      key: "servicio",
+      render: (OT) => OT.catalogo_servicios ? OT.catalogo_servicios.tp_servicio : 'Servicio no disponible',
+    },
+    {
+      header: "Costo",
+      key: "costo",
+      render: (OT) => OT.costo || 'Costo no disponible',
+    },
+  ];
+
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    fechainicio: "",
+    costo: "",
+    estado_ot_id: "",
+    ordentrabajo_catalogoservicio_id: "",
+    mecanico_id: ""
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Aquí puedes manejar la lógica para enviar el formulario
+    console.log(formData);
+    setShowModal(false);
+  };
+
   return (
     <div className='container mx-auto p-4'>
       <h1 className='text-2xl font-bold mb-4'>Mantenimiento de Autos</h1>
 
       <div className='grid gap-4 md:grid-cols-2'>
+
         {/* Sección de Mis Autos */}
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
@@ -198,7 +282,7 @@ function Client() {
             </div>
           ) : (
             <div>
-              <VehiculosTabla vehiculos={vehiculos} handleViewVehiculo={handleViewVehiculo} columns={columns} />
+              <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
             </div>
           )}
 
@@ -292,40 +376,84 @@ function Client() {
           )}
         </div>
 
-        {/* Sección de Mis Cotizaciones */}
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-2xl font-semibold leading-none tracking-tight">Mis Cotizaciones</h3>
-            <button className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700">
+            <button
+              onClick={() => setShowModal(true)}
+              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+            >
               Solicitar
             </button>
           </div>
 
+          {/* Modal del formulario */}
+          {showModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+              <div className="bg-white rounded-lg p-6 w-96">
+                <h4 className="text-xl font-semibold mb-4">Nueva Cotización</h4>
+                <form onSubmit={handleSubmit}>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">Seleccionar Servicios</label>
+                    <div className="mt-1">
+                      {servicios.map((servicio) => (
+                        <div key={servicio.id} className="flex items-center mb-2">
+                          <input
+                            type="checkbox"
+                            id={`servicio-${servicio.id}`}
+                            value={servicio.id}
+                            onChange={(e) => handleServicioSelect(e, servicio)}
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                          />
+                          <label htmlFor={`servicio-${servicio.id}`} className="ml-2 block text-sm text-gray-900">
+                            {servicio.tp_servicio} - ${servicio.costserv}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <h2 className="text-xl font-semibold">Total de Servicios: ${totalServicios}</h2>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">Mecánico ID</label>
+                    <input
+                      type="text"
+                      name="mecanico_id"
+                      value={formData.mecanico_id}
+                      onChange={handleInputChange}
+                      placeholder="ID del mecánico"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Agregar Cotización
+                  </button>
+                </form>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="mt-4 text-sm text-gray-500 hover:underline"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          )}
+
           <div>
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Servicio
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Valor
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                <tr className="cursor-pointer hover:bg-gray-100">
-                  <td className="px-6 py-4 whitespace-nowrap">Mantenimiento General</td>
-                  <td className="px-6 py-4 whitespace-nowrap">99.990</td>
-                  <td className="px-6 py-4 font-medium">
-                    <button className="text-blue-600 hover:underline">Ver</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <Tablas servicio={OT} handleViewTabla={handleViewVehiculo} columns={columns2} />
           </div>
         </div>
+
+
       </div>
     </div>
   );
