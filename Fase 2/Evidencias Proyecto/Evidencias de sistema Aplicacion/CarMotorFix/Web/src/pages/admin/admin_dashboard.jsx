@@ -64,30 +64,59 @@ const DashboardAdmin = () => {
   const [activeTab, setActiveTab] = useState("autos"); // Manejo de estado para Tabs
   const [vehiculos, setVehiculos] = useState([]);
   const navigate = useNavigate();
+  const [TotalVehiculos, setTotalVehiculos] = useState(0);
+  const [Cotizaciones, setCotizaciones] = useState(0);
+  const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
 
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
     const fetchVehiculos = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/vehiculos`, {
+          const response = await fetcher(`${STRAPI_URL}/api/vehiculos?populate[marca_id][fields][0]=nombre_marca`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
             },
           });
-
+          console.log(response.data);
+          
           const vehiculoIds = response.data || [];
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
-          console.log(response);
+
+          setTotalVehiculos(response.data.length);
           setVehiculos(validVehiculoIds);
-          console.log(jwt)
+
         } catch (error) {
           console.error('Error fetching vehicles:', error);
         }
       }
     };
 
+    const fetchOT = async () => {
+      if (jwt) {
+        try {
+          // const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[estado_ot_id][fields][0]=nom_estado`, {
+          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate=*`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+          const otIds = response.data || [];
+          const validOtIds = otIds.filter(v => v && v.id);
+          console.log(response.data);
+          
+          setCotizaciones(validOtIds);
+
+          setTotalCotizaciones(response.data.length);
+        } catch (error) {
+          console.error('Error fetching vehicles:', error);
+        }
+      }
+    };
+
+    fetchOT();
     fetchVehiculos();
   }, []);
 
@@ -131,12 +160,22 @@ const DashboardAdmin = () => {
     },
   ];
 
-
-  // Datos para las cotizaciones pendientes
-  const cotizaciones = [
-    { marca: "Honda Odyssey", cliente: "Pablo Escobar", fecha: "09/05/2024", valor: "$120.000", estado: "Aceptada" },
-    { marca: "Hyundai Accent", cliente: "Ivan Sanhueza", fecha: "23/04/2024", valor: "$89.990", estado: "Pendiente" },
-    { marca: "Nissan Skyline", cliente: "Bastian Paz", fecha: "02/05/2024", valor: "$69.990", estado: "Aceptada" },
+  const columns2 = [
+    {
+      header: "Fecha",
+      key: "fecha",
+      render: (Cotizaciones) => Cotizaciones.fechainicio ? Cotizaciones.fechainicio : 'Fecha no disponible',
+    },
+    {
+      header: "Valor",
+      key: "valor",
+      render: (Cotizaciones) => Cotizaciones.costo ? Cotizaciones.costo : 'Valor no disponible',
+    },
+    {
+      header: "Estado",
+      key: "estado",
+      render: (Cotizaciones) => Cotizaciones.estado_ot_id ? Cotizaciones.estado_ot_id.nom_estado : 'Estado no disponible',
+    },
   ];
 
   // Datos para las órdenes activas
@@ -148,8 +187,8 @@ const DashboardAdmin = () => {
 
   // Datos para los cuadros de resumen
   const stats = [
-    { title: "Total de Autos", value: 24 },
-    { title: "Cotizaciones Pendientes", value: 7 },
+    { title: "Total de Autos", value: TotalVehiculos },
+    { title: "Cotizaciones Pendientes", value: TotalCotizaciones },
     { title: "Órdenes Activas", value: 12 },
     { title: "Órdenes Pendientes", value: 12 },
   ];
@@ -232,33 +271,7 @@ const DashboardAdmin = () => {
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Marca - Modelo</TableHead>
-                          <TableHead>Nombre cliente</TableHead>
-                          <TableHead>Fecha</TableHead>
-                          <TableHead>Valor</TableHead>
-                          <TableHead>Estado</TableHead>
-                          <TableHead></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {cotizaciones.map((quote, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{quote.marca}</TableCell>
-                            <TableCell>{quote.cliente}</TableCell>
-                            <TableCell>{quote.fecha}</TableCell>
-                            <TableCell>{quote.valor}</TableCell>
-                            <TableCell>{quote.estado}</TableCell>
-                            <TableCell>
-                              <button className="flex items-center text-sm">
-                                Ver
-                                <ChevronRight className="h-4 w-4 ml-1" />
-                              </button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
+                    <Tablas servicio={Cotizaciones} handleViewTabla={handleViewVehiculo} columns={columns2} />
                     </Table>
                   </CardContent>
                 </Card>
