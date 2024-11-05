@@ -27,7 +27,7 @@ const Tablas = ({
                     >
                         {columns.map((column) => (
                             <td key={column.key} className="px-6 py-4 whitespace-nowrap">
-                                {column.render ? column.render(servicio) : servicio[column.key]}
+                                {column.render ? column.render(servicio) : (servicio[column.key] || 'N/A')}
                             </td>
                         ))}
                         <td className="px-6 py-4 font-medium text-right pr-4">
@@ -39,6 +39,7 @@ const Tablas = ({
         </table>
     );
 };
+
 Tablas.propTypes = {
     servicio: PropTypes.arrayOf(PropTypes.object).isRequired,
     handleViewTabla: PropTypes.func.isRequired,

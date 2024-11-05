@@ -77,9 +77,9 @@ const DashboardAdmin = () => {
             },
           });
 
-          const vehiculoIds = response.vehiculo_ids || [];
+          const vehiculoIds = response.data || [];
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
-
+          console.log(response);
           setVehiculos(validVehiculoIds);
           console.log(jwt)
         } catch (error) {
@@ -212,16 +212,7 @@ const DashboardAdmin = () => {
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Marca - Modelo</TableHead>
-                          <TableHead>Patente</TableHead>
-                          <TableHead>Año</TableHead>
-                          <TableHead>Último Servicio</TableHead>
-                          <TableHead></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                        <Tablas vehiculos={vehiculos} handleViewVehiculo={handleViewVehiculo} columns={columns} />
+                        <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
                     </Table>
                   </CardContent>
                 </Card>

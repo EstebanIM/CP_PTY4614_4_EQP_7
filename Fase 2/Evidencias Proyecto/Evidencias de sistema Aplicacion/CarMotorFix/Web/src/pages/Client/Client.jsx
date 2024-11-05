@@ -32,7 +32,7 @@ function Client() {
     const fetchVehiculos = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/users/me?populate[vehiculo_ids][populate][marca_id][fields][0]=nombre_marca`, {
+          const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
@@ -41,7 +41,11 @@ function Client() {
 
           const vehiculoIds = response.vehiculo_ids || [];
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
+          const OT = response || [];
 
+          console.log('vehiculos:', response);
+          
+          SetOT(OT);
           setVehiculos(validVehiculoIds);
 
         } catch (error) {
@@ -98,24 +102,6 @@ function Client() {
       }
     };
 
-    const fetchOT = async () => {
-      if (jwt) {
-        try {
-          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate=*`, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${jwt}`,
-            },
-          });
-          SetOT(response.data || []);
-          console.log('ordenes de trabajo:', response.data);
-        } catch (error) {
-          console.error('Error fetching OT:', error);
-        }
-      }
-    };
-
-    fetchOT();
     fetchServicios();
     fetchMarcas();
     fetchTiposVehiculo();
