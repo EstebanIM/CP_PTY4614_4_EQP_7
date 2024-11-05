@@ -52,6 +52,12 @@
       "relation": "oneToOne",
       "target": "api::tp-vehiculo.tp-vehiculo",
       "inversedBy": "vehiculo_id"
+    },
+    "mecanicos": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::mecanico.mecanico",
+      "mappedBy": "vehiculos"
     }
   }
 }

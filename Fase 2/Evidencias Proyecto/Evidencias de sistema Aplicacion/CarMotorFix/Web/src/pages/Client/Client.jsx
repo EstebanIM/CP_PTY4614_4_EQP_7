@@ -19,9 +19,11 @@ function Client() {
     color: ''
   });
 
+  const [servicios, setServicios] = useState([]);
   const [marcas, setMarcas] = useState([]);
   const [tiposVehiculo, setTiposVehiculo] = useState([]);
   const navigate = useNavigate();
+
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
   useEffect(() => {
@@ -78,7 +80,20 @@ function Client() {
         }
       }
     };
+    const fetchServicios = async () => {
+      try {
+        const response = await fetcher(`${STRAPI_URL}/api/catalogo-servicios`, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        });
+        setServicios(response.data || []);
+      } catch (error) {
+        console.error('Error fetching servicios:', error);
+      }
+    };
 
+    fetchServicios();
     fetchMarcas();
     fetchTiposVehiculo();
     fetchVehiculos();
@@ -175,11 +190,33 @@ function Client() {
     },
   ];
 
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    fechainicio: "",
+    costo: "",
+    estado_ot_id: "",
+    ordentrabajo_catalogoservicio_id: "",
+    mecanico_id: ""
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Aquí puedes manejar la lógica para enviar el formulario
+    console.log(formData);
+    setShowModal(false);
+  };
+
   return (
     <div className='container mx-auto p-4'>
       <h1 className='text-2xl font-bold mb-4'>Mantenimiento de Autos</h1>
 
       <div className='grid gap-4 md:grid-cols-2'>
+        
         {/* Sección de Mis Autos */}
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
@@ -292,14 +329,110 @@ function Client() {
           )}
         </div>
 
-        {/* Sección de Mis Cotizaciones */}
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-2xl font-semibold leading-none tracking-tight">Mis Cotizaciones</h3>
-            <button className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700">
+            <button
+              onClick={() => setShowModal(true)}
+              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+            >
               Solicitar
             </button>
           </div>
+
+          {/* Modal del formulario */}
+          {showModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+              <div className="bg-white rounded-lg p-6 w-96">
+                <h4 className="text-xl font-semibold mb-4">Nueva Cotización</h4>
+                <form onSubmit={handleSubmit}>
+                  {/* Campo de Fecha de Inicio */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">Fecha Inicio</label>
+                    <input
+                      type="date"
+                      name="fechainicio"
+                      value={formData.fechainicio}
+                      onChange={handleInputChange}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      required
+                    />
+                  </div>
+
+                  {/* Campo de Costo */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">Costo</label>
+                    <input
+                      type="number"
+                      name="costo"
+                      value={formData.costo}
+                      onChange={handleInputChange}
+                      placeholder="Valor del costo"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      required
+                    />
+                  </div>
+
+                  {/* Campo de Estado OT ID */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">Estado OT ID</label>
+                    <input
+                      type="text"
+                      name="estado_ot_id"
+                      value={formData.estado_ot_id}
+                      onChange={handleInputChange}
+                      placeholder="ID de estado"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      required
+                    />
+                  </div>
+
+                  {/* Campo de Orden Trabajo Catalogo Servicio ID */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Orden Trabajo Catalogo Servicio ID
+                    </label>
+                    <input
+                      type="text"
+                      name="ordentrabajo_catalogoservicio_id"
+                      value={formData.ordentrabajo_catalogoservicio_id}
+                      onChange={handleInputChange}
+                      placeholder="ID de catálogo de servicio"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      required
+                    />
+                  </div>
+
+                  {/* Campo de Mecánico ID */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700">Mecánico ID</label>
+                    <input
+                      type="text"
+                      name="mecanico_id"
+                      value={formData.mecanico_id}
+                      onChange={handleInputChange}
+                      placeholder="ID del mecánico"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Agregar Cotización
+                  </button>
+                </form>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="mt-4 text-sm text-gray-500 hover:underline"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          )}
 
           <div>
             <table className="min-w-full divide-y divide-gray-200">
@@ -326,6 +459,7 @@ function Client() {
             </table>
           </div>
         </div>
+
       </div>
     </div>
   );

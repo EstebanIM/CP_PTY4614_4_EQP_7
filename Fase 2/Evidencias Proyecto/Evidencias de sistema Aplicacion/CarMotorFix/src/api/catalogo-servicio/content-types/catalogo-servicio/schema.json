@@ -30,6 +30,12 @@
       "relation": "manyToOne",
       "target": "api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio",
       "inversedBy": "catalogo_servicios_id"
+    },
+    "ot": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::orden-trabajo.orden-trabajo",
+      "inversedBy": "catalogo_servicios"
     }
   }
 }

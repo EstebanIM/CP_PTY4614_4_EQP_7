@@ -18,15 +18,15 @@
     },
     "fecharecepcion": {
       "type": "date",
-      "required": true
+      "required": false
     },
     "fechaentrega": {
       "type": "date",
-      "required": true
+      "required": false
     },
     "fechasalida": {
       "type": "date",
-      "required": true
+      "required": false
     },
     "costo": {
       "type": "integer",
@@ -38,7 +38,7 @@
       "target": "api::estado-ot.estado-ot",
       "inversedBy": "orden_trabajos_id"
     },
-    "ordentrabajo_catalogoservicio_id": {
+    "OT_catalogoservicio_id": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio",
@@ -49,6 +49,12 @@
       "relation": "manyToOne",
       "target": "api::mecanico.mecanico",
       "inversedBy": "orden_trabajos_id"
+    },
+    "catalogo_servicios": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::catalogo-servicio.catalogo-servicio",
+      "mappedBy": "ot"
     }
   }
 }
