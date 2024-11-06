@@ -11,5 +11,5 @@ export function Input({ className = "", ...props }) {
 
 // Validación de PropTypes
 Input.propTypes = {
-  className: PropTypes.string, // `className` opcional
+  className: PropTypes.string,
 };

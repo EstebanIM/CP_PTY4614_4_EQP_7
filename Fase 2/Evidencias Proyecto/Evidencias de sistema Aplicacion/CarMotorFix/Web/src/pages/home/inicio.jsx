@@ -84,7 +84,7 @@ export default function Inicio() {
           </div>
 
           {/* Consejo del Día */}
-          <div className="mt-8"> {/* Añadir margen superior */}
+          <div className="mt-8"> {/* Añade margen superior */}
             <ConsejoAutoDelDia /> {/* Muestra el consejo del día aquí */}
           </div>
         </div>

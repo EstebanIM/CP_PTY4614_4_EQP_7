@@ -10,6 +10,8 @@ import LoadingComponent from '../../components/animation/loading';
 
 function DetalleVehiculo() {
     const { id } = useParams();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [userRole, setUserRole] = useState(null);
     const [vehiculo, setVehiculo] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({});
@@ -36,12 +38,34 @@ function DetalleVehiculo() {
         }
     }, [id, STRAPI_URL]);
 
+    const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+    const fetchUserRole = async () => {
+        const jwt = getTokenFromLocalCookie();
+        if (jwt) {
+            try {
+                const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                });
+
+                setUserRole(response.role.name);
+                console.log("User role:", response);
+            } catch (error) {
+                console.error("Error fetching user role:", error);
+            }
+        }
+    };
+
     useEffect(() => {
         fetchVehiculo();
+        fetchUserRole();
     }, [fetchVehiculo]);
 
     const handleBack = () => {
-        navigate('/dashboard'); 
+        navigate('/dashboard');
     };
 
     const handleEditClick = () => {
@@ -98,10 +122,10 @@ function DetalleVehiculo() {
 
     return (
         <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
-            <DashboardSidebar />
+            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
 
             <div className="flex-1 flex flex-col">
-                <DashboardHeader />
+                <DashboardHeader toggleSidebar={toggleSidebar} />
 
                 <div className="p-4 sm:p-6 flex flex-col">
                     <div className="flex flex-col sm:flex-row justify-between items-center mb-4">

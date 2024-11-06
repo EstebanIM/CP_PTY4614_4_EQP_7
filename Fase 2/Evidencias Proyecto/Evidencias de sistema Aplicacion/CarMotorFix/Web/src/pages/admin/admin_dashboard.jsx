@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion"; // Import framer-motion
-import PropTypes from "prop-types"; // Import PropTypes for type-checking
+import { motion } from "framer-motion";
+import PropTypes from "prop-types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
-import { ChevronRight } from "lucide-react"; // Asegúrate de tener lucide-react instalado
+import { ChevronRight } from "lucide-react";
 import { fetcher } from "../../lib/strApi";
 import { getTokenFromLocalCookie } from "../../lib/cookies";
 import Tablas from "../../components/Tablas";
@@ -80,7 +80,7 @@ const DashboardAdmin = () => {
             },
           });
           console.log(response.data);
-          
+
           const vehiculoIds = response.data || [];
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
 
@@ -106,7 +106,7 @@ const DashboardAdmin = () => {
           const otIds = response.data || [];
           const validOtIds = otIds.filter(v => v && v.id);
           console.log(response.data);
-          
+
           setCotizaciones(validOtIds);
 
           setTotalCotizaciones(response.data.length);
@@ -175,6 +175,29 @@ const DashboardAdmin = () => {
       header: "Estado",
       key: "estado",
       render: (Cotizaciones) => Cotizaciones.estado_ot_id ? Cotizaciones.estado_ot_id.nom_estado : 'Estado no disponible',
+    },
+  ];
+
+  const columns3 = [
+    {
+      header: "ID",
+      key: "id",
+    },
+    {
+      header: "Cliente",
+      key: "cliente",
+    },
+    {
+      header: "Servicio",
+      key: "servicio",
+    },
+    {
+      header: "Estado",
+      key: "estado",
+    },
+    {
+      header: "Total",
+      key: "total",
     },
   ];
 
@@ -251,7 +274,7 @@ const DashboardAdmin = () => {
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full">
-                        <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
+                      <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
                     </Table>
                   </CardContent>
                 </Card>
@@ -271,7 +294,7 @@ const DashboardAdmin = () => {
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full">
-                    <Tablas servicio={Cotizaciones} handleViewTabla={handleViewVehiculo} columns={columns2} />
+                      <Tablas servicio={Cotizaciones} handleViewTabla={handleViewVehiculo} columns={columns2} />
                     </Table>
                   </CardContent>
                 </Card>
@@ -285,40 +308,12 @@ const DashboardAdmin = () => {
                 exit="hidden"
                 variants={variants} // Apply animation
               >
-                <Card>
+                <Card className="w-full">
                   <CardHeader>
-                    <CardTitle>Historial de Órdenes</CardTitle>
+                    <CardTitle className="text-lg md:text-xl">Historial de Órdenes</CardTitle>
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
-                    <Table className="min-w-full">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Cliente</TableHead>
-                          <TableHead>Servicio</TableHead>
-                          <TableHead>Estado</TableHead>
-                          <TableHead>Total</TableHead>
-                          <TableHead></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {ordenes.map((order, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{order.id}</TableCell>
-                            <TableCell>{order.cliente}</TableCell>
-                            <TableCell>{order.servicio}</TableCell>
-                            <TableCell>{order.estado}</TableCell>
-                            <TableCell>{order.total}</TableCell>
-                            <TableCell>
-                              <button className="flex items-center text-sm">
-                                Ver
-                                <ChevronRight className="h-4 w-4 ml-1" />
-                              </button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                    <Tablas servicio={ordenes} handleViewTabla={handleViewVehiculo} columns={columns3} />
                   </CardContent>
                 </Card>
               </motion.div>

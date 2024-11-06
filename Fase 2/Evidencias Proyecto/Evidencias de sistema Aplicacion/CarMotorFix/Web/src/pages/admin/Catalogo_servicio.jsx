@@ -11,6 +11,7 @@ import opcionesServicios from '../../lib/servicios.json';
 
 function Servicios() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [userRole, setUserRole] = useState(null);
     const navigate = useNavigate();
     const [servicios, setServicios] = useState([]);
     const [isAdding, setIsAdding] = useState(false);
@@ -25,9 +26,29 @@ function Servicios() {
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
+    const fetchUserRole = async () => {
+        const jwt = getTokenFromLocalCookie();
+        if (jwt) {
+            try {
+                const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                });
+
+                setUserRole(response.role.name);
+                console.log("User role:", response);
+            } catch (error) {
+                console.error("Error fetching user role:", error);
+            }
+        }
+    };
+
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
     useEffect(() => {
+
         const fetchServicios = async () => {
             const jwt = getTokenFromLocalCookie();
             if (jwt) {
@@ -39,7 +60,7 @@ function Servicios() {
                     });
                     setServicios(response.data || []);
                     console.log(response.data);
-                    
+
                 } catch (error) {
                     console.error('Error fetching services:', error);
                 }
@@ -47,6 +68,7 @@ function Servicios() {
         };
 
         fetchServicios();
+        fetchUserRole();
     }, [STRAPI_URL]);
 
     const handleChange = (e) => {
@@ -54,12 +76,12 @@ function Servicios() {
     };
 
     const handleCategoryChange = (e) => {
-        setSelectedCategory(e.target.value); 
-        setNewServicio({ ...newServicio, tp_servicio: '' }); 
+        setSelectedCategory(e.target.value);
+        setNewServicio({ ...newServicio, tp_servicio: '' });
     };
 
     const handleOptionChange = (e) => {
-        setNewServicio({ ...newServicio, tp_servicio: e.target.value }); 
+        setNewServicio({ ...newServicio, tp_servicio: e.target.value });
     };
 
     const handleAddServicio = async (e) => {
@@ -96,7 +118,7 @@ function Servicios() {
 
                 setServicios([...servicios, response.data]);
                 setNewServicio({ tp_servicio: '', descripcion: '', costserv: '', ordentrabajo_catalogoservicio_id: '' });
-                setSelectedCategory(''); 
+                setSelectedCategory('');
                 setIsAdding(false);
             } catch (error) {
                 console.error('Error adding service:', error);
@@ -112,7 +134,7 @@ function Servicios() {
 
     return (
         <div className="flex h-screen">
-            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
             <div className="flex-1 flex flex-col">
                 <DashboardHeader toggleSidebar={toggleSidebar} />
                 <div className="container mx-auto p-4">
@@ -200,6 +222,7 @@ function Servicios() {
                                         value={newServicio.descripcion}
                                         onChange={handleChange}
                                         required
+                                        maxLength={200} 
                                         className="p-2 border rounded"
                                     />
                                     <input

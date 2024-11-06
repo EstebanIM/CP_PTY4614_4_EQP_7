@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button";
-import {Users, CarFront, File, Store, Bug, X, List, Home } from "lucide-react"; // Importa el icono Home
+import {Users, CarFront, File, Store, Bug, X, List, Home } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
