@@ -3,7 +3,6 @@ import { fetcher } from '../lib/strApi';
 import { setToken } from '../lib/cookies';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
-const STRAPI_ACCOUNT = import.meta.env.VITE_STRAPI_TOKEN_ACCOUNT;
 
 export const login = async (email, password) => {
   const strapiResponse = await fetcher(`${STRAPI_URL}/api/auth/local`, {
@@ -43,20 +42,21 @@ export const register = async (email, password, name, surname, rut) => {
   }
 
   const userId = strapiResponse.user.id;
-
+  const userjwt = strapiResponse.jwt;
+  
   const accountResponse = await fetcher(`${STRAPI_URL}/api/users/${userId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${STRAPI_ACCOUNT}`,
+      Authorization: `Bearer ${userjwt}`,
     },
-    body: JSON.stringify({ nombre: name, apellido: surname, run: cleanedRut },
-),
+    body: JSON.stringify({ nombre: name, apellido: surname, run: cleanedRut }),
   });
 
   if (accountResponse.error) {
     throw new Error(accountResponse.error.message);
   }
+
 
   const { error: supabaseError } = await supabase.auth.signUp({ email, password });
   if (supabaseError) {

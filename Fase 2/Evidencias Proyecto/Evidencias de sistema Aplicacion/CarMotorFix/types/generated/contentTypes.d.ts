@@ -478,13 +478,12 @@ export interface PluginUsersPermissionsUser
       'manyToOne',
       'plugin::users-permissions.role'
     >;
-    account_id: Schema.Attribute.Relation<'oneToOne', 'api::account.account'>;
     vehiculo_ids: Schema.Attribute.Relation<
       'oneToMany',
       'api::vehiculo.vehiculo'
     >;
-    ot: Schema.Attribute.Relation<
-      'oneToOne',
+    ots: Schema.Attribute.Relation<
+      'oneToMany',
       'api::orden-trabajo.orden-trabajo'
     >;
     nombre: Schema.Attribute.String;
@@ -501,41 +500,6 @@ export interface PluginUsersPermissionsUser
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'plugin::users-permissions.user'
-    > &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiAccountAccount extends Struct.CollectionTypeSchema {
-  collectionName: 'accounts';
-  info: {
-    singularName: 'account';
-    pluralName: 'accounts';
-    displayName: 'account';
-    description: '';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    nombre: Schema.Attribute.String & Schema.Attribute.Required;
-    apellido: Schema.Attribute.String & Schema.Attribute.Required;
-    run: Schema.Attribute.Integer & Schema.Attribute.Required;
-    user_id: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    publishedAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::account.account'
     > &
       Schema.Attribute.Private;
   };
@@ -866,7 +830,7 @@ export interface ApiOrdenTrabajoOrdenTrabajo
       'api::catalogo-servicio.catalogo-servicio'
     >;
     user: Schema.Attribute.Relation<
-      'oneToOne',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
     createdAt: Schema.Attribute.DateTime;
@@ -1475,7 +1439,6 @@ declare module '@strapi/strapi' {
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
-      'api::account.account': ApiAccountAccount;
       'api::admin.admin': ApiAdminAdmin;
       'api::catalogo-servicio.catalogo-servicio': ApiCatalogoServicioCatalogoServicio;
       'api::ciudad.ciudad': ApiCiudadCiudad;

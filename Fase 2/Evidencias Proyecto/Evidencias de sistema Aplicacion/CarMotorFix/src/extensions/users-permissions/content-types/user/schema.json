@@ -65,21 +65,15 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "account_id": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::account.account",
-      "inversedBy": "user_id"
-    },
     "vehiculo_ids": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::vehiculo.vehiculo",
       "mappedBy": "user_id"
     },
-    "ot": {
+    "ots": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::orden-trabajo.orden-trabajo",
       "mappedBy": "user"
     },
