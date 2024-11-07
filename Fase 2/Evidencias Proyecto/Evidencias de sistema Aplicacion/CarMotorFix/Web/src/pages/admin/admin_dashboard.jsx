@@ -80,7 +80,7 @@ const DashboardAdmin = () => {
     const fetchVehiculos = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/vehiculos?populate[marca_id][fields][0]=nombre_marca`, {
+          const response = await fetcher(`${STRAPI_URL}/api/vehiculos?populate[user_id][fields]=username&populate[marca_id][fields]=nombre_marca`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
@@ -101,7 +101,7 @@ const DashboardAdmin = () => {
     const fetchOTCotizaciones = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate=estado_ot_id&filters[estado_ot_id][nom_estado][$eq]=cotizando`, {
+          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[user][fields]=username&populate=estado_ot_id&filters[estado_ot_id][nom_estado][$eq]=cotizando`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
@@ -172,6 +172,11 @@ const DashboardAdmin = () => {
 
   const columns = [
     { 
+      header: "Cliente",
+      key: "cliente",
+      render: (vehiculo) => vehiculo.user_id ? vehiculo.user_id.username : 'Cliente desconocida'
+    },
+    { 
       header: "Marca",
       key: "marca",
       render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida'
@@ -195,14 +200,27 @@ const DashboardAdmin = () => {
 
   const columns2 = [
     { 
+      header: "Cliente", 
+      key: "cliente",
+      render: (cotizacion) => cotizacion.user.username || 'Cliente no disponible' 
+    },
+    { 
       header: "Fecha", 
       key: "fecha", 
-      render: (cotizacion) => cotizacion.fechainicio || 'Fecha no disponible' 
-    },
+      render: (cotizacion) => {
+        if (!cotizacion.fechainicio) return 'Fecha no disponible';
+        
+        const [year, month, day] = cotizacion.fechainicio.split('-');
+        return `${day}-${month}-${year}`;
+      }
+    },    
     { 
       header: "Valor", 
       key: "valor", 
-      render: (cotizacion) => cotizacion.costo || 'Valor no disponible' 
+      render: (cotizacion) => 
+        cotizacion.costo 
+          ? new Intl.NumberFormat('es-CL').format(cotizacion.costo) 
+          : 'Total no disponible',
     },
     { 
       header: "Estado", 
@@ -242,8 +260,11 @@ const DashboardAdmin = () => {
     {
       header: "Total",
       key: "total",
-      render: (Ordenes) => Ordenes.costo ? Ordenes.costo : 'Total no disponible',
-    },
+      render: (Ordenes) => 
+        Ordenes.costo 
+          ? new Intl.NumberFormat('es-CL').format(Ordenes.costo) 
+          : 'Total no disponible',
+    }    
 
   ];
   
