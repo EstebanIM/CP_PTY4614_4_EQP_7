@@ -5,8 +5,8 @@ import { Button } from '../../components/ui/config/button';
 import { Label } from '../../components/ui/config/label';
 import { Switch } from '../../components/ui/config/Switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/config/cards';
-import { User, Phone, Mail, Lock, Bell, Palette, Eye, EyeOff } from 'lucide-react';
-import DashboardHeader from "../../components/menu/DashboardHeader"; 
+import { User, IdCard, Mail, Lock, Bell, Palette, Eye, EyeOff } from 'lucide-react';
+import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
@@ -19,41 +19,40 @@ export default function Config() {
   const [isEditing, setIsEditing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false); // Estado para controlar el sidebar
   const [userData, setUserData] = useState({
+    email: "",
     nombre: "",
     apellido: "",
-    telefono: "",
-    email: "",
+    run: "",
   });
 
-    useEffect(() => {
-      const fetchUserData = async () => {
-        const jwt = getTokenFromLocalCookie();
-        if (jwt) {
-          try {
-            // Obtener datos de la API de Strapi para el correo
-            const userDataResponse = await fetcher(`${STRAPI_URL}/api/users/me?populate=account_id`, {
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${jwt}`,
-              },
-            });
-            const accountData = userDataResponse.account_id || []; // Asegúrate de que la respuesta sea un array
-            
-            // Actualizar el estado con los datos obtenidos
-            setUserData({
-              email: userDataResponse.email || "",
-              nombre: accountData?.nombre || "",
-              apellido: accountData?.apellido || "",
-              run: accountData?.run || "", // Cambiar teléfono a RUN
-            });
-          } catch (error) {
-            console.error("Error fetching user data:", error);
-          }
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const jwt = getTokenFromLocalCookie();
+      if (jwt) {
+        try {
+          // Obtener datos de la API de Strapi para el correo
+          const userDataResponse = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+
+          // Actualizar el estado con los datos obtenidos
+          setUserData({
+            email: userDataResponse.email || "",
+            nombre: userDataResponse.nombre || "",
+            apellido: userDataResponse.apellido || "",
+            run: userDataResponse.run || "",
+          });
+        } catch (error) {
+          console.error("Error fetching user data:", error);
         }
-      };
-  
-      fetchUserData();
-    }, []);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const [showPasswords, setShowPasswords] = useState({
     contrasenaAnterior: false,
@@ -114,12 +113,13 @@ export default function Config() {
                         {Object.entries(userData).map(([key, value]) => (
                           <div key={key} className="space-y-2">
                             <Label htmlFor={key} className="flex items-center gap-2">
-                              {key === 'nombre' || key === 'apellido' ? <User className="h-4 w-4" /> :
-                              key === 'telefono' ? <Phone className="h-4 w-4" /> :
-                              key === 'email' ? <Mail className="h-4 w-4" /> : null}
+                              {key === 'email' ? <Mail className="h-4 w-4" /> :
+                                key === 'nombre' || key === 'apellido' ? <User className="h-4 w-4" /> :
+                                  key === 'run' ? <IdCard className="h-4 w-4" /> :
+                                    null}
                               {key.charAt(0).toUpperCase() + key.slice(1)}
                             </Label>
-                            {isEditing ? (
+                            {isEditing && key !== 'run' ? (
                               <Input
                                 id={key}
                                 value={value}
@@ -127,7 +127,9 @@ export default function Config() {
                                 type={key === 'email' ? 'email' : 'text'}
                               />
                             ) : (
-                              <div className="p-2 border rounded-md">{value}</div>
+                              <div className="p-2 border rounded-md">
+                                {key === 'run' ? value : value}
+                              </div>
                             )}
                           </div>
                         ))}
@@ -139,7 +141,7 @@ export default function Config() {
                               <Label htmlFor={field} className="flex items-center gap-2">
                                 <Lock className="h-4 w-4" />
                                 {field === 'contrasenaAnterior' ? 'Contraseña Anterior' :
-                                field === 'nuevaContrasena' ? 'Nueva Contraseña' : 'Repetir Nueva Contraseña'}
+                                  field === 'nuevaContrasena' ? 'Nueva Contraseña' : 'Repetir Nueva Contraseña'}
                               </Label>
                               <div className="relative">
                                 <Input
@@ -173,7 +175,7 @@ export default function Config() {
                           </>
                         ) : (
                           <>
-                            <Button variant="destructive">Eliminar Cuenta</Button>
+                            <Button variant="destructive">Desactivar Cuenta</Button>
                             <Button onClick={handleEdit}>Editar Información</Button>
                           </>
                         )}

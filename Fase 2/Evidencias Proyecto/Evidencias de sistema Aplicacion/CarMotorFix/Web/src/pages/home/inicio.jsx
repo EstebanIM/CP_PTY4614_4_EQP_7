@@ -13,9 +13,9 @@ export default function Inicio() {
   const [userRole, setUserRole] = useState(null);
 
   const toggleSidebar = () => {
-    console.log("Cambiando estado del sidebar. Estado actual:", sidebarOpen);
+    // console.log("Cambiando estado del sidebar. Estado actual:", sidebarOpen);
     setSidebarOpen(!sidebarOpen);
-    console.log("Nuevo estado del sidebar:", !sidebarOpen);
+    // console.log("Nuevo estado del sidebar:", !sidebarOpen);
   };
 
   const fetchUserRole = async () => {
@@ -30,7 +30,7 @@ export default function Inicio() {
         });
 
         setUserRole(response.role.name);
-        console.log("User role:", response);
+        // console.log("User role:", response);
       } catch (error) {
         console.error("Error fetching user role:", error);
       }

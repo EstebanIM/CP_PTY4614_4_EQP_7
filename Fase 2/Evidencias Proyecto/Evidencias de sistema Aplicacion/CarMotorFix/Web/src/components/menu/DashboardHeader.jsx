@@ -23,13 +23,13 @@ export default function DashboardHeader({ toggleSidebar }) {
       const jwt = getTokenFromLocalCookie();
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/users/me?populate[account_id][fields][0]=nombre`, {
+          const response = await fetcher(`${STRAPI_URL}/api/users/me`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
             },
           });
-          setUserName(response.account_id.nombre);
+          setUserName(response.username);
           
         } catch (error) {
           console.error('Error fetching user:', error);
