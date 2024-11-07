@@ -82,6 +82,15 @@
       "relation": "oneToOne",
       "target": "api::orden-trabajo.orden-trabajo",
       "mappedBy": "user"
+    },
+    "nombre": {
+      "type": "string"
+    },
+    "apellido": {
+      "type": "string"
+    },
+    "run": {
+      "type": "integer"
     }
   }
 }

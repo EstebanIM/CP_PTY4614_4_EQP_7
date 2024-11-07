@@ -487,6 +487,9 @@ export interface PluginUsersPermissionsUser
       'oneToOne',
       'api::orden-trabajo.orden-trabajo'
     >;
+    nombre: Schema.Attribute.String;
+    apellido: Schema.Attribute.String;
+    run: Schema.Attribute.Integer;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
