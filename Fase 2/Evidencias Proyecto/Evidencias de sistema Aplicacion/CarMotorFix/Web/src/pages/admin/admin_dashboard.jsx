@@ -64,6 +64,9 @@ const DashboardAdmin = () => {
   const [Cotizaciones, setCotizaciones] = useState([]);
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
   const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
+    const [Ordenes, setOrdenes] = useState(0);
+  const [TotalOrdenes, setTotalOrdenes] = useState(0);
+
   const navigate = useNavigate();
 
   // Estados de paginación para cada tabla
@@ -71,9 +74,7 @@ const DashboardAdmin = () => {
   const [currentPageCotizaciones, setCurrentPageCotizaciones] = useState(1);
   const [currentPageOrdenes, setCurrentPageOrdenes] = useState(1);
   const itemsPerPage = 4;
-  const [Ordenes, setOrdenes] = useState(0);
-  const [TotalOrdenes, setTotalOrdenes] = useState(0);
-
+  
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
     const fetchVehiculos = async () => {
@@ -130,9 +131,6 @@ const DashboardAdmin = () => {
           const otIds = response.data || [];
           const validOtIds = otIds.filter(v => v && v.id);
 
-          console.log(response.data);
-          
-
           setOrdenes(validOtIds);
           setTotalOrdenes(response.data.length);
 
@@ -160,25 +158,57 @@ const DashboardAdmin = () => {
 
   // Cálculos de paginación para cada tabla
   const paginate = (data, currentPage) => {
+    if (!Array.isArray(data)) {
+      return [];
+    }
     const startIndex = (currentPage - 1) * itemsPerPage;
     return data.slice(startIndex, startIndex + itemsPerPage);
   };
+  
 
   const currentAutos = paginate(vehiculos, currentPageAutos);
   const currentCotizaciones = paginate(Cotizaciones, currentPageCotizaciones);
   const currentOrdenes = paginate(Ordenes, currentPageOrdenes);
 
   const columns = [
-    { header: "Marca", key: "marca", render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida' },
-    { header: "Modelo", key: "modelo", render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible' },
-    { header: "Patente", key: "patente", render: (vehiculo) => vehiculo.patente || 'Patente no disponible' },
-    { header: "Año", key: "anio", render: (vehiculo) => vehiculo.anio || 'Año no disponible' },
+    { 
+      header: "Marca",
+      key: "marca",
+      render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida'
+    },
+    { 
+      header: "Modelo", 
+      key: "modelo", 
+      render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible' 
+    },
+    { 
+      header: "Patente", 
+      key: "patente", 
+      render: (vehiculo) => vehiculo.patente || 'Patente no disponible' 
+    },
+    { 
+      header: "Año", 
+      key: "anio", 
+      render: (vehiculo) => vehiculo.anio || 'Año no disponible' 
+    },
   ];
 
   const columns2 = [
-    { header: "Fecha", key: "fecha", render: (cotizacion) => cotizacion.fechainicio || 'Fecha no disponible' },
-    { header: "Valor", key: "valor", render: (cotizacion) => cotizacion.costo || 'Valor no disponible' },
-    { header: "Estado", key: "estado", render: (cotizacion) => cotizacion.estado_ot_id ? cotizacion.estado_ot_id.nom_estado : 'Estado no disponible' },
+    { 
+      header: "Fecha", 
+      key: "fecha", 
+      render: (cotizacion) => cotizacion.fechainicio || 'Fecha no disponible' 
+    },
+    { 
+      header: "Valor", 
+      key: "valor", 
+      render: (cotizacion) => cotizacion.costo || 'Valor no disponible' 
+    },
+    { 
+      header: "Estado", 
+      key: "estado", 
+      render: (cotizacion) => cotizacion.estado_ot_id ? cotizacion.estado_ot_id.nom_estado : 'Estado no disponible' 
+    },
   ];
 
   const columns3 = [
@@ -232,14 +262,6 @@ const DashboardAdmin = () => {
     );
   };
 
-  // Datos para los cuadros de resumen
-  const stats = [
-    { title: "Total de Autos", value: TotalVehiculos },
-    { title: "Cotizaciones Pendientes", value: TotalCotizaciones },
-    { title: "Órdenes Activas", value: TotalOrdenes },
-    { title: "Órdenes Pendientes", value: 12 },
-  ];
-
   // Animations: Define simple fade-in/slide-in transition
   const variants = {
     hidden: { opacity: 0, x: -10 },
@@ -253,7 +275,7 @@ const DashboardAdmin = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <CountUpCard title="Total de Autos" value={TotalVehiculos} />
             <CountUpCard title="Cotizaciones Pendientes" value={TotalCotizaciones} />
-            <CountUpCard title="Órdenes Activas" value={12} />
+            <CountUpCard title="Órdenes Activas" value={TotalOrdenes} />
             <CountUpCard title="Órdenes Pendientes" value={12} />
           </div>
 
