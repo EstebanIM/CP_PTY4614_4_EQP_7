@@ -8,13 +8,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import opcionesServicios from '../../lib/servicios.json';
+import Modal from '../../components/forms/modal';
 
 function Servicios() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userRole, setUserRole] = useState(null);
     const navigate = useNavigate();
     const [servicios, setServicios] = useState([]);
-    const [isAdding, setIsAdding] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [newServicio, setNewServicio] = useState({
@@ -25,29 +26,25 @@ function Servicios() {
     });
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-
-    const fetchUserRole = async () => {
-        const jwt = getTokenFromLocalCookie();
-        if (jwt) {
-            try {
-                const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${jwt}`,
-                    },
-                });
-
-                setUserRole(response.role.name);
-                console.log("User role:", response);
-            } catch (error) {
-                console.error("Error fetching user role:", error);
-            }
-        }
-    };
-
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
     useEffect(() => {
+        const fetchUserRole = async () => {
+            const jwt = getTokenFromLocalCookie();
+            if (jwt) {
+                try {
+                    const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${jwt}`,
+                        },
+                    });
+                    setUserRole(response.role.name);
+                } catch (error) {
+                    console.error("Error fetching user role:", error);
+                }
+            }
+        };
 
         const fetchServicios = async () => {
             const jwt = getTokenFromLocalCookie();
@@ -59,8 +56,6 @@ function Servicios() {
                         },
                     });
                     setServicios(response.data || []);
-                    console.log(response.data);
-
                 } catch (error) {
                     console.error('Error fetching services:', error);
                 }
@@ -119,7 +114,7 @@ function Servicios() {
                 setServicios([...servicios, response.data]);
                 setNewServicio({ tp_servicio: '', descripcion: '', costserv: '', ordentrabajo_catalogoservicio_id: '' });
                 setSelectedCategory('');
-                setIsAdding(false);
+                setIsModalOpen(false);
             } catch (error) {
                 console.error('Error adding service:', error);
             } finally {
@@ -142,8 +137,8 @@ function Servicios() {
                     <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 w-full">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-2xl font-semibold leading-none tracking-tight">Lista de Servicios</h3>
-                            <Button onClick={() => setIsAdding(!isAdding)}>
-                                {isAdding ? 'Cancelar' : 'Agregar Servicio'}
+                            <Button onClick={() => setIsModalOpen(true)}>
+                                Agregar Servicio
                             </Button>
                         </div>
 
@@ -181,14 +176,15 @@ function Servicios() {
                             </div>
                         )}
 
-                        {isAdding && (
-                            <form onSubmit={handleAddServicio} className="mt-4">
+                        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                            <h2 className="text-xl font-bold mb-4">Agregar Servicio</h2>
+                            <form onSubmit={handleAddServicio}>
                                 <div className="grid gap-4">
                                     <select
                                         value={selectedCategory}
                                         onChange={handleCategoryChange}
                                         required
-                                        className="p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                                     >
                                         <option value="" className="text-gray-500">Seleccione una categoría</option>
                                         {opcionesServicios.map((categoria) => (
@@ -204,7 +200,7 @@ function Servicios() {
                                             value={newServicio.tp_servicio}
                                             onChange={handleOptionChange}
                                             required
-                                            className="p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                                         >
                                             <option value="" className="text-gray-500">Seleccione un tipo de servicio</option>
                                             {opcionesServicios.find(cat => cat.categoria === selectedCategory)?.opciones.map((opcion) => (
@@ -223,7 +219,7 @@ function Servicios() {
                                         onChange={handleChange}
                                         required
                                         maxLength={200} 
-                                        className="p-2 border rounded"
+                                        className="p-2 border rounded w-full"
                                     />
                                     <input
                                         type="number"
@@ -232,16 +228,16 @@ function Servicios() {
                                         value={newServicio.costserv}
                                         onChange={handleChange}
                                         required
-                                        className="p-2 border rounded"
+                                        className="p-2 border rounded w-full"
                                     />
                                 </div>
                                 {!isLoading && (
-                                    <Button type="submit" className="mt-4 px-4 py-2 text-white rounded">
+                                    <Button type="submit" className="mt-4 px-4 py-2 text-white rounded w-full">
                                         Agregar Servicio
                                     </Button>
                                 )}
                             </form>
-                        )}
+                        </Modal>
                     </div>
                 </div>
             </div>
