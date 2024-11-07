@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
-import { ChevronRight } from "lucide-react";
+import { Table } from "../../components/ui/tables/table";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import { fetcher } from "../../lib/strApi";
 import { getTokenFromLocalCookie } from "../../lib/cookies";
 import Tablas from "../../components/Tablas";
@@ -14,7 +14,6 @@ const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 // Helper function for counting animation
 const useCountUp = (targetValue, duration) => {
   const [count, setCount] = useState(0);
-
 
   useEffect(() => {
     const start = Date.now();
@@ -34,7 +33,7 @@ const useCountUp = (targetValue, duration) => {
 
 // Component to display stats with counting animation
 const CountUpCard = ({ title, value }) => {
-  const count = useCountUp(value, 1000); // Count up animation over 1 second
+  const count = useCountUp(value, 1000);
   return (
     <Card className="bg-white">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -54,19 +53,29 @@ const CountUpCard = ({ title, value }) => {
   );
 };
 
-// Define prop types for CountUpCard
 CountUpCard.propTypes = {
-  title: PropTypes.string.isRequired, // Title should be a string and is required
-  value: PropTypes.number.isRequired, // Value should be a number and is required
+  title: PropTypes.string.isRequired,
+  value: PropTypes.number.isRequired,
 };
 
 const DashboardAdmin = () => {
-  const [activeTab, setActiveTab] = useState("autos"); // Manejo de estado para Tabs
+  const [activeTab, setActiveTab] = useState("autos");
   const [vehiculos, setVehiculos] = useState([]);
-  const navigate = useNavigate();
+  const [Cotizaciones, setCotizaciones] = useState([]);
+  const [ordenes, setOrdenes] = useState([
+    { id: "ORD-001", cliente: "Carlos Rodríguez", servicio: "Cambio de frenos", estado: "En proceso", total: "$80.000" },
+    { id: "ORD-002", cliente: "Ana Martínez", servicio: "Alineación y balanceo", estado: "Pendiente", total: "$50.000" },
+    { id: "ORD-003", cliente: "Jose Escobar", servicio: "Revisión de frenos", estado: "Pendiente", total: "$30.000" },
+  ]);
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
-  const [Cotizaciones, setCotizaciones] = useState(0);
   const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
+  const navigate = useNavigate();
+
+  // Estados de paginación para cada tabla
+  const [currentPageAutos, setCurrentPageAutos] = useState(1);
+  const [currentPageCotizaciones, setCurrentPageCotizaciones] = useState(1);
+  const [currentPageOrdenes, setCurrentPageOrdenes] = useState(1);
+  const itemsPerPage = 4;
 
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
@@ -79,14 +88,9 @@ const DashboardAdmin = () => {
               Authorization: `Bearer ${jwt}`,
             },
           });
-          console.log(response.data);
-
-          const vehiculoIds = response.data || [];
-          const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
-
+          const validVehiculoIds = response.data.filter(v => v && v.id);
           setTotalVehiculos(response.data.length);
           setVehiculos(validVehiculoIds);
-
         } catch (error) {
           console.error('Error fetching vehicles:', error);
         }
@@ -96,19 +100,14 @@ const DashboardAdmin = () => {
     const fetchOT = async () => {
       if (jwt) {
         try {
-          // const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[estado_ot_id][fields][0]=nom_estado`, {
           const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate=*`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
             },
           });
-          const otIds = response.data || [];
-          const validOtIds = otIds.filter(v => v && v.id);
-          console.log(response.data);
-
+          const validOtIds = response.data.filter(v => v && v.id);
           setCotizaciones(validOtIds);
-
           setTotalCotizaciones(response.data.length);
         } catch (error) {
           console.error('Error fetching vehicles:', error);
@@ -124,97 +123,58 @@ const DashboardAdmin = () => {
     navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
   };
 
-  const formatPatente = (patente) => {
-    const letras = patente.substring(0, 4);
-    const numeros = patente.substring(4);
-
-    if (letras.length === 4 && numeros.length === 2) {
-      return `${letras}-${numeros}`;
-    } else if (letras.length === 2 && numeros.length === 4) {
-      return `${letras}-${numeros}`;
-    } else {
-      return patente;
+  // Funciones de cambio de página para cada tabla
+  const handlePageChange = (setCurrentPage, totalPages, newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
     }
   };
 
+  // Cálculos de paginación para cada tabla
+  const paginate = (data, currentPage) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return data.slice(startIndex, startIndex + itemsPerPage);
+  };
+
+  const currentAutos = paginate(vehiculos, currentPageAutos);
+  const currentCotizaciones = paginate(Cotizaciones, currentPageCotizaciones);
+  const currentOrdenes = paginate(ordenes, currentPageOrdenes);
+
   const columns = [
-    {
-      header: "Marca",
-      key: "marca",
-      render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida',
-    },
-    {
-      header: "Modelo",
-      key: "modelo",
-      render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible',
-    },
-    {
-      header: "Patente",
-      key: "patente",
-      render: (vehiculo) => vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible',
-    },
-    {
-      header: "Año",
-      key: "anio",
-      render: (vehiculo) => vehiculo.anio || 'Año no disponible',
-    },
+    { header: "Marca", key: "marca", render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida' },
+    { header: "Modelo", key: "modelo", render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible' },
+    { header: "Patente", key: "patente", render: (vehiculo) => vehiculo.patente || 'Patente no disponible' },
+    { header: "Año", key: "anio", render: (vehiculo) => vehiculo.anio || 'Año no disponible' },
   ];
 
   const columns2 = [
-    {
-      header: "Fecha",
-      key: "fecha",
-      render: (Cotizaciones) => Cotizaciones.fechainicio ? Cotizaciones.fechainicio : 'Fecha no disponible',
-    },
-    {
-      header: "Valor",
-      key: "valor",
-      render: (Cotizaciones) => Cotizaciones.costo ? Cotizaciones.costo : 'Valor no disponible',
-    },
-    {
-      header: "Estado",
-      key: "estado",
-      render: (Cotizaciones) => Cotizaciones.estado_ot_id ? Cotizaciones.estado_ot_id.nom_estado : 'Estado no disponible',
-    },
+    { header: "Fecha", key: "fecha", render: (cotizacion) => cotizacion.fechainicio || 'Fecha no disponible' },
+    { header: "Valor", key: "valor", render: (cotizacion) => cotizacion.costo || 'Valor no disponible' },
+    { header: "Estado", key: "estado", render: (cotizacion) => cotizacion.estado_ot_id ? cotizacion.estado_ot_id.nom_estado : 'Estado no disponible' },
   ];
 
   const columns3 = [
-    {
-      header: "ID",
-      key: "id",
-    },
-    {
-      header: "Cliente",
-      key: "cliente",
-    },
-    {
-      header: "Servicio",
-      key: "servicio",
-    },
-    {
-      header: "Estado",
-      key: "estado",
-    },
-    {
-      header: "Total",
-      key: "total",
-    },
+    { header: "ID", key: "id" },
+    { header: "Cliente", key: "cliente" },
+    { header: "Servicio", key: "servicio" },
+    { header: "Estado", key: "estado" },
+    { header: "Total", key: "total" },
   ];
 
-  // Datos para las órdenes activas
-  const ordenes = [
-    { id: "ORD-001", cliente: "Carlos Rodríguez", servicio: "Cambio de frenos", estado: "En proceso", total: "$80.000" },
-    { id: "ORD-002", cliente: "Ana Martínez", servicio: "Alineación y balanceo", estado: "Pendiente", total: "$50.000" },
-    { id: "ORD-003", cliente: "Jose Escobar", servicio: "Revisión de frenos", estado: "Pendiente", total: "$30.000" },
-  ];
-
-  // Datos para los cuadros de resumen
-  const stats = [
-    { title: "Total de Autos", value: TotalVehiculos },
-    { title: "Cotizaciones Pendientes", value: TotalCotizaciones },
-    { title: "Órdenes Activas", value: 12 },
-    { title: "Órdenes Pendientes", value: 12 },
-  ];
+  const renderPaginationControls = (currentPage, setCurrentPage, totalItems) => {
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    return (
+      <div className="flex items-center space-x-2">
+        <button onClick={() => handlePageChange(setCurrentPage, totalPages, currentPage - 1)} disabled={currentPage === 1} className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+          <ArrowLeft className="h-5 w-5" />
+        </button>
+        <span className="text-xs text-gray-500">Página {currentPage} de {totalPages}</span>
+        <button onClick={() => handlePageChange(setCurrentPage, totalPages, currentPage + 1)} disabled={currentPage === totalPages} className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+          <ArrowRight className="h-5 w-5" />
+        </button>
+      </div>
+    );
+  };
 
   // Animations: Define simple fade-in/slide-in transition
   const variants = {
@@ -224,57 +184,38 @@ const DashboardAdmin = () => {
 
   return (
     <div className="flex">
-
-      {/* Contenido principal */}
       <div className="flex-1">
-
         <div className="container mx-auto p-4">
-
-          {/* Estadísticas principales con animación */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {stats.map((item, index) => (
-              <CountUpCard key={index} title={item.title} value={item.value} />
-            ))}
+            <CountUpCard title="Total de Autos" value={TotalVehiculos} />
+            <CountUpCard title="Cotizaciones Pendientes" value={TotalCotizaciones} />
+            <CountUpCard title="Órdenes Activas" value={12} />
+            <CountUpCard title="Órdenes Pendientes" value={12} />
           </div>
 
-          {/* Sección de Tabs */}
           <div className="mb-6">
             <div className="flex space-x-4">
-              <button
-                onClick={() => setActiveTab("autos")}
-                className={`px-4 py-2 font-medium ${activeTab === "autos" ? "text-black border-b-2 border-black" : "text-gray-500"}`}
-              >
-                Autos
-              </button>
-              <button
-                onClick={() => setActiveTab("cotizaciones")}
-                className={`px-4 py-2 font-medium ${activeTab === "cotizaciones" ? "text-black border-b-2 border-black" : "text-gray-500"}`}
-              >
-                Cotizaciones
-              </button>
-              <button
-                onClick={() => setActiveTab("ordenes")}
-                className={`px-4 py-2 font-medium ${activeTab === "ordenes" ? "text-black border-b-2 border-black" : "text-gray-500"}`}
-              >
-                Órdenes
-              </button>
+              <button onClick={() => setActiveTab("autos")} className={`px-4 py-2 font-medium ${activeTab === "autos" ? "text-black border-b-2 border-black" : "text-gray-500"}`}>Autos</button>
+              <button onClick={() => setActiveTab("cotizaciones")} className={`px-4 py-2 font-medium ${activeTab === "cotizaciones" ? "text-black border-b-2 border-black" : "text-gray-500"}`}>Cotizaciones</button>
+              <button onClick={() => setActiveTab("ordenes")} className={`px-4 py-2 font-medium ${activeTab === "ordenes" ? "text-black border-b-2 border-black" : "text-gray-500"}`}>Órdenes</button>
             </div>
 
-            {/* Content for each Tab */}
             {activeTab === "autos" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={variants} // Apply animation
-              >
+              <motion.div initial="hidden" animate="visible" exit="hidden" variants={variants}>
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Autos registrados en el Taller</CardTitle>
+                  <CardHeader className="flex justify-between items-center w-full px-4">
+                    <div className="flex w-full items-center">
+                      <CardTitle className="flex-grow">Autos registrados en el Taller</CardTitle>
+                      <div className="flex items-center space-x-2">
+                        {renderPaginationControls(currentPageAutos, setCurrentPageAutos, vehiculos.length)}
+                      </div>
+                    </div>
                   </CardHeader>
+
+
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full">
-                      <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
+                      <Tablas servicio={currentAutos} handleViewTabla={handleViewVehiculo} columns={columns} />
                     </Table>
                   </CardContent>
                 </Card>
@@ -282,19 +223,19 @@ const DashboardAdmin = () => {
             )}
 
             {activeTab === "cotizaciones" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={variants} // Apply animation
-              >
+              <motion.div initial="hidden" animate="visible" exit="hidden" variants={variants}>
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Historial de Cotizaciones</CardTitle>
+                  <CardHeader className="flex justify-between items-center w-full px-4">
+                    <div className="flex w-full items-center">
+                      <CardTitle className="flex-grow">Historial de Cotizaciones</CardTitle>
+                      <div className="flex items-center space-x-2">
+                        {renderPaginationControls(currentPageCotizaciones, setCurrentPageCotizaciones, Cotizaciones.length)}
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full">
-                      <Tablas servicio={Cotizaciones} handleViewTabla={handleViewVehiculo} columns={columns2} />
+                      <Tablas servicio={currentCotizaciones} handleViewTabla={handleViewVehiculo} columns={columns2} />
                     </Table>
                   </CardContent>
                 </Card>
@@ -302,18 +243,20 @@ const DashboardAdmin = () => {
             )}
 
             {activeTab === "ordenes" && (
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={variants} // Apply animation
-              >
-                <Card className="w-full">
-                  <CardHeader>
-                    <CardTitle className="text-lg md:text-xl">Historial de Órdenes</CardTitle>
+              <motion.div initial="hidden" animate="visible" exit="hidden" variants={variants}>
+                <Card>
+                  <CardHeader className="flex justify-between items-center w-full px-4">
+                    <div className="flex w-full items-center">
+                      <CardTitle className="flex-grow">Historial de Órdenes</CardTitle>
+                      <div className="flex items-center space-x-2">
+                        {renderPaginationControls(currentPageOrdenes, setCurrentPageOrdenes, ordenes.length)}
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
-                    <Tablas servicio={ordenes} handleViewTabla={handleViewVehiculo} columns={columns3} />
+                    <Table className="min-w-full">
+                      <Tablas servicio={currentOrdenes} handleViewTabla={handleViewVehiculo} columns={columns3} />
+                    </Table>
                   </CardContent>
                 </Card>
               </motion.div>
