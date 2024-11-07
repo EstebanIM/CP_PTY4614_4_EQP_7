@@ -62,11 +62,6 @@ const DashboardAdmin = () => {
   const [activeTab, setActiveTab] = useState("autos");
   const [vehiculos, setVehiculos] = useState([]);
   const [Cotizaciones, setCotizaciones] = useState([]);
-  const [ordenes, setOrdenes] = useState([
-    { id: "ORD-001", cliente: "Carlos Rodríguez", servicio: "Cambio de frenos", estado: "En proceso", total: "$80.000" },
-    { id: "ORD-002", cliente: "Ana Martínez", servicio: "Alineación y balanceo", estado: "Pendiente", total: "$50.000" },
-    { id: "ORD-003", cliente: "Jose Escobar", servicio: "Revisión de frenos", estado: "Pendiente", total: "$30.000" },
-  ]);
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
   const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
   const navigate = useNavigate();
@@ -76,6 +71,8 @@ const DashboardAdmin = () => {
   const [currentPageCotizaciones, setCurrentPageCotizaciones] = useState(1);
   const [currentPageOrdenes, setCurrentPageOrdenes] = useState(1);
   const itemsPerPage = 4;
+  const [Ordenes, setOrdenes] = useState(0);
+  const [TotalOrdenes, setTotalOrdenes] = useState(0);
 
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
@@ -88,7 +85,10 @@ const DashboardAdmin = () => {
               Authorization: `Bearer ${jwt}`,
             },
           });
-          const validVehiculoIds = response.data.filter(v => v && v.id);
+
+          const vehiculoIds = response.data || [];
+          const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
+
           setTotalVehiculos(response.data.length);
           setVehiculos(validVehiculoIds);
         } catch (error) {
@@ -97,16 +97,18 @@ const DashboardAdmin = () => {
       }
     };
 
-    const fetchOT = async () => {
+    const fetchOTCotizaciones = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate=*`, {
+          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate=estado_ot_id&filters[estado_ot_id][nom_estado][$eq]=cotizando`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
             },
           });
-          const validOtIds = response.data.filter(v => v && v.id);
+          const otIds = response.data || [];
+          const validOtIds = otIds.filter(v => v && v.id);
+
           setCotizaciones(validOtIds);
           setTotalCotizaciones(response.data.length);
         } catch (error) {
@@ -115,7 +117,33 @@ const DashboardAdmin = () => {
       }
     };
 
-    fetchOT();
+    const fetchOEnproceso = async () => {
+      if (jwt) {
+        try {
+          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[estado_ot_id][fields][0]=nom_estado&populate[user][fields][0]=username&populate[catalogo_servicios][fields]=tp_servicio&filters[estado_ot_id][nom_estado][$eq]=En proceso`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+          
+          const otIds = response.data || [];
+          const validOtIds = otIds.filter(v => v && v.id);
+
+          console.log(response.data);
+          
+
+          setOrdenes(validOtIds);
+          setTotalOrdenes(response.data.length);
+
+        } catch (error) {
+          console.error('Error fetching vehicles:', error);
+        }
+      }
+    };
+
+    fetchOEnproceso();
+    fetchOTCotizaciones();
     fetchVehiculos();
   }, []);
 
@@ -138,7 +166,7 @@ const DashboardAdmin = () => {
 
   const currentAutos = paginate(vehiculos, currentPageAutos);
   const currentCotizaciones = paginate(Cotizaciones, currentPageCotizaciones);
-  const currentOrdenes = paginate(ordenes, currentPageOrdenes);
+  const currentOrdenes = paginate(Ordenes, currentPageOrdenes);
 
   const columns = [
     { header: "Marca", key: "marca", render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida' },
@@ -154,14 +182,42 @@ const DashboardAdmin = () => {
   ];
 
   const columns3 = [
-    { header: "ID", key: "id" },
-    { header: "Cliente", key: "cliente" },
-    { header: "Servicio", key: "servicio" },
-    { header: "Estado", key: "estado" },
-    { header: "Total", key: "total" },
-  ];
+    {
+      header: "ID",
+      key: "id",
+      render: (Ordenes) => Ordenes.id ? Ordenes.id : 'ID no disponible',
+    },
+    {
+      header: "Cliente",
+      key: "cliente",
+      render: (Ordenes) => Ordenes.user ? Ordenes.user.username : 'Cliente no disponible',
+    },
+    {
+      header: "Servicio",
+      key: "servicio",
+      render: (Ordenes) => {
+        if (Ordenes.catalogo_servicios && Ordenes.catalogo_servicios.length > 0) {
+          const firstService = Ordenes.catalogo_servicios[0].tp_servicio;
+          const moreServices = Ordenes.catalogo_servicios.length > 1;
+          return moreServices ? `${firstService} (+${Ordenes.catalogo_servicios.length - 1} más)` : firstService;
+        }
+        return 'Servicio no disponible';
+      },
+    },
+    {
+      header: "Estado",
+      key: "estado",
+      render: (Ordenes) => Ordenes.estado_ot_id ? Ordenes.estado_ot_id.nom_estado : 'Estado no disponible',
+    },
+    {
+      header: "Total",
+      key: "total",
+      render: (Ordenes) => Ordenes.costo ? Ordenes.costo : 'Total no disponible',
+    },
 
-  const renderPaginationControls = (currentPage, setCurrentPage, totalItems) => {
+  ];
+  
+    const renderPaginationControls = (currentPage, setCurrentPage, totalItems) => {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     return (
       <div className="flex items-center space-x-2">
@@ -175,6 +231,14 @@ const DashboardAdmin = () => {
       </div>
     );
   };
+
+  // Datos para los cuadros de resumen
+  const stats = [
+    { title: "Total de Autos", value: TotalVehiculos },
+    { title: "Cotizaciones Pendientes", value: TotalCotizaciones },
+    { title: "Órdenes Activas", value: TotalOrdenes },
+    { title: "Órdenes Pendientes", value: 12 },
+  ];
 
   // Animations: Define simple fade-in/slide-in transition
   const variants = {
@@ -249,14 +313,12 @@ const DashboardAdmin = () => {
                     <div className="flex w-full items-center">
                       <CardTitle className="flex-grow">Historial de Órdenes</CardTitle>
                       <div className="flex items-center space-x-2">
-                        {renderPaginationControls(currentPageOrdenes, setCurrentPageOrdenes, ordenes.length)}
+                        {renderPaginationControls(currentPageOrdenes, setCurrentPageOrdenes, Ordenes.length)}
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
-                    <Table className="min-w-full">
-                      <Tablas servicio={currentOrdenes} handleViewTabla={handleViewVehiculo} columns={columns3} />
-                    </Table>
+                    <Tablas servicio={Ordenes} handleViewTabla={handleViewVehiculo} columns={columns3} />
                   </CardContent>
                 </Card>
               </motion.div>
