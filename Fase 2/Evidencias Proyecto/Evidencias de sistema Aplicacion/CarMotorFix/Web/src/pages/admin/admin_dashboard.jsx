@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
-import { ChevronRight } from "lucide-react";
+import { Table } from "../../components/ui/tables/table";
 import { fetcher } from "../../lib/strApi";
 import { getTokenFromLocalCookie } from "../../lib/cookies";
 import Tablas from "../../components/Tablas";
@@ -67,6 +66,8 @@ const DashboardAdmin = () => {
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
   const [Cotizaciones, setCotizaciones] = useState(0);
   const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
+  const [Ordenes, setOrdenes] = useState(0);
+  const [TotalOrdenes, setTotalOrdenes] = useState(0);
 
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
@@ -79,7 +80,6 @@ const DashboardAdmin = () => {
               Authorization: `Bearer ${jwt}`,
             },
           });
-          console.log(response.data);
 
           const vehiculoIds = response.data || [];
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
@@ -93,11 +93,10 @@ const DashboardAdmin = () => {
       }
     };
 
-    const fetchOT = async () => {
+    const fetchOTCotizaciones = async () => {
       if (jwt) {
         try {
-          // const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[estado_ot_id][fields][0]=nom_estado`, {
-          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate=*`, {
+          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate=estado_ot_id&filters[estado_ot_id][nom_estado][$eq]=cotizando`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
@@ -105,7 +104,6 @@ const DashboardAdmin = () => {
           });
           const otIds = response.data || [];
           const validOtIds = otIds.filter(v => v && v.id);
-          console.log(response.data);
 
           setCotizaciones(validOtIds);
 
@@ -116,7 +114,33 @@ const DashboardAdmin = () => {
       }
     };
 
-    fetchOT();
+    const fetchOEnproceso = async () => {
+      if (jwt) {
+        try {
+          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[estado_ot_id][fields][0]=nom_estado&populate[user][fields][0]=username&populate[catalogo_servicios][fields]=tp_servicio&filters[estado_ot_id][nom_estado][$eq]=En proceso`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+          
+          const otIds = response.data || [];
+          const validOtIds = otIds.filter(v => v && v.id);
+
+          console.log(response.data);
+          
+
+          setOrdenes(validOtIds);
+          setTotalOrdenes(response.data.length);
+
+        } catch (error) {
+          console.error('Error fetching vehicles:', error);
+        }
+      }
+    };
+
+    fetchOEnproceso();
+    fetchOTCotizaciones();
     fetchVehiculos();
   }, []);
 
@@ -182,37 +206,44 @@ const DashboardAdmin = () => {
     {
       header: "ID",
       key: "id",
+      render: (Ordenes) => Ordenes.id ? Ordenes.id : 'ID no disponible',
     },
     {
       header: "Cliente",
       key: "cliente",
+      render: (Ordenes) => Ordenes.user ? Ordenes.user.username : 'Cliente no disponible',
     },
     {
       header: "Servicio",
       key: "servicio",
+      render: (Ordenes) => {
+        if (Ordenes.catalogo_servicios && Ordenes.catalogo_servicios.length > 0) {
+          const firstService = Ordenes.catalogo_servicios[0].tp_servicio;
+          const moreServices = Ordenes.catalogo_servicios.length > 1;
+          return moreServices ? `${firstService} (+${Ordenes.catalogo_servicios.length - 1} más)` : firstService;
+        }
+        return 'Servicio no disponible';
+      },
     },
     {
       header: "Estado",
       key: "estado",
+      render: (Ordenes) => Ordenes.estado_ot_id ? Ordenes.estado_ot_id.nom_estado : 'Estado no disponible',
     },
     {
       header: "Total",
       key: "total",
+      render: (Ordenes) => Ordenes.costo ? Ordenes.costo : 'Total no disponible',
     },
   ];
-
-  // Datos para las órdenes activas
-  const ordenes = [
-    { id: "ORD-001", cliente: "Carlos Rodríguez", servicio: "Cambio de frenos", estado: "En proceso", total: "$80.000" },
-    { id: "ORD-002", cliente: "Ana Martínez", servicio: "Alineación y balanceo", estado: "Pendiente", total: "$50.000" },
-    { id: "ORD-003", cliente: "Jose Escobar", servicio: "Revisión de frenos", estado: "Pendiente", total: "$30.000" },
-  ];
+  
+  
 
   // Datos para los cuadros de resumen
   const stats = [
     { title: "Total de Autos", value: TotalVehiculos },
     { title: "Cotizaciones Pendientes", value: TotalCotizaciones },
-    { title: "Órdenes Activas", value: 12 },
+    { title: "Órdenes Activas", value: TotalOrdenes },
     { title: "Órdenes Pendientes", value: 12 },
   ];
 
@@ -313,7 +344,7 @@ const DashboardAdmin = () => {
                     <CardTitle className="text-lg md:text-xl">Historial de Órdenes</CardTitle>
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
-                    <Tablas servicio={ordenes} handleViewTabla={handleViewVehiculo} columns={columns3} />
+                    <Tablas servicio={Ordenes} handleViewTabla={handleViewVehiculo} columns={columns3} />
                   </CardContent>
                 </Card>
               </motion.div>
