@@ -318,7 +318,7 @@ const DashboardAdmin = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
-                    <Tablas servicio={Ordenes} handleViewTabla={handleViewVehiculo} columns={columns3} />
+                    <Tablas servicio={currentOrdenes} handleViewTabla={handleViewVehiculo} columns={columns3} />
                   </CardContent>
                 </Card>
               </motion.div>
