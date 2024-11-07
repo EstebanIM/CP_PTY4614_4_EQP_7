@@ -2,6 +2,10 @@ import { ArrowRight } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 const Tablas = ({ servicio, handleViewTabla, columns }) => {
+    if (!Array.isArray(servicio)) return null;
+    if (!Array.isArray(columns)) return null;
+    if (typeof handleViewTabla !== 'function') return null;
+
     return (
         <div className="w-full">
             <div className="overflow-x-auto w-full">
@@ -47,15 +51,24 @@ const Tablas = ({ servicio, handleViewTabla, columns }) => {
 };
 
 Tablas.propTypes = {
-    servicio: PropTypes.arrayOf(PropTypes.object).isRequired,
-    handleViewTabla: PropTypes.func.isRequired,
-    columns: PropTypes.arrayOf(
-        PropTypes.shape({
-            header: PropTypes.string.isRequired,
-            key: PropTypes.string.isRequired,
-            render: PropTypes.func
-        })
-    ).isRequired
+    servicio: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.object),
+        PropTypes.null
+    ]),
+    handleViewTabla: PropTypes.oneOfType([
+        PropTypes.func,
+        PropTypes.null
+    ]),
+    columns: PropTypes.oneOfType([
+        PropTypes.arrayOf(
+            PropTypes.shape({
+                header: PropTypes.string.isRequired,
+                key: PropTypes.string.isRequired,
+                render: PropTypes.func
+            })
+        ),
+        PropTypes.null
+    ]),
 };
 
 export default Tablas;

@@ -27,7 +27,9 @@ export const login = async (email, password) => {
 };
 
 export const register = async (email, password, name, surname, rut) => {
-  const generatedUsername = `${name.toLowerCase()}_${surname.toLowerCase()}_${email.split('@')[0]}`;
+  const formattedName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  const formattedSurname = surname.charAt(0).toUpperCase() + surname.slice(1).toLowerCase();
+  const generatedUsername = `${formattedName} ${formattedSurname}`;
   const cleanedRut = rut.replace(/[^0-9]/g, ''); 
 
   const strapiResponse = await fetcher(`${STRAPI_URL}/api/auth/local/register`, {

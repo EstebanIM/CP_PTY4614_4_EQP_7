@@ -43,7 +43,7 @@ function Client() {
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
           const OT = response || [];
 
-          console.log('vehiculos:', response);
+          // console.log('vehiculos:', response);
           
           SetOT(OT);
           setVehiculos(validVehiculoIds);
@@ -95,7 +95,7 @@ function Client() {
           },
         });
         setServicios(response.data || []);
-        console.log('servicios:', response.data);
+        // console.log('servicios:', response.data);
 
       } catch (error) {
         console.error('Error fetching servicios:', error);
@@ -240,7 +240,7 @@ function Client() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Aquí puedes manejar la lógica para enviar el formulario
-    console.log(formData);
+    // console.log(formData);
     setShowModal(false);
   };
 
@@ -435,7 +435,15 @@ function Client() {
           )}
 
           <div>
-            <Tablas servicio={OT} handleViewTabla={handleViewVehiculo} columns={columns2} />
+            {OT.length === 0 ? (
+              <div className="text-center text-gray-500 mt-4">
+              <h4 className="text-xl">No tienes Cotizaciones.</h4>
+            </div>
+          ) : (
+            <div>
+              <Tablas servicio={OT} handleViewTabla={handleViewVehiculo} columns={columns2} />
+            </div>
+          )}
           </div>
         </div>
 
