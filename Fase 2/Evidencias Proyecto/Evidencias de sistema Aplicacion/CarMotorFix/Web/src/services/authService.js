@@ -44,15 +44,14 @@ export const register = async (email, password, name, surname, rut) => {
 
   const userId = strapiResponse.user.id;
 
-  const accountResponse = await fetcher(`${STRAPI_URL}/api/accounts`, {
-    method: 'POST',
+  const accountResponse = await fetcher(`${STRAPI_URL}/api/users/${userId}`, {
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${STRAPI_ACCOUNT}`,
     },
-    body: JSON.stringify({
-      data: { nombre: name, apellido: surname, run: cleanedRut, user_id: userId },
-    }),
+    body: JSON.stringify({ nombre: name, apellido: surname, run: cleanedRut },
+),
   });
 
   if (accountResponse.error) {
