@@ -64,7 +64,7 @@ const DashboardAdmin = () => {
   const [Cotizaciones, setCotizaciones] = useState([]);
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
   const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
-    const [Ordenes, setOrdenes] = useState(0);
+  const [Ordenes, setOrdenes] = useState(0);
   const [TotalOrdenes, setTotalOrdenes] = useState(0);
 
   const navigate = useNavigate();

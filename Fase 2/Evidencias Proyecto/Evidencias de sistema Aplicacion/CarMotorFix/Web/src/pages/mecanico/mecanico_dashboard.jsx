@@ -1,28 +1,30 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
+import { Table } from "../../components/ui/tables/table";
 import { Button } from "../../components/ui/button";
-import { ChevronRight } from "lucide-react";
 import Tablas from "../../components/Tablas";
 import { getTokenFromLocalCookie } from "../../lib/cookies";
 import { fetcher } from "../../lib/strApi";
+import { useNavigate } from "react-router-dom";
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 const DashboardAutos = () => {
+  const navigate = useNavigate();
 
   const [vehiculos, setVehiculos] = useState([]);
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
-  const [Cotizaciones, setCotizaciones] = useState(0);
+  const [Cotizaciones, setCotizaciones] = useState([]);
   const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
   const [idMecanico, setIdMecanico] = useState(0);
+  const [ordenes, setOrdenes] = useState([]);
+  const [TotalOrdenes, setTotalOrdenes] = useState(0);
 
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
 
     const fetchIDMecanico = async () => {
-      if (jwt) {
         try {
           const response = await fetcher(`${STRAPI_URL}/api/users/me?populate[mecanico][fields]=documentId`, {
             headers: {
@@ -35,50 +37,78 @@ const DashboardAutos = () => {
 
         } catch (error) {
           console.error('Error fetching IDMecanico:', error);
-        }
       }
     };
 
-    const fetchCotizaciones = async () => {
-      if (jwt) {
+    const fetchOT = async () => {
         try {
-          // const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&filters[estado_ot_id][nom_estado][$eq]=cotizando&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
-          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
+            const response = await fetcher(  `${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&populate[estado_ot_id][fields]=nom_estado&populate[vehiculo][populate][marca_id][fields]=nombre_marca&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
             },
           });
-
-          console.log('Cotizaciones:', response.data);
           
-          setCotizaciones(response.data);
+          const OT = response.data.map((OT) => {
+            return {
+              ...OT,
+              user: OT.user.username,
+              estado_ot_id: OT.estado_ot_id.nom_estado,
+              catalogo_servicios: OT.catalogo_servicios.map(servicio => servicio.tp_servicio),
+              costo: OT.costo,
+              fechainicio: OT.fechainicio,
+              vehiculo: {
+                anio: OT.vehiculo.anio,
+                documentId: OT.vehiculo.documentId,
+                modelo: OT.vehiculo.modelo,
+                motor: OT.vehiculo.motor,
+                patente: OT.vehiculo.patente,
+                marca_id: OT.vehiculo.marca_id.nombre_marca,
+              }
+            };
+          });
 
-          setTotalCotizaciones(response.data.length);
+        const vehiculosUnicos = response.data.reduce((acc, OT) => {
+          const documentId = OT.vehiculo.documentId;
+        
+          if (!acc.has(documentId)) {
+            acc.add(documentId);
+          }
+        
+          return acc;
+        }, new Set());
+
+        setVehiculos(OT.map(item => item.vehiculo));
+        
+        setTotalVehiculos(vehiculosUnicos.size);
+        
+        const Cotizacion = OT.filter(cotizacion => cotizacion.estado_ot_id === 'cotizando');
+        const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'cotizando');
+
+        setOrdenes(Ordenes);
+        setTotalOrdenes(Ordenes.length);
+
+        setCotizaciones(Cotizacion);
+        setTotalCotizaciones(Cotizacion.length);
+
+          
         } catch (error) {
           console.error('Error fetching vehicles:', error);
         }
-      }
     };
 
     fetchIDMecanico();
-    fetchCotizaciones();
+    fetchOT();
   }, [idMecanico]);
 
   const handleViewVehiculo = (vehiculo) => {
-    console.log('Viewing vehiculo:', vehiculo);
+    navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
   };
-
-  // Datos para las órdenes activas
-  const ordenes = [
-    { cliente: "Juan Escobar", servicio: "Cambio de aceite", valor: "45.000", estado: "En Progreso" },
-    { cliente: "María González", servicio: "Revisión de frenos", valor: "80.000", estado: "Sin iniciar" },
-  ];
 
   // Datos para los cuadros de resumen
   const stats = [
     { title: "Total de Autos", value: TotalVehiculos },
-    { title: "Órdenes Activas", value: 2 },
+    { title: "Órdenes Activas", value: TotalOrdenes },
     { title: "Cotizaciones Pendientes", value: TotalCotizaciones },
   ];
 
@@ -86,7 +116,7 @@ const DashboardAutos = () => {
     {
       header: "Marca",
       key: "marca",
-      render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida',
+      render: (vehiculo) => vehiculo.marca_id || 'Marca desconocida',
     },
     {
       header: "Modelo",
@@ -96,7 +126,7 @@ const DashboardAutos = () => {
     {
       header: "Patente",
       key: "patente",
-      render: (vehiculo) => vehiculo.patente ? vehiculo.patente : 'Patente no disponible',
+      render: (vehiculo) => vehiculo.patente || 'Patente no disponible',
     },
     {
       header: "Año",
@@ -105,18 +135,52 @@ const DashboardAutos = () => {
     },
   ];
 
+  const columns2 = [
+    {
+      header: "Cliente",
+      key: "cliente",
+      render: (ordenes) => ordenes.user || 'Cliente no disponible',
+    },
+    {
+      header: "Servicio",
+      key: "servicio",
+      render: (ordenes) => {
+        if (ordenes.catalogo_servicios && ordenes.catalogo_servicios.length > 0) {
+          const firstService = ordenes.catalogo_servicios;
+          const moreServices = ordenes.catalogo_servicios.length > 1;
+          return moreServices ? `${firstService} (+${ordenes.catalogo_servicios.length - 1} más)` : firstService;
+        }
+        return 'Servicio no disponible';
+      },
+    },
+    { 
+      header: "Valor", 
+      key: "valor", 
+      render: (ordenes) => 
+        ordenes.costo 
+          ? new Intl.NumberFormat('es-CL').format(ordenes.costo) 
+          : 'Valor no disponible',
+    },
+    {
+      header: "Estado",
+      key: "estado",
+      render: (ordenes) => ordenes.estado_ot_id || 'Estado no disponible',
+    }
+  ];
+
+
   const columns3 = [
     {
       header: "Cliente",
       key: "cliente",
-      render: (Cotizaciones) => Cotizaciones.user ? Cotizaciones.user.username : 'Cliente no disponible',
+      render: (Cotizaciones) => Cotizaciones.user || 'Cliente no disponible',
     },
     {
       header: "Servicio",
       key: "servicio",
       render: (Cotizaciones) => {
         if (Cotizaciones.catalogo_servicios && Cotizaciones.catalogo_servicios.length > 0) {
-          const firstService = Cotizaciones.catalogo_servicios[0].tp_servicio;
+          const firstService = Cotizaciones.catalogo_servicios;
           const moreServices = Cotizaciones.catalogo_servicios.length > 1;
           return moreServices ? `${firstService} (+${Cotizaciones.catalogo_servicios.length - 1} más)` : firstService;
         }
@@ -131,16 +195,16 @@ const DashboardAutos = () => {
           ? new Intl.NumberFormat('es-CL').format(Cotizaciones.costo) 
           : 'Valor no disponible',
     },
-    { 
-      header: "Fecha", 
-      key: "fecha", 
-      render: (Cotizaciones) => {
-        if (!Cotizaciones.fechainicio) return 'Fecha no disponible';
+    // { 
+    //   header: "Fecha", 
+    //   key: "fecha", 
+    //   render: (Cotizaciones) => {
+    //     if (!Cotizaciones.fechainicio) return 'Fecha no disponible';
         
-        const [year, month, day] = Cotizaciones.fechainicio.split('-');
-        return `${day}-${month}-${year}`;
-      }
-    },
+    //     const [year, month, day] = Cotizaciones.fechainicio.split('-');
+    //     return `${day}-${month}-${year}`;
+    //   }
+    // },
   ];
 
   // Animation settings for framer-motion
@@ -192,31 +256,7 @@ const DashboardAutos = () => {
             <Card>
               <CardContent className="overflow-x-auto">
                 <Table className="min-w-full">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Cliente</TableHead>
-                      <TableHead>Servicio</TableHead>
-                      <TableHead>Valor</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {ordenes.map((orden, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{orden.cliente}</TableCell>
-                        <TableCell>{orden.servicio}</TableCell>
-                        <TableCell>{orden.valor}</TableCell>
-                        <TableCell>{orden.estado}</TableCell>
-                        <TableCell>
-                          <button className="flex items-center text-sm">
-                            Ver
-                            <ChevronRight className="h-4 w-4 ml-1" />
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
+                  <Tablas servicio={ordenes} handleViewTabla={handleViewVehiculo} columns={columns2} />
                 </Table>
               </CardContent>
             </Card>
