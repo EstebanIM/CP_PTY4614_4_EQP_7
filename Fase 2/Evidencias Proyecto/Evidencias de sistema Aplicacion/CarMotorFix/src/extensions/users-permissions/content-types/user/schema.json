@@ -85,6 +85,12 @@
     },
     "run": {
       "type": "integer"
+    },
+    "mecanico": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::mecanico.mecanico",
+      "inversedBy": "user"
     }
   }
 }

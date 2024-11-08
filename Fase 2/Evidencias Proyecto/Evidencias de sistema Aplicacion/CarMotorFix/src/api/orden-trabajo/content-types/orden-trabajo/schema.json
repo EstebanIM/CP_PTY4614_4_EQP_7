@@ -61,6 +61,12 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "ots"
+    },
+    "vehiculo": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::vehiculo.vehiculo",
+      "inversedBy": "ot"
     }
   }
 }

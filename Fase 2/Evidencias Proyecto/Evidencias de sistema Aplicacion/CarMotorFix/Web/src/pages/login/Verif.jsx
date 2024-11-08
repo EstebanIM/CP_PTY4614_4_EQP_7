@@ -2,20 +2,19 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "../../components/ui/button";
 import AnimatedBackground from "../../components/animation/animated-background";
-import PropTypes from 'prop-types';  // Importamos PropTypes
+import PropTypes from 'prop-types';
+import { supabase } from "../../lib/supabaseClient";
 
 // Definimos las propTypes con PropTypes
 EmailSentConfirmation.propTypes = {
-  onLogin: PropTypes.func.isRequired,  // onLogin es requerido y debe ser una función
   onResend: PropTypes.func.isRequired, // onResend es requerido y debe ser una función
   email: PropTypes.string.isRequired,  // email es requerido y debe ser un string
   className: PropTypes.string          // className es opcional y debe ser un string
 };
 
 export default function EmailSentConfirmation({
-  onResend,
   email,
-  className = ""  // Si no se pasa className, usamos un string vacío por defecto
+  className = ""
 }) {
   const [timeRemaining, setTimeRemaining] = useState(30);
   const [canResend, setCanResend] = useState(false);
@@ -31,11 +30,24 @@ export default function EmailSentConfirmation({
     }
   }, [timeRemaining]);
 
-  const handleResend = () => {
+  const handleResend = async () => {
     if (canResend) {
-      onResend();
-      setTimeRemaining(60);
-      setCanResend(false);
+      try {
+        const { error } = await supabase.auth.resend({
+          type: 'signup',
+          email: email
+        });
+        if (error) {
+          console.error("Error al reenviar el correo de verificación:", error.message);
+          alert("Hubo un problema al reenviar el correo de verificación. Intenta nuevamente.");
+        } else {
+          alert("Correo de verificación reenviado. Por favor, revisa tu bandeja de entrada.");
+          setTimeRemaining(60); // Reiniciar el contador de espera
+          setCanResend(false);   // Desactivar el botón de reenvío hasta que el tiempo expire
+        }
+      } catch (error) {
+        console.error("Error inesperado:", error);
+      }
     }
   };
 

@@ -16,36 +16,54 @@ const DashboardAutos = () => {
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
   const [Cotizaciones, setCotizaciones] = useState(0);
   const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
+  const [idMecanico, setIdMecanico] = useState(0);
 
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
 
-    const fetchOT = async () => {
+    const fetchIDMecanico = async () => {
       if (jwt) {
         try {
-          // const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[estado_ot_id][fields][0]=nom_estado`, {
-          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate=*`, {
+          const response = await fetcher(`${STRAPI_URL}/api/users/me?populate[mecanico][fields]=documentId`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
             },
           });
 
-          // const otIds = response.data || [];
-          // const validOtIds = otIds.filter(v => v && v.id);
-          console.log(response.data);
+          setIdMecanico(response.mecanico.documentId);
 
-          // setCotizaciones(validOtIds);
+        } catch (error) {
+          console.error('Error fetching IDMecanico:', error);
+        }
+      }
+    };
 
-          // setTotalCotizaciones(response.data.length);
+    const fetchCotizaciones = async () => {
+      if (jwt) {
+        try {
+          // const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&filters[estado_ot_id][nom_estado][$eq]=cotizando&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
+          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+
+          console.log('Cotizaciones:', response.data);
+          
+          setCotizaciones(response.data);
+
+          setTotalCotizaciones(response.data.length);
         } catch (error) {
           console.error('Error fetching vehicles:', error);
         }
       }
     };
 
-    fetchOT();
-  }, []);
+    fetchIDMecanico();
+    fetchCotizaciones();
+  }, [idMecanico]);
 
   const handleViewVehiculo = (vehiculo) => {
     console.log('Viewing vehiculo:', vehiculo);
@@ -55,11 +73,6 @@ const DashboardAutos = () => {
   const ordenes = [
     { cliente: "Juan Escobar", servicio: "Cambio de aceite", valor: "45.000", estado: "En Progreso" },
     { cliente: "María González", servicio: "Revisión de frenos", valor: "80.000", estado: "Sin iniciar" },
-  ];
-
-  // Datos para las cotizaciones pendientes
-  const cotizaciones = [
-    { cliente: "Ana Martínez", servicio: "Cambio de correa de distribución", valor: "150.000", fecha: "10-07-2023" },
   ];
 
   // Datos para los cuadros de resumen
@@ -89,6 +102,44 @@ const DashboardAutos = () => {
       header: "Año",
       key: "anio",
       render: (vehiculo) => vehiculo.anio || 'Año no disponible',
+    },
+  ];
+
+  const columns3 = [
+    {
+      header: "Cliente",
+      key: "cliente",
+      render: (Cotizaciones) => Cotizaciones.user ? Cotizaciones.user.username : 'Cliente no disponible',
+    },
+    {
+      header: "Servicio",
+      key: "servicio",
+      render: (Cotizaciones) => {
+        if (Cotizaciones.catalogo_servicios && Cotizaciones.catalogo_servicios.length > 0) {
+          const firstService = Cotizaciones.catalogo_servicios[0].tp_servicio;
+          const moreServices = Cotizaciones.catalogo_servicios.length > 1;
+          return moreServices ? `${firstService} (+${Cotizaciones.catalogo_servicios.length - 1} más)` : firstService;
+        }
+        return 'Servicio no disponible';
+      },
+    },
+    { 
+      header: "Valor", 
+      key: "valor", 
+      render: (Cotizaciones) => 
+        Cotizaciones.costo 
+          ? new Intl.NumberFormat('es-CL').format(Cotizaciones.costo) 
+          : 'Valor no disponible',
+    },
+    { 
+      header: "Fecha", 
+      key: "fecha", 
+      render: (Cotizaciones) => {
+        if (!Cotizaciones.fechainicio) return 'Fecha no disponible';
+        
+        const [year, month, day] = Cotizaciones.fechainicio.split('-');
+        return `${day}-${month}-${year}`;
+      }
     },
   ];
 
@@ -182,31 +233,7 @@ const DashboardAutos = () => {
             <Card>
               <CardContent className="overflow-x-auto">
                 <Table className="min-w-full">
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Cliente</TableHead>
-                      <TableHead>Servicio</TableHead>
-                      <TableHead>Valor</TableHead>
-                      <TableHead>Fecha</TableHead>
-                      <TableHead></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {cotizaciones.map((cotizacion, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{cotizacion.cliente}</TableCell>
-                        <TableCell>{cotizacion.servicio}</TableCell>
-                        <TableCell>{cotizacion.valor}</TableCell>
-                        <TableCell>{cotizacion.fecha}</TableCell>
-                        <TableCell>
-                          <button className="flex items-center text-sm">
-                            Ver
-                            <ChevronRight className="h-4 w-4 ml-1" />
-                          </button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
+                    <Tablas servicio={Cotizaciones} handleViewTabla={handleViewVehiculo} columns={columns3} />
                 </Table>
               </CardContent>
             </Card>
