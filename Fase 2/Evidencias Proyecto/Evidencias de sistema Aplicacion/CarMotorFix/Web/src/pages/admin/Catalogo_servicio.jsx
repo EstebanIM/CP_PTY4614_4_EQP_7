@@ -255,15 +255,27 @@ function Servicios() {
                                     )}
 
                                     <label className="flex items-center gap-2">
-                                        <input
-                                            type="checkbox"
-                                            name="Estado"
-                                            checked={newServicio.Estado}
-                                            onChange={handleChange}
-                                            className="form-checkbox"
-                                        />
-                                        Activo
+                                        <span className="text-gray-700">Activo</span>
+                                        <div className="relative">
+                                            <input
+                                                type="checkbox"
+                                                name="Estado"
+                                                checked={newServicio.Estado}
+                                                onChange={handleChange}
+                                                className="sr-only" // Esconde el checkbox original, dejándolo solo para accesibilidad
+                                            />
+                                            <div
+                                                className={`w-10 h-6 bg-gray-300 rounded-full transition duration-200 ${newServicio.Estado ? 'bg-green-500' : 'bg-gray-300'
+                                                    }`}
+                                            ></div>
+                                            <div
+                                                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${newServicio.Estado ? 'translate-x-4' : 'translate-x-0'
+                                                    }`}
+                                            ></div>
+                                        </div>
                                     </label>
+
+
 
                                     <input
                                         type="number"
