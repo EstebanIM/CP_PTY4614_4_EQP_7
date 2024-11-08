@@ -33,9 +33,15 @@
       "target": "api::orden-trabajo.orden-trabajo",
       "inversedBy": "catalogo_servicios"
     },
+<<<<<<< HEAD
     "estado": {
       "type": "boolean",
       "required": true
+=======
+    "Estado": {
+      "type": "boolean",
+      "default": true
+>>>>>>> e6f71608ac04ffbbc80348720d99baa57a149cd2
     }
   }
 }
