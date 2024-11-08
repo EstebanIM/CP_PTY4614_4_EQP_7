@@ -577,11 +577,7 @@ export interface ApiCatalogoServicioCatalogoServicio
       'manyToOne',
       'api::orden-trabajo.orden-trabajo'
     >;
-<<<<<<< HEAD
-    estado: Schema.Attribute.Boolean & Schema.Attribute.Required;
-=======
     Estado: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
->>>>>>> e6f71608ac04ffbbc80348720d99baa57a149cd2
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;

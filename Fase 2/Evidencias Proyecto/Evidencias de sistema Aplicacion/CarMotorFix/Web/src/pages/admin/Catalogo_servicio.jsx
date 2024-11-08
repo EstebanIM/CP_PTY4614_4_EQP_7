@@ -20,7 +20,7 @@ function Servicios() {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [newServicio, setNewServicio] = useState({
         tp_servicio: '',
-        estado: false, // Estado inicial como booleano
+        Estado: false, // Estado inicial como booleano
         costserv: '',
         ordentrabajo_catalogoservicio_id: ''
     });
@@ -112,7 +112,7 @@ function Servicios() {
                 const servicioData = {
                     data: {
                         tp_servicio: newServicio.tp_servicio,
-                        estado: newServicio.estado,
+                        Estado: newServicio.Estado, // Usar "Estado" en lugar de "estado"
                         costserv: parseFloat(newServicio.costserv)
                     }
                 };
@@ -135,7 +135,7 @@ function Servicios() {
                 }
 
                 setServicios([...servicios, response.data]);
-                setNewServicio({ tp_servicio: '', estado: false, costserv: '', ordentrabajo_catalogoservicio_id: '' });
+                setNewServicio({ tp_servicio: '', Estado: false, costserv: '', ordentrabajo_catalogoservicio_id: '' });
                 setSelectedCategory('');
                 setIsModalOpen(false);
             } catch (error) {
@@ -184,7 +184,7 @@ function Servicios() {
                                         {currentServicios.map((servicio) => (
                                             <TableRow key={servicio.id} className="hover:bg-gray-100">
                                                 <TableCell className="w-1/4">{servicio.tp_servicio || 'Sin especificar'}</TableCell>
-                                                <TableCell className="w-1/4">{servicio.estado ? 'Activo' : 'Inactivo'}</TableCell>
+                                                <TableCell className="w-1/4">{servicio.Estado ? 'Activo' : 'Inactivo'}</TableCell>
                                                 <TableCell className="w-1/4">${servicio.costserv || 'N/A'}</TableCell>
                                                 <TableCell className="w-1/4 px-6 py-4 font-medium text-right pr-4">
                                                     <ArrowRight
@@ -257,8 +257,8 @@ function Servicios() {
                                     <label className="flex items-center gap-2">
                                         <input
                                             type="checkbox"
-                                            name="estado"
-                                            checked={newServicio.estado}
+                                            name="Estado"
+                                            checked={newServicio.Estado}
                                             onChange={handleChange}
                                             className="form-checkbox"
                                         />
