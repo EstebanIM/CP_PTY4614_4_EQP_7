@@ -20,9 +20,9 @@ function Servicios() {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [newServicio, setNewServicio] = useState({
         tp_servicio: '',
-        descripcion: '',
         costserv: '',
-        ordentrabajo_catalogoservicio_id: ''
+        ordentrabajo_catalogoservicio_id: '',
+        estado: '' // Nuevo campo de estado
     });
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -89,8 +89,8 @@ function Servicios() {
                 const servicioData = {
                     data: {
                         tp_servicio: newServicio.tp_servicio,
-                        descripcion: newServicio.descripcion,
-                        costserv: parseFloat(newServicio.costserv)
+                        costserv: parseFloat(newServicio.costserv),
+                        estado: newServicio.estado // Añadimos el estado al enviar
                     }
                 };
 
@@ -112,7 +112,7 @@ function Servicios() {
                 }
 
                 setServicios([...servicios, response.data]);
-                setNewServicio({ tp_servicio: '', descripcion: '', costserv: '', ordentrabajo_catalogoservicio_id: '' });
+                setNewServicio({ tp_servicio: '', costserv: '', ordentrabajo_catalogoservicio_id: '', estado: '' });
                 setSelectedCategory('');
                 setIsModalOpen(false);
             } catch (error) {
@@ -152,8 +152,8 @@ function Servicios() {
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead>Tipo de Servicio</TableHead>
-                                            <TableHead>Descripción</TableHead>
                                             <TableHead>Costo</TableHead>
+                                            <TableHead>Estado</TableHead> {/* Nueva columna */}
                                             <TableHead></TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -161,8 +161,8 @@ function Servicios() {
                                         {servicios.map((servicio) => (
                                             <TableRow key={servicio.id} className="hover:bg-gray-100">
                                                 <TableCell>{servicio.tp_servicio || 'Sin especificar'}</TableCell>
-                                                <TableCell>{servicio.descripcion}</TableCell>
                                                 <TableCell>${servicio.costserv || 'N/A'}</TableCell>
+                                                <TableCell>{servicio.estado || 'N/A'}</TableCell> {/* Nueva celda */}
                                                 <TableCell className="px-6 py-4 font-medium text-right pr-4">
                                                     <ArrowRight
                                                         className="inline-block cursor-pointer"
@@ -212,20 +212,19 @@ function Servicios() {
                                     )}
 
                                     <input
-                                        type="text"
-                                        name="descripcion"
-                                        placeholder="Descripción"
-                                        value={newServicio.descripcion}
-                                        onChange={handleChange}
-                                        required
-                                        maxLength={200} 
-                                        className="p-2 border rounded w-full"
-                                    />
-                                    <input
                                         type="number"
                                         name="costserv"
                                         placeholder="Costo"
                                         value={newServicio.costserv}
+                                        onChange={handleChange}
+                                        required
+                                        className="p-2 border rounded w-full"
+                                    />
+                                    <input
+                                        type="text"
+                                        name="estado"
+                                        placeholder="Estado"
+                                        value={newServicio.estado}
                                         onChange={handleChange}
                                         required
                                         className="p-2 border rounded w-full"
