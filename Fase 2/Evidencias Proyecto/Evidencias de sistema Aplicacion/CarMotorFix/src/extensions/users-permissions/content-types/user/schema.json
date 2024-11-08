@@ -90,7 +90,7 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::mecanico.mecanico",
-      "inversedBy": "user"
+      "mappedBy": "user"
     }
   }
 }
