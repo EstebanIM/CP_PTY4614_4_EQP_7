@@ -11,7 +11,8 @@ import { User, IdCard, Mail, Lock, Bell, Palette, Eye, EyeOff } from 'lucide-rea
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import { fetcher } from '../../lib/strApi';
-import { getTokenFromLocalCookie } from '../../lib/cookies';
+import { getTokenFromLocalCookie, getIdFromLocalCookie } from '../../lib/cookies';
+import { supabase } from '../../lib/supabaseClient';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -30,6 +31,12 @@ export default function Config() {
     contrasenaAnterior: false,
     nuevaContrasena: false,
     repetirNuevaContrasena: false,
+  });
+
+  const [passwords, setPasswords] = useState({
+    contrasenaAnterior: "",
+    nuevaContrasena: "",
+    repetirNuevaContrasena: "",
   });
 
   useEffect(() => {
@@ -63,22 +70,8 @@ export default function Config() {
     setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
-  const handleSave = () => {
-    setIsEditing(false);
-  };
-
-  const handleChange = (e) => {
-    setUserData({ ...userData, [e.target.id]: e.target.value });
-  };
-
   const handlePasswordChange = async () => {
-    const contrasenaAnterior = document.getElementById("contrasenaAnterior").value;
-    const nuevaContrasena = document.getElementById("nuevaContrasena").value;
-    const repetirNuevaContrasena = document.getElementById("repetirNuevaContrasena").value;
+    const { contrasenaAnterior, nuevaContrasena, repetirNuevaContrasena } = passwords;
 
     // Validación básica de contraseñas
     if (!contrasenaAnterior || !nuevaContrasena || !repetirNuevaContrasena) {
@@ -92,9 +85,10 @@ export default function Config() {
     }
 
     try {
-      // Solicitud a la API para cambiar la contraseña
       const jwt = getTokenFromLocalCookie();
-      const response = await fetch(`${STRAPI_URL}/api/auth/change-password`, {
+
+      // Actualización de la contraseña en Strapi
+      const strapiResponse = await fetch(`${STRAPI_URL}/api/auth/change-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -102,24 +96,70 @@ export default function Config() {
         },
         body: JSON.stringify({
           currentPassword: contrasenaAnterior,
-          newPassword: nuevaContrasena,
+          password: nuevaContrasena,
+          passwordConfirmation: repetirNuevaContrasena,
         }),
       });
 
-      const data = await response.json();
+      const strapiData = await strapiResponse.json();
 
-      if (response.ok) {
+      if (strapiResponse.ok) {
         toast.success("Contraseña cambiada exitosamente.");
-        document.getElementById("contrasenaAnterior").value = "";
-        document.getElementById("nuevaContrasena").value = "";
-        document.getElementById("repetirNuevaContrasena").value = "";
+
+        await supabase.auth.updateUser({ password: nuevaContrasena });
+
+        // Limpiar los campos de contraseña
+        setPasswords({ contrasenaAnterior: "", nuevaContrasena: "", repetirNuevaContrasena: "" });
       } else {
-        toast.error(data.message || "Hubo un error al cambiar la contraseña.");
+        toast.error(strapiData.message || "Hubo un error al cambiar la contraseña en Strapi.");
       }
     } catch (error) {
       console.error("Error al cambiar la contraseña:", error);
       toast.error("Hubo un error al cambiar la contraseña.");
     }
+  };
+
+  const handlePasswordInputChange = (e) => {
+    const { id, value } = e.target;
+    setPasswords((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    const userjwt = getTokenFromLocalCookie();
+    const userId = await getIdFromLocalCookie();
+
+    try {
+      const accountResponse = await fetch(`${STRAPI_URL}/api/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${userjwt}`,
+        },
+        body: JSON.stringify({
+          nombre: userData.nombre,
+          apellido: userData.apellido
+        }),
+      });
+
+      if (accountResponse.ok) {
+        toast.success("Información actualizada exitosamente.");
+        setIsEditing(false);
+      } else {
+        const errorData = await accountResponse.json();
+        toast.error(errorData.message || "Hubo un error al actualizar la información.");
+      }
+    } catch (error) {
+      console.error("Error al actualizar la información:", error);
+      toast.error("Hubo un error al actualizar la información.");
+    }
+  };
+
+  const handleChange = (e) => {
+    setUserData({ ...userData, [e.target.id]: e.target.value });
   };
 
   return (
@@ -154,8 +194,7 @@ export default function Config() {
                             <Label htmlFor={key} className="flex items-center gap-2">
                               {key === 'email' ? <Mail className="h-4 w-4" /> :
                                 key === 'nombre' || key === 'apellido' ? <User className="h-4 w-4" /> :
-                                  key === 'run' ? <IdCard className="h-4 w-4" /> :
-                                    null}
+                                  key === 'run' ? <IdCard className="h-4 w-4" /> : null}
                               {key.charAt(0).toUpperCase() + key.slice(1)}
                             </Label>
                             {isEditing && key !== 'run' ? (
@@ -205,6 +244,8 @@ export default function Config() {
                           <Input
                             id={field}
                             type={showPasswords[field] ? 'text' : 'password'}
+                            value={passwords[field]}
+                            onChange={handlePasswordInputChange}
                           />
                           <Button
                             type="button"
@@ -219,7 +260,6 @@ export default function Config() {
                         </div>
                       </div>
                     ))}
-                    {/* Confirm Change Password Button */}
                     <div className="flex justify-start pt-4">
                       <Button onClick={handlePasswordChange}>
                         Confirmar Cambio
