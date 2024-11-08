@@ -20,7 +20,7 @@ function Servicios() {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [newServicio, setNewServicio] = useState({
         tp_servicio: '',
-        Estado: false, // Estado inicial como booleano
+        Estado: false,
         costserv: '',
         ordentrabajo_catalogoservicio_id: ''
     });
@@ -89,7 +89,7 @@ function Servicios() {
         const { name, value, type, checked } = e.target;
         setNewServicio({
             ...newServicio,
-            [name]: type === "checkbox" ? checked : value // Manejar el checkbox para el booleano
+            [name]: type === "checkbox" ? checked : value
         });
     };
 
@@ -112,7 +112,7 @@ function Servicios() {
                 const servicioData = {
                     data: {
                         tp_servicio: newServicio.tp_servicio,
-                        Estado: newServicio.Estado, // Usar "Estado" en lugar de "estado"
+                        Estado: newServicio.Estado,
                         costserv: parseFloat(newServicio.costserv)
                     }
                 };
@@ -218,7 +218,6 @@ function Servicios() {
                                 <ArrowRight className="h-5 w-5" />
                             </button>
                         </div>
-
                         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                             <h2 className="text-xl font-bold mb-4">Agregar Servicio</h2>
                             <form onSubmit={handleAddServicio}>
@@ -236,7 +235,6 @@ function Servicios() {
                                             </option>
                                         ))}
                                     </select>
-
                                     {selectedCategory && (
                                         <select
                                             name="tp_servicio"
@@ -253,7 +251,6 @@ function Servicios() {
                                             ))}
                                         </select>
                                     )}
-
                                     <label className="flex items-center gap-2">
                                         <span className="text-gray-700">Activo</span>
                                         <div className="relative">
@@ -262,7 +259,7 @@ function Servicios() {
                                                 name="Estado"
                                                 checked={newServicio.Estado}
                                                 onChange={handleChange}
-                                                className="sr-only" // Esconde el checkbox original, dejándolo solo para accesibilidad
+                                                className="sr-only"
                                             />
                                             <div
                                                 className={`w-10 h-6 bg-gray-300 rounded-full transition duration-200 ${newServicio.Estado ? 'bg-green-500' : 'bg-gray-300'
@@ -274,9 +271,6 @@ function Servicios() {
                                             ></div>
                                         </div>
                                     </label>
-
-
-
                                     <input
                                         type="number"
                                         name="costserv"

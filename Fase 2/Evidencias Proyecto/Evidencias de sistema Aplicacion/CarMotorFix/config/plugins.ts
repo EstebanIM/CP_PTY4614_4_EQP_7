@@ -1,7 +1,14 @@
 module.exports = ({ env }) => ({
-    'strapi-plugin-populate-deep': {
+    email: {
         config: {
-            defaultDepth: 3, // Default is 5
+            provider: 'strapi-provider-email-resend',
+            providerOptions: {
+                apiKey: env('RESEND_API_KEY'),
+            },
+            settings: {
+                defaultFrom: 'no-reply@diego0alonso.dev',
+                defaultReplyTo: 'no-reply@diego0alonso.dev',
+            },
         }
-    },
+    }
 });

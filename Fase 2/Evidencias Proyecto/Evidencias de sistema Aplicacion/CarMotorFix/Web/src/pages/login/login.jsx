@@ -45,6 +45,8 @@ export default function ResponsiveAuthForm({ className = "" }) {
         await register(email, password, name, surname, rut);
         toast.success("Registro exitoso, revisa tu correo para confirmar tu cuenta");
         navigate("/verify-email");
+      } else if (mode === "reset") {
+        toast.success("Correo de recuperación enviado");
       }
     } catch (error) {
       toast.error("Error: " + error.message);
