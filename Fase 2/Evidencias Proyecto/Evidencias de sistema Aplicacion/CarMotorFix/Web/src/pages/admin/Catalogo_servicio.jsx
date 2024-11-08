@@ -5,7 +5,7 @@ import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import { Button } from '../../components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import opcionesServicios from '../../lib/servicios.json';
 import Modal from '../../components/forms/modal';
@@ -20,10 +20,14 @@ function Servicios() {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [newServicio, setNewServicio] = useState({
         tp_servicio: '',
+        estado: false, // Estado inicial como booleano
         costserv: '',
-        ordentrabajo_catalogoservicio_id: '',
-        estado: '' // Nuevo campo de estado
+        ordentrabajo_catalogoservicio_id: ''
     });
+
+    // Estados para paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 7;
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
@@ -66,8 +70,27 @@ function Servicios() {
         fetchUserRole();
     }, [STRAPI_URL]);
 
+    // Paginación
+    const paginate = (data, currentPage) => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return data.slice(startIndex, startIndex + itemsPerPage);
+    };
+
+    const currentServicios = paginate(servicios, currentPage);
+
+    const handlePageChange = (newPage) => {
+        const totalPages = Math.ceil(servicios.length / itemsPerPage);
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
     const handleChange = (e) => {
-        setNewServicio({ ...newServicio, [e.target.name]: e.target.value });
+        const { name, value, type, checked } = e.target;
+        setNewServicio({
+            ...newServicio,
+            [name]: type === "checkbox" ? checked : value // Manejar el checkbox para el booleano
+        });
     };
 
     const handleCategoryChange = (e) => {
@@ -89,8 +112,8 @@ function Servicios() {
                 const servicioData = {
                     data: {
                         tp_servicio: newServicio.tp_servicio,
-                        costserv: parseFloat(newServicio.costserv),
-                        estado: newServicio.estado // Añadimos el estado al enviar
+                        estado: newServicio.estado,
+                        costserv: parseFloat(newServicio.costserv)
                     }
                 };
 
@@ -112,7 +135,7 @@ function Servicios() {
                 }
 
                 setServicios([...servicios, response.data]);
-                setNewServicio({ tp_servicio: '', costserv: '', ordentrabajo_catalogoservicio_id: '', estado: '' });
+                setNewServicio({ tp_servicio: '', estado: false, costserv: '', ordentrabajo_catalogoservicio_id: '' });
                 setSelectedCategory('');
                 setIsModalOpen(false);
             } catch (error) {
@@ -148,22 +171,22 @@ function Servicios() {
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
-                                <Table className="min-w-full divide-y divide-gray-200">
-                                    <TableHeader>
+                                <Table className="min-w-full divide-y divide-gray-200 table-fixed">
+                                    <TableHeader className="bg-gray-100 sticky top-0 z-10">
                                         <TableRow>
-                                            <TableHead>Tipo de Servicio</TableHead>
-                                            <TableHead>Costo</TableHead>
-                                            <TableHead>Estado</TableHead> {/* Nueva columna */}
-                                            <TableHead></TableHead>
+                                            <TableHead className="p-2 w-1/4">Tipo de Servicio</TableHead>
+                                            <TableHead className="p-2 w-1/4">Estado</TableHead>
+                                            <TableHead className="p-2 w-1/4">Costo</TableHead>
+                                            <TableHead className="p-2 w-1/4"></TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {servicios.map((servicio) => (
+                                        {currentServicios.map((servicio) => (
                                             <TableRow key={servicio.id} className="hover:bg-gray-100">
-                                                <TableCell>{servicio.tp_servicio || 'Sin especificar'}</TableCell>
-                                                <TableCell>${servicio.costserv || 'N/A'}</TableCell>
-                                                <TableCell>{servicio.estado || 'N/A'}</TableCell> {/* Nueva celda */}
-                                                <TableCell className="px-6 py-4 font-medium text-right pr-4">
+                                                <TableCell className="w-1/4">{servicio.tp_servicio || 'Sin especificar'}</TableCell>
+                                                <TableCell className="w-1/4">{servicio.estado ? 'Activo' : 'Inactivo'}</TableCell>
+                                                <TableCell className="w-1/4">${servicio.costserv || 'N/A'}</TableCell>
+                                                <TableCell className="w-1/4 px-6 py-4 font-medium text-right pr-4">
                                                     <ArrowRight
                                                         className="inline-block cursor-pointer"
                                                         onClick={() => handleViewServicio(servicio.documentId)}
@@ -173,8 +196,28 @@ function Servicios() {
                                         ))}
                                     </TableBody>
                                 </Table>
+
                             </div>
                         )}
+
+                        {/* Controles de Paginación */}
+                        <div className="flex items-center justify-center space-x-4 mt-4">
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <ArrowLeft className="h-5 w-5" />
+                            </button>
+                            <span className="text-xs text-gray-500">Página {currentPage} de {Math.ceil(servicios.length / itemsPerPage)}</span>
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === Math.ceil(servicios.length / itemsPerPage)}
+                                className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <ArrowRight className="h-5 w-5" />
+                            </button>
+                        </div>
 
                         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                             <h2 className="text-xl font-bold mb-4">Agregar Servicio</h2>
@@ -211,20 +254,22 @@ function Servicios() {
                                         </select>
                                     )}
 
+                                    <label className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            name="estado"
+                                            checked={newServicio.estado}
+                                            onChange={handleChange}
+                                            className="form-checkbox"
+                                        />
+                                        Activo
+                                    </label>
+
                                     <input
                                         type="number"
                                         name="costserv"
                                         placeholder="Costo"
                                         value={newServicio.costserv}
-                                        onChange={handleChange}
-                                        required
-                                        className="p-2 border rounded w-full"
-                                    />
-                                    <input
-                                        type="text"
-                                        name="estado"
-                                        placeholder="Estado"
-                                        value={newServicio.estado}
                                         onChange={handleChange}
                                         required
                                         className="p-2 border rounded w-full"

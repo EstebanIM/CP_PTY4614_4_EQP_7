@@ -557,6 +557,7 @@ export interface ApiCatalogoServicioCatalogoServicio
     singularName: 'catalogo-servicio';
     pluralName: 'catalogo-servicios';
     displayName: 'Catalogo_servicio';
+    description: '';
   };
   options: {
     draftAndPublish: false;
@@ -567,11 +568,6 @@ export interface ApiCatalogoServicioCatalogoServicio
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 40;
       }>;
-    descripcion: Schema.Attribute.Text &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 200;
-      }>;
     costserv: Schema.Attribute.Integer & Schema.Attribute.Required;
     ordentrabajo_catalogoservicio_id: Schema.Attribute.Relation<
       'manyToOne',
@@ -581,6 +577,7 @@ export interface ApiCatalogoServicioCatalogoServicio
       'manyToOne',
       'api::orden-trabajo.orden-trabajo'
     >;
+    estado: Schema.Attribute.Boolean & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
