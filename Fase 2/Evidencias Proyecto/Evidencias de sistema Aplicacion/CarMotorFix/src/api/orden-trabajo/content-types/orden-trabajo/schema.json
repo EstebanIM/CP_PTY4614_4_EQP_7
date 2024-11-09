@@ -64,9 +64,9 @@
     },
     "vehiculo": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "api::vehiculo.vehiculo",
-      "inversedBy": "ot"
+      "inversedBy": "ots"
     }
   }
 }

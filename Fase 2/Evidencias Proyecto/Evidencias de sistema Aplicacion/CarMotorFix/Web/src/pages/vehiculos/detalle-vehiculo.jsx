@@ -5,8 +5,8 @@ import { getTokenFromLocalCookie } from '../../lib/cookies';
 import DashboardSidebar from '../../components/menu/DashboardSidebar';
 import DashboardHeader from '../../components/menu/DashboardHeader';
 import { Button } from '../../components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
 import LoadingComponent from '../../components/animation/loading';
+import Tablas from '../../components/Tablas';
 
 function DetalleVehiculo() {
     const { id } = useParams();
@@ -15,15 +15,17 @@ function DetalleVehiculo() {
     const [vehiculo, setVehiculo] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({});
-    const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
     const navigate = useNavigate();
+
+    const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
     const fetchVehiculo = useCallback(async () => {
         if (id) {
             const jwt = getTokenFromLocalCookie();
             if (jwt) {
                 try {
-                    const response = await fetcher(`${STRAPI_URL}/api/vehiculos/${id}?populate[marca_id][fields][0]=nombre_marca&populate[tp_vehiculo_id][fields][0]=nom_tp_vehiculo`, {
+                    // const response = await fetcher(`${STRAPI_URL}/api/vehiculos/${id}?populate[marca_id][fields][0]=nombre_marca&populate[tp_vehiculo_id][fields][0]=nom_tp_vehiculo`, {
+                    const response = await fetcher(`${STRAPI_URL}/api/vehiculos/${id}?populate=*`, {
                         headers: {
                             'Content-Type': 'application/json',
                             Authorization: `Bearer ${jwt}`,
@@ -31,6 +33,8 @@ function DetalleVehiculo() {
                     });
                     setVehiculo(response.data);
                     setEditData(response.data);
+                    console.log("OT:", response.data.ots);
+                    
                 } catch (error) {
                     console.error('Error fetching vehicle details:', error);
                 }
@@ -62,7 +66,7 @@ function DetalleVehiculo() {
     useEffect(() => {
         fetchVehiculo();
         fetchUserRole();
-    }, [fetchVehiculo]);
+    }, []);
 
     const handleBack = () => {
         navigate('/dashboard');
@@ -119,6 +123,25 @@ function DetalleVehiculo() {
     };
 
     if (!vehiculo) return <LoadingComponent />;
+
+    const columns = [
+        {
+            header: "#",
+            key: "id",
+        },
+        {
+            header: "Fecha",
+            key: "fecha",
+        },
+        {
+            header: "Tipo de mantención",
+            key: "tipo_mantencion",
+        },
+        {
+            header: "Valor",
+            key: "valor",
+        }
+    ];
 
     return (
         <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
@@ -181,28 +204,9 @@ function DetalleVehiculo() {
 
                     <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto">
                         <h3 className="text-lg sm:text-xl font-semibold mb-4">Historial de Mantenimiento</h3>
-                        <Table className="min-w-full">
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>#</TableHead>
-                                    <TableHead>Fecha</TableHead>
-                                    <TableHead>Tipo de mantención</TableHead>
-                                    <TableHead>Detalle de la mantención</TableHead>
-                                    <TableHead>Valor</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {vehiculo.historialMantenimiento && vehiculo.historialMantenimiento.map((mantenimiento, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>{index + 1}</TableCell>
-                                        <TableCell>{mantenimiento.fecha}</TableCell>
-                                        <TableCell>{mantenimiento.tipo}</TableCell>
-                                        <TableCell>{mantenimiento.detalle}</TableCell>
-                                        <TableCell>{mantenimiento.valor}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                        <div className="min-w-full">
+                            <Tablas servicio={vehiculo} columns={columns} />
+                        </div>
                     </div>
                 </div>
             </div>

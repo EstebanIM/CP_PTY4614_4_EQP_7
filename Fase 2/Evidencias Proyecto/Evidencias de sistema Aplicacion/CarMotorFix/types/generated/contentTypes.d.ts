@@ -831,7 +831,7 @@ export interface ApiOrdenTrabajoOrdenTrabajo
       'manyToOne',
       'plugin::users-permissions.user'
     >;
-    vehiculo: Schema.Attribute.Relation<'oneToOne', 'api::vehiculo.vehiculo'>;
+    vehiculo: Schema.Attribute.Relation<'manyToOne', 'api::vehiculo.vehiculo'>;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -1040,8 +1040,8 @@ export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::mecanico.mecanico'
     >;
-    ot: Schema.Attribute.Relation<
-      'oneToOne',
+    ots: Schema.Attribute.Relation<
+      'oneToMany',
       'api::orden-trabajo.orden-trabajo'
     >;
     createdAt: Schema.Attribute.DateTime;
