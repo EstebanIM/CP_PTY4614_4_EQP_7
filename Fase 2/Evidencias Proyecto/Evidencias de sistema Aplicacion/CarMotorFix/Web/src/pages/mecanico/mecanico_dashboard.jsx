@@ -168,7 +168,6 @@ const DashboardAutos = () => {
     }
   ];
 
-
   const columns3 = [
     {
       header: "Cliente",

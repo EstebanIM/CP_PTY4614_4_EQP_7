@@ -15,6 +15,7 @@ function DetalleVehiculo() {
     const [vehiculo, setVehiculo] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({});
+    const [ots, setOts] = useState([]);
     const navigate = useNavigate();
 
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
@@ -33,8 +34,8 @@ function DetalleVehiculo() {
                     });
                     setVehiculo(response.data);
                     setEditData(response.data);
-                    console.log("OT:", response.data.ots);
-                    
+                    setOts(response.data.ots || []);
+
                 } catch (error) {
                     console.error('Error fetching vehicle details:', error);
                 }
@@ -122,24 +123,40 @@ function DetalleVehiculo() {
         }
     };
 
+    const handleViewOT = (id) => {
+        console.log("Ver OT:", id);
+
+        // navigate(`/dashboard/ots/${id}`);
+    };
+
     if (!vehiculo) return <LoadingComponent />;
 
     const columns = [
         {
             header: "#",
             key: "id",
+            render: (ots) => ots.id || 'Sin ID',
         },
         {
             header: "Fecha",
             key: "fecha",
+            render: (ots) => {
+                if (!ots.fechainicio) return 'Fecha no disponible';
+                const [year, month, day] = ots.fechainicio.split('-');
+                return `${day}-${month}-${year}`;
+            }
         },
         {
             header: "Tipo de mantención",
             key: "tipo_mantencion",
+            render: (ots) => ots.tipo_mantencion || 'Sin tipo',
         },
         {
             header: "Valor",
             key: "valor",
+            render: (ots) => ots.costo
+                ? new Intl.NumberFormat('es-CL').format(ots.costo)
+                : 'Total no disponible',
         }
     ];
 
@@ -205,7 +222,15 @@ function DetalleVehiculo() {
                     <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto">
                         <h3 className="text-lg sm:text-xl font-semibold mb-4">Historial de Mantenimiento</h3>
                         <div className="min-w-full">
-                            <Tablas servicio={vehiculo} columns={columns} />
+                            {ots.length === 0 ? (
+                                <div className="text-center text-gray-500 mt-4">
+                                    <h4 className="text-xl">No hay historial sobre este vehiculo.</h4>
+                                </div>
+                            ) : (
+                                <div>
+                                    <Tablas servicio={ots} handleViewTabla={handleViewOT} columns={columns} />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
