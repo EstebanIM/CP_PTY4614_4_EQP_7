@@ -5,7 +5,8 @@ import { getTokenFromLocalCookie } from '../../lib/cookies';
 import DashboardSidebar from '../../components/menu/DashboardSidebar';
 import DashboardHeader from '../../components/menu/DashboardHeader';
 import { Button } from '../../components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
+import { Table } from "../../components/ui/tables/table";
+import Tablas from "../../components/Tablas";
 import LoadingComponent from '../../components/animation/loading';
 
 function DetalleVehiculo() {
@@ -221,34 +222,15 @@ function DetalleVehiculo() {
                     <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto">
                         <h3 className="text-lg sm:text-xl font-semibold mb-4">Historial de Mantenimiento</h3>
                         <Table className="min-w-full">
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>#</TableHead>
-                                    <TableHead>Fecha</TableHead>
-                                    <TableHead>Tipo de mantención</TableHead>
-                                    <TableHead>Detalle de la mantención</TableHead>
-                                    <TableHead>Valor</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {vehiculo.historialMantenimiento && vehiculo.historialMantenimiento.length > 0 ? (
-                                    vehiculo.historialMantenimiento.map((mantenimiento, index) => (
-                                        <TableRow key={index}>
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{mantenimiento.fecha}</TableCell>
-                                            <TableCell>{mantenimiento.tipo}</TableCell>
-                                            <TableCell>{mantenimiento.detalle}</TableCell>
-                                            <TableCell>{mantenimiento.valor}</TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="text-center text-gray-500 py-4">
-                                            No hay historial sobre este vehículo.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
+                        {ots.length === 0 ? (
+                                <div className="text-center text-gray-500 mt-4">
+                                    <h4 className="text-xl">No hay historial sobre este vehiculo.</h4>
+                                </div>
+                            ) : (
+                                <div>
+                                    <Tablas servicio={ots} handleViewTabla={handleViewOT} columns={columns} />
+                                </div>
+                            )}
                         </Table>
                     </div>
                 </div>
