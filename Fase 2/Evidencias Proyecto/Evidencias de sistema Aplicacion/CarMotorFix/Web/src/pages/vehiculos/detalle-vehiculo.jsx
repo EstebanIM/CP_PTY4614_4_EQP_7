@@ -15,8 +15,10 @@ function DetalleVehiculo() {
     const [vehiculo, setVehiculo] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({});
-    const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
+    const [ots, setOts] = useState([]);
     const navigate = useNavigate();
+
+    const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
     const fetchVehiculo = useCallback(async () => {
         if (id) {
@@ -31,6 +33,8 @@ function DetalleVehiculo() {
                     });
                     setVehiculo(response.data);
                     setEditData(response.data);
+                    setOts(response.data.ots || []);
+
                 } catch (error) {
                     console.error('Error fetching vehicle details:', error);
                 }
@@ -118,7 +122,42 @@ function DetalleVehiculo() {
         }
     };
 
+    const handleViewOT = (id) => {
+        console.log("Ver OT:", id);
+
+        // navigate(`/dashboard/ots/${id}`);
+    };
+
     if (!vehiculo) return <LoadingComponent />;
+
+    const columns = [
+        {
+            header: "#",
+            key: "id",
+            render: (ots) => ots.id || 'Sin ID',
+        },
+        {
+            header: "Fecha",
+            key: "fecha",
+            render: (ots) => {
+                if (!ots.fechainicio) return 'Fecha no disponible';
+                const [year, month, day] = ots.fechainicio.split('-');
+                return `${day}-${month}-${year}`;
+            }
+        },
+        {
+            header: "Tipo de mantención",
+            key: "tipo_mantencion",
+            render: (ots) => ots.tipo_mantencion || 'Sin tipo',
+        },
+        {
+            header: "Valor",
+            key: "valor",
+            render: (ots) => ots.costo
+                ? new Intl.NumberFormat('es-CL').format(ots.costo)
+                : 'Total no disponible',
+        }
+    ];
 
     return (
         <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
@@ -192,17 +231,26 @@ function DetalleVehiculo() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {vehiculo.historialMantenimiento && vehiculo.historialMantenimiento.map((mantenimiento, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>{index + 1}</TableCell>
-                                        <TableCell>{mantenimiento.fecha}</TableCell>
-                                        <TableCell>{mantenimiento.tipo}</TableCell>
-                                        <TableCell>{mantenimiento.detalle}</TableCell>
-                                        <TableCell>{mantenimiento.valor}</TableCell>
+                                {vehiculo.historialMantenimiento && vehiculo.historialMantenimiento.length > 0 ? (
+                                    vehiculo.historialMantenimiento.map((mantenimiento, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell>{index + 1}</TableCell>
+                                            <TableCell>{mantenimiento.fecha}</TableCell>
+                                            <TableCell>{mantenimiento.tipo}</TableCell>
+                                            <TableCell>{mantenimiento.detalle}</TableCell>
+                                            <TableCell>{mantenimiento.valor}</TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="text-center text-gray-500 py-4">
+                                            No hay historial sobre este vehículo.
+                                        </TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
+
                     </div>
                 </div>
             </div>
