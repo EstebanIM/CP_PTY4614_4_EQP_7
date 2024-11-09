@@ -26,7 +26,7 @@ function DetalleVehiculo() {
             const jwt = getTokenFromLocalCookie();
             if (jwt) {
                 try {
-                    const response = await fetcher(`${STRAPI_URL}/api/vehiculos/${id}?populate[marca_id][fields][0]=nombre_marca&populate[tp_vehiculo_id][fields][0]=nom_tp_vehiculo`, {
+                    const response = await fetcher(`${STRAPI_URL}/api/vehiculos/${id}?populate[marca_id][fields]=nombre_marca&populate[tp_vehiculo_id][fields]=nom_tp_vehiculo&populate=ots`, {
                         headers: {
                             'Content-Type': 'application/json',
                             Authorization: `Bearer ${jwt}`,
@@ -57,7 +57,6 @@ function DetalleVehiculo() {
                 });
 
                 setUserRole(response.role.name);
-                console.log("User role:", response);
             } catch (error) {
                 console.error("Error fetching user role:", error);
             }
@@ -67,7 +66,7 @@ function DetalleVehiculo() {
     useEffect(() => {
         fetchVehiculo();
         fetchUserRole();
-    }, [fetchVehiculo]);
+    }, []);
 
     const handleBack = () => {
         navigate('/dashboard');
