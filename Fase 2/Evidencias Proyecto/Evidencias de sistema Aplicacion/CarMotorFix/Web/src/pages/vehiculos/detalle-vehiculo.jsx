@@ -250,7 +250,6 @@ function DetalleVehiculo() {
                                 )}
                             </TableBody>
                         </Table>
-
                     </div>
                 </div>
             </div>

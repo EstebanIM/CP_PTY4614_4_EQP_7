@@ -357,6 +357,9 @@ const DashboardAdmin = () => {
                             <TableCell>{vehiculo.modelo || 'Modelo no disponible'}</TableCell>
                             <TableCell>{vehiculo.patente || 'Patente no disponible'}</TableCell>
                             <TableCell>{vehiculo.anio || 'Año no disponible'}</TableCell>
+                            <TableCell>
+                              <ArrowRight onClick={() => handleViewVehiculo(vehiculo.id)} className="cursor-pointer text-gray-500 hover:text-gray-700" />
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -395,6 +398,9 @@ const DashboardAdmin = () => {
                             <TableCell>{cotizacion.fechainicio || 'Fecha no disponible'}</TableCell>
                             <TableCell>${cotizacion.costo || 'N/A'}</TableCell>
                             <TableCell>{cotizacion.estado_ot_id?.nom_estado || 'Estado no disponible'}</TableCell>
+                            <TableCell>
+                              <ArrowRight onClick={() => handleViewVehiculo(cotizacion.id)} className="cursor-pointer text-gray-500 hover:text-gray-700" />
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -435,6 +441,9 @@ const DashboardAdmin = () => {
                             <TableCell>{orden.catalogo_servicios[0]?.tp_servicio || 'Servicio no disponible'}</TableCell>
                             <TableCell>{orden.estado_ot_id?.nom_estado || 'Estado no disponible'}</TableCell>
                             <TableCell>${orden.costo || 'N/A'}</TableCell>
+                            <TableCell>
+                              <ArrowRight onClick={() => handleViewVehiculo(orden.id)} className="cursor-pointer text-gray-500 hover:text-gray-700" />
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
