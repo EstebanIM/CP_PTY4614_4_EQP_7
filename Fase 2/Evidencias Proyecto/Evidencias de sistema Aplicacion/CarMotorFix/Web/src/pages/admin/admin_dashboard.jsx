@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
-import { Table } from "../../components/ui/tables/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { fetcher } from "../../lib/strApi";
 import { getTokenFromLocalCookie } from "../../lib/cookies";
@@ -74,7 +74,7 @@ const DashboardAdmin = () => {
   const [currentPageCotizaciones, setCurrentPageCotizaciones] = useState(1);
   const [currentPageOrdenes, setCurrentPageOrdenes] = useState(1);
   const itemsPerPage = 4;
-  
+
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
     const fetchVehiculos = async () => {
@@ -127,7 +127,7 @@ const DashboardAdmin = () => {
               Authorization: `Bearer ${jwt}`,
             },
           });
-          
+
           const otIds = response.data || [];
           const validOtIds = otIds.filter(v => v && v.id);
 
@@ -164,68 +164,68 @@ const DashboardAdmin = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return data.slice(startIndex, startIndex + itemsPerPage);
   };
-  
+
 
   const currentAutos = paginate(vehiculos, currentPageAutos);
   const currentCotizaciones = paginate(Cotizaciones, currentPageCotizaciones);
   const currentOrdenes = paginate(Ordenes, currentPageOrdenes);
 
   const columns = [
-    { 
+    {
       header: "Cliente",
       key: "cliente",
       render: (vehiculo) => vehiculo.user_id ? vehiculo.user_id.username : 'Cliente desconocida'
     },
-    { 
+    {
       header: "Marca",
       key: "marca",
       render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida'
     },
-    { 
-      header: "Modelo", 
-      key: "modelo", 
-      render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible' 
+    {
+      header: "Modelo",
+      key: "modelo",
+      render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible'
     },
-    { 
-      header: "Patente", 
-      key: "patente", 
-      render: (vehiculo) => vehiculo.patente || 'Patente no disponible' 
+    {
+      header: "Patente",
+      key: "patente",
+      render: (vehiculo) => vehiculo.patente || 'Patente no disponible'
     },
-    { 
-      header: "Año", 
-      key: "anio", 
-      render: (vehiculo) => vehiculo.anio || 'Año no disponible' 
+    {
+      header: "Año",
+      key: "anio",
+      render: (vehiculo) => vehiculo.anio || 'Año no disponible'
     },
   ];
 
   const columns2 = [
-    { 
-      header: "Cliente", 
+    {
+      header: "Cliente",
       key: "cliente",
-      render: (cotizacion) => cotizacion.user.username || 'Cliente no disponible' 
+      render: (cotizacion) => cotizacion.user.username || 'Cliente no disponible'
     },
-    { 
-      header: "Fecha", 
-      key: "fecha", 
+    {
+      header: "Fecha",
+      key: "fecha",
       render: (cotizacion) => {
         if (!cotizacion.fechainicio) return 'Fecha no disponible';
-        
+
         const [year, month, day] = cotizacion.fechainicio.split('-');
         return `${day}-${month}-${year}`;
       }
-    },    
-    { 
-      header: "Valor", 
-      key: "valor", 
-      render: (cotizacion) => 
-        cotizacion.costo 
-          ? new Intl.NumberFormat('es-CL').format(cotizacion.costo) 
+    },
+    {
+      header: "Valor",
+      key: "valor",
+      render: (cotizacion) =>
+        cotizacion.costo
+          ? new Intl.NumberFormat('es-CL').format(cotizacion.costo)
           : 'Total no disponible',
     },
-    { 
-      header: "Estado", 
-      key: "estado", 
-      render: (cotizacion) => cotizacion.estado_ot_id ? cotizacion.estado_ot_id.nom_estado : 'Estado no disponible' 
+    {
+      header: "Estado",
+      key: "estado",
+      render: (cotizacion) => cotizacion.estado_ot_id ? cotizacion.estado_ot_id.nom_estado : 'Estado no disponible'
     },
   ];
 
@@ -260,15 +260,15 @@ const DashboardAdmin = () => {
     {
       header: "Total",
       key: "total",
-      render: (Ordenes) => 
-        Ordenes.costo 
-          ? new Intl.NumberFormat('es-CL').format(Ordenes.costo) 
+      render: (Ordenes) =>
+        Ordenes.costo
+          ? new Intl.NumberFormat('es-CL').format(Ordenes.costo)
           : 'Total no disponible',
-    }    
+    }
 
   ];
-  
-    const renderPaginationControls = (currentPage, setCurrentPage, totalItems) => {
+
+  const renderPaginationControls = (currentPage, setCurrentPage, totalItems) => {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     return (
       <div className="flex items-center space-x-2">
@@ -290,9 +290,11 @@ const DashboardAdmin = () => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex flex-col md:flex-row">
       <div className="flex-1">
         <div className="container mx-auto p-4">
+
+          {/* Tarjetas de estadísticas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <CountUpCard title="Total de Autos" value={TotalVehiculos} />
             <CountUpCard title="Cotizaciones Pendientes" value={TotalCotizaciones} />
@@ -301,12 +303,29 @@ const DashboardAdmin = () => {
           </div>
 
           <div className="mb-6">
-            <div className="flex space-x-4">
-              <button onClick={() => setActiveTab("autos")} className={`px-4 py-2 font-medium ${activeTab === "autos" ? "text-black border-b-2 border-black" : "text-gray-500"}`}>Autos</button>
-              <button onClick={() => setActiveTab("cotizaciones")} className={`px-4 py-2 font-medium ${activeTab === "cotizaciones" ? "text-black border-b-2 border-black" : "text-gray-500"}`}>Cotizaciones</button>
-              <button onClick={() => setActiveTab("ordenes")} className={`px-4 py-2 font-medium ${activeTab === "ordenes" ? "text-black border-b-2 border-black" : "text-gray-500"}`}>Órdenes</button>
+            {/* Botones de navegación por pestañas */}
+            <div className="flex flex-wrap space-x-4 mb-4 overflow-auto">
+              <button
+                onClick={() => setActiveTab("autos")}
+                className={`px-4 py-2 font-medium ${activeTab === "autos" ? "text-black border-b-2 border-black" : "text-gray-500"}`}
+              >
+                Autos
+              </button>
+              <button
+                onClick={() => setActiveTab("cotizaciones")}
+                className={`px-4 py-2 font-medium ${activeTab === "cotizaciones" ? "text-black border-b-2 border-black" : "text-gray-500"}`}
+              >
+                Cotizaciones
+              </button>
+              <button
+                onClick={() => setActiveTab("ordenes")}
+                className={`px-4 py-2 font-medium ${activeTab === "ordenes" ? "text-black border-b-2 border-black" : "text-gray-500"}`}
+              >
+                Órdenes
+              </button>
             </div>
 
+            {/* Sección de Autos */}
             {activeTab === "autos" && (
               <motion.div initial="hidden" animate="visible" exit="hidden" variants={variants}>
                 <Card>
@@ -319,16 +338,35 @@ const DashboardAdmin = () => {
                     </div>
                   </CardHeader>
 
-
                   <CardContent className="overflow-x-auto">
-                    <Table className="min-w-full">
-                      <Tablas servicio={currentAutos} handleViewTabla={handleViewVehiculo} columns={columns} />
+                    <Table className="min-w-full divide-y divide-gray-200 table-fixed">
+                      <TableHeader className="bg-gray-200 sticky top-0 z-10">
+                        <TableRow>
+                          <TableHead className="p-2 min-w-[100px]">Cliente</TableHead>
+                          <TableHead className="p-2 min-w-[100px]">Marca</TableHead>
+                          <TableHead className="p-2 min-w-[100px]">Modelo</TableHead>
+                          <TableHead className="p-2 min-w-[100px]">Patente</TableHead>
+                          <TableHead className="p-2 min-w-[60px]">Año</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {currentAutos.map((vehiculo) => (
+                          <TableRow key={vehiculo.id} className="hover:bg-gray-100">
+                            <TableCell>{vehiculo.user_id?.username || 'Cliente desconocido'}</TableCell>
+                            <TableCell>{vehiculo.marca_id?.nombre_marca || 'Marca desconocida'}</TableCell>
+                            <TableCell>{vehiculo.modelo || 'Modelo no disponible'}</TableCell>
+                            <TableCell>{vehiculo.patente || 'Patente no disponible'}</TableCell>
+                            <TableCell>{vehiculo.anio || 'Año no disponible'}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
                     </Table>
                   </CardContent>
                 </Card>
               </motion.div>
             )}
 
+            {/* Sección de Cotizaciones */}
             {activeTab === "cotizaciones" && (
               <motion.div initial="hidden" animate="visible" exit="hidden" variants={variants}>
                 <Card>
@@ -341,14 +379,32 @@ const DashboardAdmin = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
-                    <Table className="min-w-full">
-                      <Tablas servicio={currentCotizaciones} handleViewTabla={handleViewVehiculo} columns={columns2} />
+                    <Table className="min-w-full divide-y divide-gray-200 table-fixed">
+                      <TableHeader className="bg-gray-100 sticky top-0 z-10">
+                        <TableRow>
+                          <TableHead className="p-2 min-w-[100px]">Cliente</TableHead>
+                          <TableHead className="p-2 min-w-[100px]">Fecha</TableHead>
+                          <TableHead className="p-2 min-w-[100px]">Valor</TableHead>
+                          <TableHead className="p-2 min-w-[100px]">Estado</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {currentCotizaciones.map((cotizacion) => (
+                          <TableRow key={cotizacion.id} className="hover:bg-gray-100">
+                            <TableCell>{cotizacion.user.username || 'Cliente no disponible'}</TableCell>
+                            <TableCell>{cotizacion.fechainicio || 'Fecha no disponible'}</TableCell>
+                            <TableCell>${cotizacion.costo || 'N/A'}</TableCell>
+                            <TableCell>{cotizacion.estado_ot_id?.nom_estado || 'Estado no disponible'}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
                     </Table>
                   </CardContent>
                 </Card>
               </motion.div>
             )}
 
+            {/* Sección de Órdenes */}
             {activeTab === "ordenes" && (
               <motion.div initial="hidden" animate="visible" exit="hidden" variants={variants}>
                 <Card>
@@ -361,7 +417,28 @@ const DashboardAdmin = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
-                    <Tablas servicio={currentOrdenes} handleViewTabla={handleViewVehiculo} columns={columns3} />
+                    <Table className="min-w-full divide-y divide-gray-200 table-fixed">
+                      <TableHeader className="bg-gray-100 sticky top-0 z-10">
+                        <TableRow>
+                          <TableHead className="p-2 min-w-[100px]">ID</TableHead>
+                          <TableHead className="p-2 min-w-[100px]">Cliente</TableHead>
+                          <TableHead className="p-2 min-w-[100px]">Servicio</TableHead>
+                          <TableHead className="p-2 min-w-[100px]">Estado</TableHead>
+                          <TableHead className="p-2 min-w-[100px]">Total</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {currentOrdenes.map((orden) => (
+                          <TableRow key={orden.id} className="hover:bg-gray-100">
+                            <TableCell>{orden.id || 'ID no disponible'}</TableCell>
+                            <TableCell>{orden.user?.username || 'Cliente no disponible'}</TableCell>
+                            <TableCell>{orden.catalogo_servicios[0]?.tp_servicio || 'Servicio no disponible'}</TableCell>
+                            <TableCell>{orden.estado_ot_id?.nom_estado || 'Estado no disponible'}</TableCell>
+                            <TableCell>${orden.costo || 'N/A'}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </CardContent>
                 </Card>
               </motion.div>

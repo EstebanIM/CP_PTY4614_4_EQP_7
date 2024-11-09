@@ -9,7 +9,7 @@ const Tablas = ({ servicio, handleViewTabla, columns }) => {
     return (
         <div className="w-full">
             <div className="overflow-x-auto w-full">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-gray-200 hidden md:table">
                     <thead>
                         <tr>
                             {columns.map((column) => (
@@ -45,6 +45,29 @@ const Tablas = ({ servicio, handleViewTabla, columns }) => {
                         ))}
                     </tbody>
                 </table>
+
+                {/* Mobile view - Display cards */}
+                <div className="md:hidden">
+                    {servicio.map((item) => (
+                        <div
+                            key={item.id}
+                            onClick={() => handleViewTabla(item)}
+                            className="border rounded-lg p-4 mb-4 shadow-sm cursor-pointer hover:bg-gray-50"
+                        >
+                            {columns.map((column) => (
+                                <div key={column.key} className="mb-2">
+                                    <p className="text-xs font-semibold text-gray-500 uppercase">{column.header}</p>
+                                    <p className="text-sm">
+                                        {column.render ? column.render(item) : (item[column.key] || 'N/A')}
+                                    </p>
+                                </div>
+                            ))}
+                            <div className="text-right">
+                                <ArrowRight className="inline-block text-gray-500" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
