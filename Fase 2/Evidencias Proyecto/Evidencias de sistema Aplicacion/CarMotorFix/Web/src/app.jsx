@@ -16,6 +16,7 @@ import DetalleVehiculo from './pages/vehiculos/detalle-vehiculo';
 import Dashboard from './pages/home/dashboard';
 import Catalogo_servicio from './pages/admin/Catalogo_servicio';
 import Detalle_servicio from './pages/admin/detalle-servicio';
+import Detalle_Orden from './ejemplo/detalle_ot';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           {/* Rutas públicas */}
           <Route path="/" element={<Login />} />
           <Route path="/verify-email" element={<EmailVerification />} />
+          <Route path="/detalle_ot" element={<Detalle_Orden />} />
 
           {/* Rutas protegidas con PrivateRoute */}
           <Route
