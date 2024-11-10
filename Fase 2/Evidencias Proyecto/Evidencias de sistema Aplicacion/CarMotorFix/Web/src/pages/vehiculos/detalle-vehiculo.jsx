@@ -32,6 +32,7 @@ function DetalleVehiculo() {
                             Authorization: `Bearer ${jwt}`,
                         },
                     });
+
                     setVehiculo(response.data);
                     setEditData(response.data);
                     setOts(response.data.ots || []);

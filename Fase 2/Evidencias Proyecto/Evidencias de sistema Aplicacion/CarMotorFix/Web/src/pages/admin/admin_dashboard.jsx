@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/tables/table";
+import { Table } from "../../components/ui/tables/table";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { fetcher } from "../../lib/strApi";
 import { getTokenFromLocalCookie } from "../../lib/cookies";
@@ -147,6 +147,10 @@ const DashboardAdmin = () => {
 
   const handleViewVehiculo = (vehiculo) => {
     navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
+  };
+
+  const handleViewCotizacion = (cotizacion) => {
+    navigate(`/detalle_ot/${cotizacion.documentId}`);
   };
 
   // Funciones de cambio de página para cada tabla
@@ -340,29 +344,7 @@ const DashboardAdmin = () => {
 
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full divide-y divide-gray-200 table-fixed">
-                      <TableHeader className="bg-gray-200 sticky top-0 z-10">
-                        <TableRow>
-                          <TableHead className="p-2 min-w-[100px]">Cliente</TableHead>
-                          <TableHead className="p-2 min-w-[100px]">Marca</TableHead>
-                          <TableHead className="p-2 min-w-[100px]">Modelo</TableHead>
-                          <TableHead className="p-2 min-w-[100px]">Patente</TableHead>
-                          <TableHead className="p-2 min-w-[60px]">Año</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {currentAutos.map((vehiculo) => (
-                          <TableRow key={vehiculo.id} className="hover:bg-gray-100">
-                            <TableCell>{vehiculo.user_id?.username || 'Cliente desconocido'}</TableCell>
-                            <TableCell>{vehiculo.marca_id?.nombre_marca || 'Marca desconocida'}</TableCell>
-                            <TableCell>{vehiculo.modelo || 'Modelo no disponible'}</TableCell>
-                            <TableCell>{vehiculo.patente || 'Patente no disponible'}</TableCell>
-                            <TableCell>{vehiculo.anio || 'Año no disponible'}</TableCell>
-                            <TableCell>
-                              <ArrowRight onClick={() => handleViewVehiculo(vehiculo.id)} className="cursor-pointer text-gray-500 hover:text-gray-700" />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
+                      <Tablas servicio={currentAutos} handleViewTabla={handleViewVehiculo} columns={columns} />
                     </Table>
                   </CardContent>
                 </Card>
@@ -383,27 +365,7 @@ const DashboardAdmin = () => {
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full divide-y divide-gray-200 table-fixed">
-                      <TableHeader className="bg-gray-100 sticky top-0 z-10">
-                        <TableRow>
-                          <TableHead className="p-2 min-w-[100px]">Cliente</TableHead>
-                          <TableHead className="p-2 min-w-[100px]">Fecha</TableHead>
-                          <TableHead className="p-2 min-w-[100px]">Valor</TableHead>
-                          <TableHead className="p-2 min-w-[100px]">Estado</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {currentCotizaciones.map((cotizacion) => (
-                          <TableRow key={cotizacion.id} className="hover:bg-gray-100">
-                            <TableCell>{cotizacion.user.username || 'Cliente no disponible'}</TableCell>
-                            <TableCell>{cotizacion.fechainicio || 'Fecha no disponible'}</TableCell>
-                            <TableCell>${cotizacion.costo || 'N/A'}</TableCell>
-                            <TableCell>{cotizacion.estado_ot_id?.nom_estado || 'Estado no disponible'}</TableCell>
-                            <TableCell>
-                              <ArrowRight onClick={() => handleViewVehiculo(cotizacion.id)} className="cursor-pointer text-gray-500 hover:text-gray-700" />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
+                      <Tablas servicio={currentCotizaciones} handleViewTabla={handleViewCotizacion} columns={columns2} />
                     </Table>
                   </CardContent>
                 </Card>
@@ -424,29 +386,7 @@ const DashboardAdmin = () => {
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full divide-y divide-gray-200 table-fixed">
-                      <TableHeader className="bg-gray-100 sticky top-0 z-10">
-                        <TableRow>
-                          <TableHead className="p-2 min-w-[100px]">ID</TableHead>
-                          <TableHead className="p-2 min-w-[100px]">Cliente</TableHead>
-                          <TableHead className="p-2 min-w-[100px]">Servicio</TableHead>
-                          <TableHead className="p-2 min-w-[100px]">Estado</TableHead>
-                          <TableHead className="p-2 min-w-[100px]">Total</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {currentOrdenes.map((orden) => (
-                          <TableRow key={orden.id} className="hover:bg-gray-100">
-                            <TableCell>{orden.id || 'ID no disponible'}</TableCell>
-                            <TableCell>{orden.user?.username || 'Cliente no disponible'}</TableCell>
-                            <TableCell>{orden.catalogo_servicios[0]?.tp_servicio || 'Servicio no disponible'}</TableCell>
-                            <TableCell>{orden.estado_ot_id?.nom_estado || 'Estado no disponible'}</TableCell>
-                            <TableCell>${orden.costo || 'N/A'}</TableCell>
-                            <TableCell>
-                              <ArrowRight onClick={() => handleViewVehiculo(orden.id)} className="cursor-pointer text-gray-500 hover:text-gray-700" />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
+                      <Tablas servicio={currentOrdenes} handleViewTabla={handleViewCotizacion} columns={columns3} />
                     </Table>
                   </CardContent>
                 </Card>

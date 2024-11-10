@@ -76,11 +76,11 @@ const Tablas = ({ servicio, handleViewTabla, columns }) => {
 Tablas.propTypes = {
     servicio: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.object),
-        PropTypes.null
+        PropTypes.oneOf([null])
     ]),
     handleViewTabla: PropTypes.oneOfType([
         PropTypes.func,
-        PropTypes.null
+        PropTypes.oneOf([null])
     ]),
     columns: PropTypes.oneOfType([
         PropTypes.arrayOf(
@@ -90,7 +90,7 @@ Tablas.propTypes = {
                 render: PropTypes.func
             })
         ),
-        PropTypes.null
+        PropTypes.oneOf([null])
     ]),
 };
 
