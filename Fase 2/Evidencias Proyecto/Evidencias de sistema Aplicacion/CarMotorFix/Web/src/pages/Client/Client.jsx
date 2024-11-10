@@ -4,6 +4,8 @@ import { getTokenFromLocalCookie } from '../../lib/cookies';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import Tablas from '../../components/Tablas';
+import Modal from '../../components/forms/modal'; 
+import { toast } from 'react-toastify';
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
@@ -13,7 +15,10 @@ function Client() {
   const [marcas, setMarcas] = useState([]);
   const [tiposVehiculo, setTiposVehiculo] = useState([]);
   const [OT, SetOT] = useState([]);
+  const [showAddVehiculoModal, setShowAddVehiculoModal] = useState(false);
+  const [showCotizacionModal, setShowCotizacionModal] = useState(false);
   const navigate = useNavigate();
+
   const [newVehiculo, setNewVehiculo] = useState({
     marca_id: '',
     tp_vehiculo_id: '',
@@ -24,6 +29,38 @@ function Client() {
     motor: '',
     color: ''
   });
+  const [formData, setFormData] = useState({
+    fechainicio: "",
+    costo: "",
+    estado_ot_id: "",
+    ordentrabajo_catalogoservicio_id: "",
+    mecanico_id: ""
+  });
+
+  const validatePatente = () => {
+    const selectedTipo = tiposVehiculo.find(
+      (tipo) => tipo.id === Number(newVehiculo.tp_vehiculo_id)
+    );
+
+    if (selectedTipo && selectedTipo.nom_tp_vehiculo === "Moto/motocicleta") {
+      const motoPattern = /^[A-Z]{3}-\d{2}$/;
+      if (!motoPattern.test(newVehiculo.patente)) {
+        toast.error("Formato de patente para moto no válido. Debe ser en formato AAA-11 en mayúsculas.");
+        return false;
+      }
+    } else {
+      const autoPattern = /^[A-Z]{2}-[A-Z]{2}-\d{2}$/;
+      if (!autoPattern.test(newVehiculo.patente)) {
+        toast.error("Formato de patente para auto no válido. Debe ser en formato BB-CC-12 en mayúsculas.");
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const isPatenteDuplicada = (patente) => {
+    return vehiculos.some((vehiculo) => vehiculo.patente === patente);
+  };
 
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -43,13 +80,11 @@ function Client() {
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
           const OT = response || [];
 
-          // console.log('vehiculos:', response);
-          
           SetOT(OT);
           setVehiculos(validVehiculoIds);
-
         } catch (error) {
           console.error('Error fetching vehicles:', error);
+          toast.error("Error al obtener la lista de vehículos.");
         }
       }
     };
@@ -66,6 +101,7 @@ function Client() {
           setMarcas(response.data);
         } catch (error) {
           console.error('Error fetching marcas:', error);
+          toast.error("Error al obtener la lista de marcas.");
         }
       }
     };
@@ -80,9 +116,9 @@ function Client() {
             },
           });
           setTiposVehiculo(response.data);
-
         } catch (error) {
           console.error('Error fetching tipos vehiculo:', error);
+          toast.error("Error al obtener los tipos de vehículos.");
         }
       }
     };
@@ -95,10 +131,9 @@ function Client() {
           },
         });
         setServicios(response.data || []);
-        // console.log('servicios:', response.data);
-
       } catch (error) {
         console.error('Error fetching servicios:', error);
+        toast.error("Error al obtener el catálogo de servicios.");
       }
     };
 
@@ -109,22 +144,25 @@ function Client() {
   }, [STRAPI_URL]);
 
   const handleServicioSelect = (e, servicio) => {
-    if (e.target.checked) {
-      // Si el servicio es seleccionado, suma el costo al total
-      setTotalServicios((prevTotal) => prevTotal + servicio.costserv);
-    } else {
-      // Si se deselecciona, resta el costo del total
-      setTotalServicios((prevTotal) => prevTotal - servicio.costserv);
-    }
+    setTotalServicios((prevTotal) => e.target.checked ? prevTotal + servicio.costserv : prevTotal - servicio.costserv);
   };
 
-
   const handleChange = (e) => {
-    setNewVehiculo({ ...newVehiculo, [e.target.name.toLowerCase()]: e.target.value });
+    setNewVehiculo({ ...newVehiculo, [e.target.name]: e.target.value });
   };
 
   const handleAddVehiculo = async (e) => {
     e.preventDefault();
+
+    if (isPatenteDuplicada(newVehiculo.patente)) {
+      toast.error("La patente ya está registrada. Intente con otra.");
+      return;
+    }
+
+    if (!validatePatente()) {
+      return;
+    }
+
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
       try {
@@ -162,14 +200,15 @@ function Client() {
           marca_id: '',
           tp_vehiculo_id: ''
         });
-        setIsAdding(false);
+        setShowAddVehiculoModal(false);
+        toast.success("Vehículo agregado correctamente");
       } catch (error) {
         console.error('Error adding vehicle:', error);
+        toast.error("Error al agregar el vehículo");
       }
     }
   };
 
-  // Función para redirigir al detalle del vehículo
   const handleViewVehiculo = (vehiculo) => {
     navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
   };
@@ -177,89 +216,48 @@ function Client() {
   const formatPatente = (patente) => {
     const letras = patente.substring(0, 4);
     const numeros = patente.substring(4);
-
-    if (letras.length === 4 && numeros.length === 2) {
-      return `${letras}-${numeros}`;
-    } else if (letras.length === 2 && numeros.length === 4) {
-      return `${letras}-${numeros}`;
-    } else {
-      return patente;
-    }
+    return (letras.length === 4 && numeros.length === 2) || (letras.length === 2 && numeros.length === 4) ? `${letras}-${numeros}` : patente;
   };
-
-  const columns = [
-    {
-      header: "Marca",
-      key: "marca",
-      render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida',
-    },
-    {
-      header: "Modelo",
-      key: "modelo",
-      render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible',
-    },
-    {
-      header: "Patente",
-      key: "patente",
-      render: (vehiculo) => vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible',
-    },
-    {
-      header: "Año",
-      key: "anio",
-      render: (vehiculo) => vehiculo.anio || 'Año no disponible',
-    },
-  ];
-
-  const columns2 = [
-    {
-      header: "Servicio",
-      key: "servicio",
-      render: (OT) => OT.catalogo_servicios ? OT.catalogo_servicios.tp_servicio : 'Servicio no disponible',
-    },
-    {
-      header: "Costo",
-      key: "costo",
-      render: (OT) => OT.costo || 'Costo no disponible',
-    },
-  ];
-
-  const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({
-    fechainicio: "",
-    costo: "",
-    estado_ot_id: "",
-    ordentrabajo_catalogoservicio_id: "",
-    mecanico_id: ""
-  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmitCotizacion = (e) => {
     e.preventDefault();
-    // Aquí puedes manejar la lógica para enviar el formulario
-    // console.log(formData);
-    setShowModal(false);
+    setShowCotizacionModal(false);
   };
+
+  const columns = [
+    { header: "Marca", key: "marca", render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida' },
+    { header: "Modelo", key: "modelo", render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible' },
+    { header: "Patente", key: "patente", render: (vehiculo) => vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible' },
+    { header: "Año", key: "anio", render: (vehiculo) => vehiculo.anio || 'Año no disponible' },
+  ];
+
+  const columns2 = [
+    { header: "Servicio", key: "servicio", render: (OT) => OT.catalogo_servicios ? OT.catalogo_servicios.tp_servicio : 'Servicio no disponible' },
+    { header: "Costo", key: "costo", render: (OT) => OT.costo || 'Costo no disponible' },
+  ];
 
   return (
     <div className='container mx-auto p-4'>
       <h1 className='text-2xl font-bold mb-4'>Mantenimiento de Autos</h1>
 
       <div className='grid gap-4 md:grid-cols-2'>
-
-        {/* Sección de Mis Autos */}
+        {/* Mis Autos  */}
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-2xl font-semibold leading-none tracking-tight">Mis Autos</h3>
-            <button
-              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
-              onClick={() => setIsAdding(!isAdding)}
-            >
-              {isAdding ? 'Cancelar' : 'Agregar'}
-            </button>
+            {vehiculos.length < 4 && (
+              <button
+                className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+                onClick={() => setShowAddVehiculoModal(true)}
+              >
+                Agregar
+              </button>
+            )}
           </div>
 
           {vehiculos.length === 0 ? (
@@ -267,14 +265,13 @@ function Client() {
               <h4 className="text-xl">No tienes vehículos registrados.</h4>
             </div>
           ) : (
-            <div>
-              <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
-            </div>
+            <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
           )}
 
-          {/* Formulario para agregar vehículo */}
-          {isAdding && (
-            <form onSubmit={handleAddVehiculo} className="mt-4">
+          {/* modal del vehiculo */}
+          <Modal isOpen={showAddVehiculoModal} onClose={() => setShowAddVehiculoModal(false)}>
+            <h4 className="text-xl font-semibold mb-4">Agregar Vehículo</h4>
+            <form onSubmit={handleAddVehiculo}>
               <div className="grid gap-4">
                 <select
                   name="tp_vehiculo_id"
@@ -339,7 +336,7 @@ function Client() {
                 <input
                   type="text"
                   name="motor"
-                  placeholder="motor"
+                  placeholder="Motor"
                   value={newVehiculo.motor}
                   onChange={handleChange}
                   required
@@ -348,7 +345,7 @@ function Client() {
                 <input
                   type="text"
                   name="color"
-                  placeholder="color"
+                  placeholder="Color"
                   value={newVehiculo.color}
                   onChange={handleChange}
                   required
@@ -359,95 +356,80 @@ function Client() {
                 Agregar Vehículo
               </button>
             </form>
-          )}
+          </Modal>
         </div>
 
+        {/* Cotizaciones Section */}
         <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-2xl font-semibold leading-none tracking-tight">Mis Cotizaciones</h3>
             <button
-              onClick={() => setShowModal(true)}
+              onClick={() => setShowCotizacionModal(true)}
               className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
             >
               Solicitar
             </button>
           </div>
 
-          {/* Modal del formulario */}
-          {showModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
-              <div className="bg-white rounded-lg p-6 w-96">
-                <h4 className="text-xl font-semibold mb-4">Nueva Cotización</h4>
-                <form onSubmit={handleSubmit}>
-
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Seleccionar Servicios</label>
-                    <div className="mt-1">
-                      {servicios.map((servicio) => (
-                        <div key={servicio.id} className="flex items-center mb-2">
-                          <input
-                            type="checkbox"
-                            id={`servicio-${servicio.id}`}
-                            value={servicio.id}
-                            onChange={(e) => handleServicioSelect(e, servicio)}
-                            className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                          />
-                          <label htmlFor={`servicio-${servicio.id}`} className="ml-2 block text-sm text-gray-900">
-                            {servicio.tp_servicio} - ${servicio.costserv}
-                          </label>
-                        </div>
-                      ))}
+          <Modal isOpen={showCotizacionModal} onClose={() => setShowCotizacionModal(false)}>
+            <h4 className="text-xl font-semibold mb-4">Nueva Cotización</h4>
+            <form onSubmit={handleSubmitCotizacion}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Seleccionar Servicios</label>
+                <div className="mt-1">
+                  {servicios.map((servicio) => (
+                    <div key={servicio.id} className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        id={`servicio-${servicio.id}`}
+                        value={servicio.id}
+                        onChange={(e) => handleServicioSelect(e, servicio)}
+                        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                      />
+                      <label htmlFor={`servicio-${servicio.id}`} className="ml-2 block text-sm text-gray-900">
+                        {servicio.tp_servicio} - ${servicio.costserv}
+                      </label>
                     </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <h2 className="text-xl font-semibold">Total de Servicios: ${totalServicios}</h2>
-                  </div>
-
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700">Mecánico ID</label>
-                    <input
-                      type="text"
-                      name="mecanico_id"
-                      value={formData.mecanico_id}
-                      onChange={handleInputChange}
-                      placeholder="ID del mecánico"
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                      required
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Agregar Cotización
-                  </button>
-                </form>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="mt-4 text-sm text-gray-500 hover:underline"
-                >
-                  Cerrar
-                </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+
+              <div className="mt-4">
+                <h2 className="text-xl font-semibold">Total de Servicios: ${totalServicios}</h2>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Mecánico ID</label>
+                <input
+                  type="text"
+                  name="mecanico_id"
+                  value={formData.mecanico_id}
+                  onChange={handleInputChange}
+                  placeholder="ID del mecánico"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Agregar Cotización
+              </button>
+            </form>
+          </Modal>
 
           <div>
             {OT.length === 0 ? (
               <div className="text-center text-gray-500 mt-4">
-              <h4 className="text-xl">No tienes Cotizaciones.</h4>
-            </div>
-          ) : (
-            <div>
+                <h4 className="text-xl">No tienes Cotizaciones.</h4>
+              </div>
+            ) : (
               <Tablas servicio={OT} handleViewTabla={handleViewVehiculo} columns={columns2} />
-            </div>
-          )}
+            )}
           </div>
         </div>
-
-
       </div>
     </div>
   );
