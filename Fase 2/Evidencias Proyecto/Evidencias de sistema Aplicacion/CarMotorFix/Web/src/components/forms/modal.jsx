@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getDarkModeFromLocalCookie } from '../../lib/cookies'; 
+import { getDarkModeFromLocalCookie } from '../../lib/cookies';
+import Spinner from '../../components/animation/spinner'; // Import Spinner component
 
-const Modal = ({ isOpen, onClose, children }) => {
-    const darkMode = getDarkModeFromLocalCookie(); 
+const Modal = ({ isOpen, onClose, children, loading = false }) => {
+    const darkMode = getDarkModeFromLocalCookie();
 
     const handleOutsideClick = (e) => {
         if (e.target === e.currentTarget) onClose();
@@ -38,7 +39,13 @@ const Modal = ({ isOpen, onClose, children }) => {
                         >
                             <X className="h-6 w-6 text-gray-600 hover:text-gray-800" />
                         </button>
-                        {children}
+                        {loading ? (
+                            <div className="flex justify-center items-center h-full">
+                                <Spinner size="large" />
+                            </div>
+                        ) : (
+                            children
+                        )}
                     </motion.div>
                 </motion.div>
             )}
@@ -50,6 +57,7 @@ Modal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     children: PropTypes.node.isRequired,
+    loading: PropTypes.bool, // New loading prop
 };
 
 export default Modal;

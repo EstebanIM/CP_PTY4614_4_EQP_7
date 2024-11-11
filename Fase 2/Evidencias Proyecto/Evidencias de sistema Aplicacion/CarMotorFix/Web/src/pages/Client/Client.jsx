@@ -7,6 +7,7 @@ import Tablas from '../../components/Tablas';
 import Modal from '../../components/forms/modal';
 import { toast } from 'react-toastify';
 import { getDarkModeFromLocalCookie } from '../../lib/cookies';
+import Spinner from '../../components/animation/spinner';
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
@@ -18,6 +19,7 @@ function Client() {
   const [OT, SetOT] = useState([]);
   const [showAddVehiculoModal, setShowAddVehiculoModal] = useState(false);
   const [showCotizacionModal, setShowCotizacionModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const [newVehiculo, setNewVehiculo] = useState({
@@ -74,6 +76,7 @@ function Client() {
 
     const fetchVehiculos = async () => {
       if (jwt) {
+        setLoading(true);
         try {
           const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
             headers: {
@@ -94,6 +97,9 @@ function Client() {
         } catch (error) {
           console.error('Error fetching vehicles:', error);
           toast.error("Error al obtener la lista de vehículos.");
+        }
+        finally {
+          setLoading(false);
         }
       }
     };
@@ -192,6 +198,7 @@ function Client() {
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
       try {
+        setLoading(true);
         const vehiculoData = {
           data: {
             user_id: Cookies.get('id'),
@@ -231,6 +238,8 @@ function Client() {
       } catch (error) {
         console.error('Error adding vehicle:', error);
         toast.error("Error al agregar el vehículo");
+      }finally {
+        setLoading(false);
       }
     }
   };
@@ -336,93 +345,97 @@ function Client() {
           )}
 
           {/* modal del vehiculo */}
-          <Modal isOpen={showAddVehiculoModal} onClose={() => setShowAddVehiculoModal(false)}>
+          <Modal isOpen={showAddVehiculoModal} onClose={() => setShowAddVehiculoModal(false)} loading={loading}>
             <h4 className="text-xl font-semibold mb-4">Agregar Vehículo</h4>
-            <form onSubmit={handleAddVehiculo}>
-              <div className="grid gap-4">
-                <select
-                  name="tp_vehiculo_id"
-                  value={newVehiculo.tp_vehiculo_id}
-                  onChange={handleChange}
-                  required
-                  className="p-2 border rounded"
-                >
-                  <option value="">Seleccione Tipo</option>
-                  {tiposVehiculo.map((tipo) => (
-                    <option key={tipo.id} value={tipo.id}>{tipo.nom_tp_vehiculo}</option>
-                  ))}
-                </select>
-                <select
-                  name="marca_id"
-                  value={newVehiculo.marca_id}
-                  onChange={handleChange}
-                  required
-                  className="p-2 border rounded"
-                >
-                  <option value="">Seleccione Marca</option>
-                  {marcas.map((marca) => (
-                    <option key={marca.id} value={marca.id}>{marca.nombre_marca}</option>
-                  ))}
-                </select>
-                <input
-                  type="text"
-                  name="modelo"
-                  placeholder="Modelo"
-                  value={newVehiculo.modelo}
-                  onChange={handleChange}
-                  required
-                  className="p-2 border rounded"
-                />
-                <input
-                  type="text"
-                  name="patente"
-                  placeholder="Patente"
-                  value={newVehiculo.patente}
-                  onChange={handleChange}
-                  required
-                  className="p-2 border rounded"
-                />
-                <input
-                  type="numeric"
-                  name="anio"
-                  placeholder="Año"
-                  value={newVehiculo.anio}
-                  onChange={handleChange}
-                  required
-                  className="p-2 border rounded"
-                />
-                <input
-                  type="number"
-                  name="kilometraje"
-                  placeholder="Kilometraje"
-                  value={newVehiculo.kilometraje}
-                  onChange={handleChange}
-                  required
-                  className="p-2 border rounded"
-                />
-                <input
-                  type="text"
-                  name="motor"
-                  placeholder="Motor"
-                  value={newVehiculo.motor}
-                  onChange={handleChange}
-                  required
-                  className="p-2 border rounded"
-                />
-                <input
-                  type="text"
-                  name="color"
-                  placeholder="Color"
-                  value={newVehiculo.color}
-                  onChange={handleChange}
-                  required
-                  className="p-2 border rounded"
-                />
-              </div>
-              <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
-                Agregar Vehículo
-              </button>
-            </form>
+            {loading ? (
+              <Spinner size="large" />
+            ) : (
+              <form onSubmit={handleAddVehiculo}>
+                <div className="grid gap-4">
+                  <select
+                    name="tp_vehiculo_id"
+                    value={newVehiculo.tp_vehiculo_id}
+                    onChange={handleChange}
+                    required
+                    className="p-2 border rounded"
+                  >
+                    <option value="">Seleccione Tipo</option>
+                    {tiposVehiculo.map((tipo) => (
+                      <option key={tipo.id} value={tipo.id}>{tipo.nom_tp_vehiculo}</option>
+                    ))}
+                  </select>
+                  <select
+                    name="marca_id"
+                    value={newVehiculo.marca_id}
+                    onChange={handleChange}
+                    required
+                    className="p-2 border rounded"
+                  >
+                    <option value="">Seleccione Marca</option>
+                    {marcas.map((marca) => (
+                      <option key={marca.id} value={marca.id}>{marca.nombre_marca}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    name="modelo"
+                    placeholder="Modelo"
+                    value={newVehiculo.modelo}
+                    onChange={handleChange}
+                    required
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    name="patente"
+                    placeholder="Patente"
+                    value={newVehiculo.patente}
+                    onChange={handleChange}
+                    required
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="numeric"
+                    name="anio"
+                    placeholder="Año"
+                    value={newVehiculo.anio}
+                    onChange={handleChange}
+                    required
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    name="kilometraje"
+                    placeholder="Kilometraje"
+                    value={newVehiculo.kilometraje}
+                    onChange={handleChange}
+                    required
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    name="motor"
+                    placeholder="Motor"
+                    value={newVehiculo.motor}
+                    onChange={handleChange}
+                    required
+                    className="p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    name="color"
+                    placeholder="Color"
+                    value={newVehiculo.color}
+                    onChange={handleChange}
+                    required
+                    className="p-2 border rounded"
+                  />
+                </div>
+                <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                  Agregar Vehículo
+                </button>
+              </form>
+            )}
           </Modal>
         </div>
 

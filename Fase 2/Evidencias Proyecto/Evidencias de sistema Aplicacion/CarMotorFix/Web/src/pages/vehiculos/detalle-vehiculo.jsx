@@ -9,6 +9,7 @@ import { Table } from "../../components/ui/tables/table";
 import Tablas from "../../components/Tablas";
 import LoadingComponent from '../../components/animation/loading';
 import { getDarkModeFromLocalCookie } from '../../lib/cookies'; 
+import Modal  from "../../components/forms/modal";
 function DetalleVehiculo() {
     const { id } = useParams();
     const [sidebarOpen, setSidebarOpen] = useState(false);
