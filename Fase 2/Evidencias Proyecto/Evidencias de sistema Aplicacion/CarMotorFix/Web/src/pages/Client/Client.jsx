@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Tablas from '../../components/Tablas';
 import Modal from '../../components/forms/modal';
 import { toast } from 'react-toastify';
-import { getDarkModeFromLocalCookie } from '../../lib/cookies'; 
+import { getDarkModeFromLocalCookie } from '../../lib/cookies';
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
@@ -38,13 +38,13 @@ function Client() {
     mecanico_id: ""
   });
 
-  const [darkMode] = useState(getDarkModeFromLocalCookie());  
+  const [darkMode] = useState(getDarkModeFromLocalCookie());
 
   const validatePatente = () => {
     const selectedTipo = tiposVehiculo.find(
       (tipo) => tipo.id === Number(newVehiculo.tp_vehiculo_id)
     );
-  
+
     if (selectedTipo && selectedTipo.nom_tp_vehiculo === "Moto/motocicleta") {
       const motoPattern = /^[A-Z]{2}\d{3}$|^[A-Z]{3}\d{2}$/;
       if (!motoPattern.test(newVehiculo.patente)) {
@@ -60,7 +60,7 @@ function Client() {
     }
     return true;
   };
-  
+
 
   const isPatenteDuplicada = (patente) => {
     return vehiculos.some((vehiculo) => vehiculo.patente === patente);
@@ -71,7 +71,7 @@ function Client() {
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
     console.log(jwt);
-    
+
     const fetchVehiculos = async () => {
       if (jwt) {
         try {
@@ -84,7 +84,10 @@ function Client() {
 
           const vehiculoIds = response.vehiculo_ids || [];
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
-          const OT = response || [];
+          const OT = response.ots || [];
+          console.log(OT);
+
+          console.log(response);
 
           SetOT(OT);
           setVehiculos(validVehiculoIds);
@@ -254,20 +257,55 @@ function Client() {
   const handleSubmitCotizacion = (e) => {
     e.preventDefault();
     console.log(formData);
-    
+
     setShowCotizacionModal(false);
   };
 
   const columns = [
-    { header: "Marca", key: "marca", render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida' },
-    { header: "Modelo", key: "modelo", render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible' },
-    { header: "Patente", key: "patente", render: (vehiculo) => vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible' },
-    { header: "Año", key: "anio", render: (vehiculo) => vehiculo.anio || 'Año no disponible' },
+    {
+      header: "Marca",
+      key: "marca",
+      render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida'
+    },
+    {
+      header: "Modelo",
+      key: "modelo",
+      render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible'
+    },
+    {
+      header: "Patente",
+      key: "patente",
+      render: (vehiculo) => vehiculo.patente ? formatPatente(vehiculo.patente) : 'Patente no disponible'
+    },
+    {
+      header: "Año",
+      key: "anio",
+      render: (vehiculo) => vehiculo.anio || 'Año no disponible'
+    },
   ];
 
   const columns2 = [
-    { header: "Servicio", key: "servicio", render: (OT) => OT.catalogo_servicios ? OT.catalogo_servicios.tp_servicio : 'Servicio no disponible' },
-    { header: "Costo", key: "costo", render: (OT) => OT.costo || 'Costo no disponible' },
+    {
+      header: "Servicio",
+      key: "servicio",
+      // render: (OT) => OT.catalogo_servicios ? OT.catalogo_servicios.tp_servicio : 'Servicio no disponible'
+      render: (OT) => {
+        if (OT.catalogo_servicios && OT.catalogo_servicios.length > 0) {
+          const firstService = OT.catalogo_servicios[0].tp_servicio;
+          const moreServices = OT.catalogo_servicios.length > 1;
+          return moreServices ? `${firstService} (+${OT.catalogo_servicios.length - 1} más)` : firstService;
+        }
+        return 'Servicio no disponible';
+      },
+    },
+    {
+      header: "Costo",
+      key: "costo",
+      render: (OT) =>
+        OT.costo
+          ? new Intl.NumberFormat('es-CL').format(OT.costo)
+          : 'Costo no disponible',
+    },
   ];
 
   return (
