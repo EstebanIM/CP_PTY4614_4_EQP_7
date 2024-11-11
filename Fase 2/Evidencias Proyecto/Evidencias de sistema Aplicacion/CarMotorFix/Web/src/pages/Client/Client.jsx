@@ -10,10 +10,10 @@ import { getDarkModeFromLocalCookie } from '../../lib/cookies';
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
-  // const [isAdding, setIsAdding] = useState(false);
   const [totalServicios, setTotalServicios] = useState(0);
   const [servicios, setServicios] = useState([]);
   const [marcas, setMarcas] = useState([]);
+  const [mecanico, setMecanico] = useState([]);
   const [tiposVehiculo, setTiposVehiculo] = useState([]);
   const [OT, SetOT] = useState([]);
   const [showAddVehiculoModal, setShowAddVehiculoModal] = useState(false);
@@ -70,6 +70,8 @@ function Client() {
 
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
+    console.log(jwt);
+    
     const fetchVehiculos = async () => {
       if (jwt) {
         try {
@@ -141,10 +143,27 @@ function Client() {
       }
     };
 
+    const fetchMecanicos = async () => {
+      try {
+        const response = await fetcher(`${STRAPI_URL}/api/mecanicos`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+        setMecanico(response.data || []);
+
+      } catch (error) {
+        console.error('Error fetching Mecanico:', error);
+        toast.error("Error al obtener a los Mecanicos.");
+      }
+    };
+
     fetchServicios();
     fetchMarcas();
     fetchTiposVehiculo();
     fetchVehiculos();
+    fetchMecanicos();
   }, [STRAPI_URL]);
 
   const handleServicioSelect = (e, servicio) => {
@@ -234,6 +253,8 @@ function Client() {
 
   const handleSubmitCotizacion = (e) => {
     e.preventDefault();
+    console.log(formData);
+    
     setShowCotizacionModal(false);
   };
 

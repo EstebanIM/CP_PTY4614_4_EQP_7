@@ -14,7 +14,8 @@
   "attributes": {
     "patente": {
       "type": "string",
-      "required": true
+      "required": true,
+      "unique": true
     },
     "anio": {
       "type": "integer",

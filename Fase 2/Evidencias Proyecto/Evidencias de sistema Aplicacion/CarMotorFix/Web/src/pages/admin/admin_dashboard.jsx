@@ -205,7 +205,7 @@ const DashboardAdmin = () => {
     {
       header: "Cliente",
       key: "cliente",
-      render: (cotizacion) => cotizacion.user.username || 'Cliente no disponible'
+      render: (cotizacion) => cotizacion.user?.username || 'Cliente no disponible'
     },
     {
       header: "Fecha",
@@ -236,12 +236,12 @@ const DashboardAdmin = () => {
     {
       header: "ID",
       key: "id",
-      render: (Ordenes) => Ordenes.id ? Ordenes.id : 'ID no disponible',
+      render: (Ordenes) => Ordenes?.id ? Ordenes?.id : 'ID no disponible',
     },
     {
       header: "Cliente",
       key: "cliente",
-      render: (Ordenes) => Ordenes.user ? Ordenes.user.username : 'Cliente no disponible',
+      render: (Ordenes) => Ordenes?.user ? Ordenes.user?.username : 'Cliente no disponible',
     },
     {
       header: "Servicio",
@@ -286,7 +286,6 @@ const DashboardAdmin = () => {
     );
   };
 
-  // Animations: Define simple fade-in/slide-in transition
   const variants = {
     hidden: { opacity: 0, x: -10 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
@@ -343,7 +342,12 @@ const DashboardAdmin = () => {
 
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full divide-y divide-gray-200 table-fixed">
-                      <Tablas servicio={currentAutos} handleViewTabla={handleViewVehiculo} columns={columns} />
+                      {currentAutos.length === 0 ? (
+                        <div className="p-4 text-center text-gray-500">No hay autos registrados</div>
+                      ) : (
+                        <Tablas servicio={currentAutos} handleViewTabla={handleViewVehiculo} columns={columns} />
+                      )
+                      }
                     </Table>
                   </CardContent>
                 </Card>
@@ -364,7 +368,13 @@ const DashboardAdmin = () => {
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full divide-y divide-gray-200 table-fixed">
-                      <Tablas servicio={currentCotizaciones} handleViewTabla={handleViewCotizacion} columns={columns2} />
+                      {
+                        currentCotizaciones.length === 0 ? (
+                          <div className="p-4 text-center text-gray-500">No hay cotizaciones registradas</div>
+                        ) : (
+                          <Tablas servicio={currentCotizaciones} handleViewTabla={handleViewCotizacion} columns={columns2} />
+                        )
+                      }
                     </Table>
                   </CardContent>
                 </Card>
@@ -385,7 +395,13 @@ const DashboardAdmin = () => {
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
                     <Table className="min-w-full divide-y divide-gray-200 table-fixed">
-                      <Tablas servicio={currentOrdenes} handleViewTabla={handleViewCotizacion} columns={columns3} />
+                      {/* No se ve no hay cotizaciones */}
+                      {currentOrdenes.length === 0  ? (
+                        <div className="p-4 text-center text-gray-500">No hay órdenes registradas</div>
+                      ) : (
+                        <Tablas servicio={currentOrdenes} handleViewTabla={handleViewCotizacion} columns={columns3} />
+                      )
+                      }
                     </Table>
                   </CardContent>
                 </Card>

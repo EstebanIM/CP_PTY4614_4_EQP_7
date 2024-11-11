@@ -1015,7 +1015,9 @@ export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
     draftAndPublish: false;
   };
   attributes: {
-    patente: Schema.Attribute.String & Schema.Attribute.Required;
+    patente: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     anio: Schema.Attribute.Integer &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
