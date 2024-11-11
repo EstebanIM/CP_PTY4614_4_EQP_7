@@ -33,7 +33,7 @@ export default function WorkOrderDetails() {
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
       try {
-        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos/${id}?populate=*`, {
+        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos/${id}?pLevel=3`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -42,6 +42,8 @@ export default function WorkOrderDetails() {
         });
 
         setOrden(response.data);
+        console.log(response.data);
+        
         setVehiculoID(response.data.vehiculo.documentId);
       } catch (error) {
         console.error('Error fetching order:', error);

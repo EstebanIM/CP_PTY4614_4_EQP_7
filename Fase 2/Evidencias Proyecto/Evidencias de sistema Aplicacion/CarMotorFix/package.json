@@ -19,6 +19,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
     "strapi-provider-email-resend": "^1.0.4",
+    "strapi-v5-plugin-populate-deep": "^4.0.4",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {
