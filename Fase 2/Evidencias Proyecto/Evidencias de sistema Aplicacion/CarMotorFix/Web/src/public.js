@@ -1,28 +1,26 @@
-// components/PrivateRoute.jsx
-import React, { useEffect } from 'react';
-import { useAuth } from './context/AuthContext'; // Asegúrate de que la ruta sea correcta
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Cambiado a useNavigate de react-router-dom
+import { useAuth } from './context/AuthContext';
+import Cookies from 'js-cookie';
 import PropTypes from 'prop-types';
 
-const PrivateRoute = ({ children }) => {
+const PublicRoute = ({ children }) => {
   const { user } = useAuth();
-  const navigate = useNavigate(); // Usa `useNavigate` para redirigir
+  const navigate = useNavigate(); // Cambiado a useNavigate
 
   useEffect(() => {
-    if (user) {
-      navigate('/Inicio'); // Redirige al usuario a la página de login si no está autenticado
+    const jwt = Cookies.get('jwt');
+
+    if (user || jwt) {
+      navigate('/Inicio', { replace: true }); // Redirigir a /Inicio si el usuario está autenticado
     }
   }, [user, navigate]);
 
-  // Si no hay usuario, no renderiza nada hasta que navegue
-  if (!user) return null;
-
-  // Si hay usuario, renderiza el contenido de la ruta privada
-  return children;
+  return !user ? children : null; // Retorna los children solo si el usuario no está autenticado
 };
 
-PrivateRoute.propTypes = {
-  children: PropTypes.node.isRequired,
+PublicRoute.propTypes = {
+  children: PropTypes.node.isRequired, // Validación de tipo para children
 };
 
-export default PrivateRoute;
+export default PublicRoute;

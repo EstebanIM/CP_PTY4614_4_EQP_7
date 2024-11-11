@@ -3,21 +3,21 @@ import { Button } from "../ui/nadvar/button";
 import { Menu, Bell, User, Settings, LogOut } from "lucide-react";
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { unsetToken } from '../../lib/cookies';
+import { unsetToken, getTokenFromLocalCookie } from '../../lib/cookies';
 import { fetcher } from '../../lib/strApi';
-import { getTokenFromLocalCookie } from '../../lib/cookies';
 
 export default function DashboardHeader({ toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userName, setUserName] = useState('');
   const navigate = useNavigate();
-
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
-  
+
+  // Toggle del menú desplegable de usuario
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
-  const [userName, setUserName] = useState('');
 
+  // Obtener el nombre del usuario al cargar el componente
   useEffect(() => {
     const fetchUser = async () => {
       const jwt = getTokenFromLocalCookie();
@@ -30,7 +30,6 @@ export default function DashboardHeader({ toggleSidebar }) {
             },
           });
           setUserName(response.username);
-          
         } catch (error) {
           console.error('Error fetching user:', error);
         }
@@ -42,16 +41,14 @@ export default function DashboardHeader({ toggleSidebar }) {
 
   const logout = async () => {
     try {
-      // console.log("Cerrando sesión...");
-
-      // Eliminar cookies de autenticación
       unsetToken();
 
-      // Eliminar caché del navegador (localStorage o sessionStorage)
-      localStorage.clear(); // O utiliza sessionStorage.clear() si prefieres
+      localStorage.clear();
 
-      // Redirigir al usuario a la página de inicio
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       navigate('/');
+      window.location.reload();
     } catch (error) {
       console.error("Error al cerrar sesión:", error.message);
     }

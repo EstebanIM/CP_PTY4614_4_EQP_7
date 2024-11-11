@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 //imports de las protecciones
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './private';
+import PublicRoute from './public';
 
 //Imports de las paginas
 import Login from './pages/login/login';
@@ -24,9 +25,23 @@ function App() {
       <Router>
         <Routes>
           {/* Rutas públicas */}
-          <Route path="/" element={<Login />} />
-          <Route path="/verify-email" element={<EmailVerification />} />
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
 
+<Route
+            path="/verify-email"
+            element={
+              <PublicRoute>
+                <EmailVerification />
+              </PublicRoute>
+            }
+          />
           {/* Rutas protegidas con PrivateRoute */}
           <Route
             path="/Inicio"

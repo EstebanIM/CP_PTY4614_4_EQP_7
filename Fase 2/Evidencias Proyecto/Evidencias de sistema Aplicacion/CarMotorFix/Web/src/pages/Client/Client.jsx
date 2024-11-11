@@ -49,9 +49,9 @@ function Client() {
         return false;
       }
     } else {
-      const autoPattern = /^[A-Z]{2}-[A-Z]{2}-\d{2}$/;
+      const autoPattern = /^(?:[A-Z]{4}-\d{2}|[A-Z]{2}-\d{4})$/;
       if (!autoPattern.test(newVehiculo.patente)) {
-        toast.error("Formato de patente para auto no válido. Debe ser en formato BB-CC-12 en mayúsculas.");
+        toast.error("Formato de patente no válido. Debe ser en formato AABB-00 o AA-0000.");
         return false;
       }
     }
