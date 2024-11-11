@@ -1,21 +1,24 @@
 import { ArrowRight } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { getDarkModeFromLocalCookie } from '../lib/cookies'; 
 
 const Tablas = ({ servicio, handleViewTabla, columns }) => {
     if (!Array.isArray(servicio)) return null;
     if (!Array.isArray(columns)) return null;
     if (typeof handleViewTabla !== 'function') return null;
 
+    const darkMode = getDarkModeFromLocalCookie();
+
     return (
-        <div className="w-full">
+        <div className={`w-full ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
             <div className="overflow-x-auto w-full">
-                <table className="min-w-full divide-y divide-gray-200 hidden md:table">
+                <table className={`min-w-full divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'} hidden md:table`}>
                     <thead>
                         <tr>
                             {columns.map((column) => (
                                 <th
                                     key={column.header}
-                                    className="px-4 py-2 md:px-6 md:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    className={`px-4 py-2 md:px-6 md:py-3 text-left text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'} uppercase tracking-wider`}
                                 >
                                     {column.header}
                                 </th>
@@ -23,23 +26,23 @@ const Tablas = ({ servicio, handleViewTabla, columns }) => {
                             <th className="px-4 py-2 md:px-6 md:py-3"></th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className={`${darkMode ? 'bg-gray-800' : 'bg-white'} divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
                         {servicio.map((item) => (
                             <tr
                                 key={item.id}
                                 onClick={() => handleViewTabla(item)}
-                                className="cursor-pointer hover:bg-gray-100"
+                                className={`cursor-pointer hover:bg-gray-100 ${darkMode ? 'hover:bg-gray-700' : ''}`}
                             >
                                 {columns.map((column) => (
                                     <td
                                         key={column.key}
-                                        className="px-4 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm"
+                                        className={`px-4 py-2 md:px-6 md:py-4 whitespace-nowrap text-sm ${darkMode ? 'text-gray-300' : 'text-black'}`}
                                     >
                                         {column.render ? column.render(item) : (item[column.key] || 'N/A')}
                                     </td>
                                 ))}
                                 <td className="px-4 py-2 md:px-6 md:py-4 font-medium text-right pr-4">
-                                    <ArrowRight className="inline-block" />
+                                    <ArrowRight className={`inline-block ${darkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                                 </td>
                             </tr>
                         ))}
@@ -52,18 +55,18 @@ const Tablas = ({ servicio, handleViewTabla, columns }) => {
                         <div
                             key={item.id}
                             onClick={() => handleViewTabla(item)}
-                            className="border rounded-lg p-4 mb-4 shadow-sm cursor-pointer hover:bg-gray-50"
+                            className={`border rounded-lg p-4 mb-4 shadow-sm cursor-pointer hover:bg-gray-50 ${darkMode ? 'hover:bg-gray-700' : ''}`}
                         >
                             {columns.map((column) => (
                                 <div key={column.key} className="mb-2">
-                                    <p className="text-xs font-semibold text-gray-500 uppercase">{column.header}</p>
+                                    <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'} uppercase`}>{column.header}</p>
                                     <p className="text-sm">
                                         {column.render ? column.render(item) : (item[column.key] || 'N/A')}
                                     </p>
                                 </div>
                             ))}
                             <div className="text-right">
-                                <ArrowRight className="inline-block text-gray-500" />
+                                <ArrowRight className={`inline-block ${darkMode ? 'text-gray-400' : 'text-gray-600'}`} />
                             </div>
                         </div>
                     ))}

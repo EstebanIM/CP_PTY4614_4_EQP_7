@@ -8,12 +8,14 @@ import Admin_dashboard from "../admin/admin_dashboard";
 
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
+import { getDarkModeFromLocalCookie } from '../../lib/cookies'; // Import the dark mode cookie getter
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function MisVehiculos() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userRole, setUserRole] = useState(null); // Para guardar el rol del usuario
+    const [darkMode] = useState(getDarkModeFromLocalCookie()); // Get dark mode from cookies
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
@@ -31,8 +33,6 @@ export default function MisVehiculos() {
                 });
 
                 setUserRole(response.role.name); // Guarda el nombre del rol en el estado
-                // console.log("User role:", response);
-                
             } catch (error) {
                 console.error("Error fetching user role:", error);
             }
@@ -72,7 +72,7 @@ export default function MisVehiculos() {
     };
 
     return (
-        <div className="flex h-screen">
+        <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
             {/* Sidebar */}
             <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
 
@@ -83,10 +83,8 @@ export default function MisVehiculos() {
 
                 {/* Main content */}
                 <div className="container mx-auto p-4">
-
                     {/* Contenido del cliente modular */}
                     {renderComponentByRole(userRole)}
-
                 </div>
             </div>
         </div>

@@ -1,8 +1,11 @@
 import PropTypes from 'prop-types';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getDarkModeFromLocalCookie } from '../../lib/cookies'; 
 
 const Modal = ({ isOpen, onClose, children }) => {
+    const darkMode = getDarkModeFromLocalCookie(); 
+
     const handleOutsideClick = (e) => {
         if (e.target === e.currentTarget) onClose();
     };
@@ -11,7 +14,7 @@ const Modal = ({ isOpen, onClose, children }) => {
         <AnimatePresence>
             {isOpen && (
                 <motion.div 
-                    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                    className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ${darkMode ? 'bg-gray-900' : 'bg-black'}`}
                     onClick={handleOutsideClick}
                     aria-labelledby="modal-title"
                     role="dialog"
@@ -22,7 +25,7 @@ const Modal = ({ isOpen, onClose, children }) => {
                     transition={{ duration: 0.3 }}
                 >
                     <motion.div 
-                        className="bg-white p-6 rounded-lg shadow-lg w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4 relative"
+                        className={`p-6 rounded-lg shadow-lg w-11/12 sm:w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4 relative ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.9, opacity: 0 }}
@@ -50,4 +53,3 @@ Modal.propTypes = {
 };
 
 export default Modal;
-    

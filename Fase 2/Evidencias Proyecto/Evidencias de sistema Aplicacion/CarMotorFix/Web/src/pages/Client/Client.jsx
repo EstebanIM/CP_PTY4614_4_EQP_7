@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Tablas from '../../components/Tablas';
 import Modal from '../../components/forms/modal'; 
 import { toast } from 'react-toastify';
+import { getDarkModeFromLocalCookie } from '../../lib/cookies'; 
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
@@ -36,6 +37,8 @@ function Client() {
     ordentrabajo_catalogoservicio_id: "",
     mecanico_id: ""
   });
+
+  const [darkMode] = useState(getDarkModeFromLocalCookie());  
 
   const validatePatente = () => {
     const selectedTipo = tiposVehiculo.find(
@@ -242,7 +245,7 @@ function Client() {
   ];
 
   return (
-    <div className='container mx-auto p-4'>
+    <div className={`container mx-auto p-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
       <h1 className='text-2xl font-bold mb-4'>Mantenimiento de Autos</h1>
 
       <div className='grid gap-4 md:grid-cols-2'>

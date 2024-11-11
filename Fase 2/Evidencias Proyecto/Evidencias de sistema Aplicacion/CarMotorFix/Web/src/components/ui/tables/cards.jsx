@@ -1,59 +1,55 @@
 import * as React from "react";
 import PropTypes from "prop-types";
+import { getDarkModeFromLocalCookie } from "../../../lib/cookies"; 
 
-// Componente principal de Card
+const darkMode = getDarkModeFromLocalCookie();
+
 const Card = React.forwardRef(({ className = "", ...props }, ref) => (
   <div
     ref={ref}
-    className={`rounded-lg border border-gray-200 bg-white text-black shadow-sm ${className}`} // Fondo blanco y texto negro
+    className={`rounded-lg border ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-200 bg-white text-black'} shadow-sm ${className}`}
     {...props}
   />
 ));
 Card.displayName = "Card";
 
-// Componente para el encabezado del Card
 const CardHeader = React.forwardRef(({ className = "", ...props }, ref) => (
   <div
     ref={ref}
-    className={`flex flex-col space-y-1.5 p-6 ${className}`}
+    className={`flex flex-col space-y-1.5 p-6 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'} ${className}`}
     {...props}
   />
 ));
 CardHeader.displayName = "CardHeader";
 
-// Componente para el título del Card
 const CardTitle = React.forwardRef(({ className = "", ...props }, ref) => (
   <h3
     ref={ref}
-    className={`text-2xl font-semibold leading-none tracking-tight text-black ${className}`} // Título con texto negro
+    className={`text-2xl font-semibold leading-none tracking-tight ${darkMode ? 'text-white' : 'text-black'} ${className}`}
     {...props}
   />
 ));
 CardTitle.displayName = "CardTitle";
 
-// Componente para la descripción del Card
 const CardDescription = React.forwardRef(({ className = "", ...props }, ref) => (
   <p
     ref={ref}
-    className={`text-sm text-gray-500 ${className}`} // Descripción con texto gris
+    className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} ${className}`}
     {...props}
   />
 ));
 CardDescription.displayName = "CardDescription";
 
-// Componente para el contenido del Card
 const CardContent = React.forwardRef(({ className = "", ...props }, ref) => (
-  <div ref={ref} className={`p-6 pt-0 text-black ${className}`} {...props} /> // Texto negro en el contenido
+  <div ref={ref} className={`p-6 pt-0 ${darkMode ? 'text-gray-300' : 'text-black'} ${className}`} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
-// Componente para el footer del Card
 const CardFooter = React.forwardRef(({ className = "", ...props }, ref) => (
-  <div ref={ref} className={`flex items-center p-6 pt-0 ${className}`} {...props} />
+  <div ref={ref} className={`flex items-center p-6 pt-0 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'} ${className}`} {...props} />
 ));
 CardFooter.displayName = "CardFooter";
 
-// Añadimos PropTypes para validar las props
 
 Card.propTypes = {
   className: PropTypes.string,

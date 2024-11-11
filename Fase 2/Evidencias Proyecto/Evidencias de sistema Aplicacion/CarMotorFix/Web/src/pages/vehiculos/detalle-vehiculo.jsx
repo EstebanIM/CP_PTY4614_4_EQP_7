@@ -8,7 +8,7 @@ import { Button } from '../../components/ui/button';
 import { Table } from "../../components/ui/tables/table";
 import Tablas from "../../components/Tablas";
 import LoadingComponent from '../../components/animation/loading';
-
+import { getDarkModeFromLocalCookie } from '../../lib/cookies'; 
 function DetalleVehiculo() {
     const { id } = useParams();
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -125,8 +125,6 @@ function DetalleVehiculo() {
 
     const handleViewOT = (id) => {
         console.log("Ver OT:", id);
-
-        // navigate(`/dashboard/ots/${id}`);
     };
 
     if (!vehiculo) return <LoadingComponent />;
@@ -160,20 +158,23 @@ function DetalleVehiculo() {
         }
     ];
 
+    // Get dark mode from cookies
+    const darkMode = getDarkModeFromLocalCookie();
+
     return (
-        <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
+        <div className={`flex flex-col lg:flex-row h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100'}`}>
             <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
 
             <div className="flex-1 flex flex-col">
                 <DashboardHeader toggleSidebar={toggleSidebar} />
 
-                <div className="p-4 sm:p-6 flex flex-col">
+                <div className={`p-4 sm:p-6 flex flex-col ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                     <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-                        <Button onClick={handleBack} variant="outline" size="md" className="mb-2 sm:mb-0">Volver</Button>
-                        <h1 className="text-2xl sm:text-4xl font-bold text-black text-center sm:w-full">{vehiculo.modelo}</h1>
+                        <Button onClick={handleBack} variant="default" size="md">Volver</Button>
+                        <h1 className="text-2xl sm:text-4xl font-bold text-center sm:w-full">{vehiculo.modelo}</h1>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
+                    <div className={`rounded-lg shadow-md p-4 sm:p-6 mb-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                         {!isEditing ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-4">
                                 <p><strong>Marca:</strong> {vehiculo.marca_id?.nombre_marca || 'Sin marca'}</p>
@@ -219,7 +220,7 @@ function DetalleVehiculo() {
                         )}
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto">
+                    <div className={`rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                         <h3 className="text-lg sm:text-xl font-semibold mb-4">Historial de Mantenimiento</h3>
                         <Table className="min-w-full">
                         {ots.length === 0 ? (

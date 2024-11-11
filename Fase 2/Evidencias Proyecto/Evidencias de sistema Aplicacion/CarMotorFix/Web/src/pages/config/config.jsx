@@ -11,13 +11,13 @@ import { User, IdCard, Mail, Lock, Bell, Palette, Eye, EyeOff } from 'lucide-rea
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import { fetcher } from '../../lib/strApi';
-import { getTokenFromLocalCookie, getIdFromLocalCookie } from '../../lib/cookies';
+import { getTokenFromLocalCookie, getIdFromLocalCookie, getDarkModeFromLocalCookie, setDarkMode as saveDarkModePreference } from '../../lib/cookies';
 import { supabase } from '../../lib/supabaseClient';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function Config() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(getDarkModeFromLocalCookie()); // Initial dark mode state from cookie
   const [isEditing, setIsEditing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userData, setUserData] = useState({
@@ -40,6 +40,7 @@ export default function Config() {
   });
 
   useEffect(() => {
+    // Fetch user data
     const fetchUserData = async () => {
       const jwt = getTokenFromLocalCookie();
       if (jwt) {
@@ -73,7 +74,6 @@ export default function Config() {
   const handlePasswordChange = async () => {
     const { contrasenaAnterior, nuevaContrasena, repetirNuevaContrasena } = passwords;
 
-    // Validación básica de contraseñas
     if (!contrasenaAnterior || !nuevaContrasena || !repetirNuevaContrasena) {
       toast.error("Por favor, completa todos los campos de contraseña.");
       return;
@@ -87,7 +87,6 @@ export default function Config() {
     try {
       const jwt = getTokenFromLocalCookie();
 
-      // Actualización de la contraseña en Strapi
       const strapiResponse = await fetch(`${STRAPI_URL}/api/auth/change-password`, {
         method: "POST",
         headers: {
@@ -108,7 +107,6 @@ export default function Config() {
 
         await supabase.auth.updateUser({ password: nuevaContrasena });
 
-        // Limpiar los campos de contraseña
         setPasswords({ contrasenaAnterior: "", nuevaContrasena: "", repetirNuevaContrasena: "" });
       } else {
         toast.error(strapiData.message || "Hubo un error al cambiar la contraseña en Strapi.");
@@ -162,13 +160,21 @@ export default function Config() {
     setUserData({ ...userData, [e.target.id]: e.target.value });
   };
 
+  const handleDarkModeToggle = (enabled) => {
+    setDarkMode(enabled);
+    saveDarkModePreference(enabled); // Save preference to cookie
+
+    // Reload the page to apply dark mode changes immediately
+    window.location.reload();
+  };
+
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} closeOnClick pauseOnFocusLoss draggable pauseOnHover />
       <div className="flex flex-col h-screen md:flex-row">
-        <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} darkMode={darkMode} />
         <div className="flex-1 flex flex-col overflow-hidden">
-          <DashboardHeader toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <DashboardHeader toggleSidebar={() => setSidebarOpen(!sidebarOpen)} darkMode={darkMode} />
 
           <div className="flex-1 overflow-y-auto p-6">
             <h1 className="text-3xl font-bold mb-6">Configuración del Cliente</h1>
@@ -180,7 +186,6 @@ export default function Config() {
               </TabsList>
 
               <TabsContent value="perfil">
-                {/* Card for Personal Information */}
                 <Card className="mb-6">
                   <CardHeader>
                     <CardTitle>Perfil del Cliente</CardTitle>
@@ -306,7 +311,7 @@ export default function Config() {
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="dark-mode">Modo Oscuro</Label>
-                      <Switch id="dark-mode" checked={darkMode} onCheckedChange={setDarkMode} />
+                      <Switch id="dark-mode" checked={darkMode} onCheckedChange={handleDarkModeToggle} />
                     </div>
                   </CardContent>
                 </Card>

@@ -11,6 +11,24 @@ export const setToken = (data) => {
     Cookies.set('jwt', data.jwt);
 
 };
+export const setDarkMode = (isDarkMode) => {
+    if (typeof window === 'undefined') {
+        return;
+    }
+    Cookies.set('darkMode', isDarkMode ? 'enabled' : 'disabled');
+};
+
+export const unsetDarkMode = () => {
+    if (typeof window === 'undefined') {
+        return;
+    }
+    Cookies.remove('darkMode');
+};
+
+export const getDarkModeFromLocalCookie = () => {
+    const darkMode = Cookies.get('darkMode');
+    return darkMode === 'enabled';
+};
 
 export const unsetToken = () => {
     if (typeof window === 'undefined') {
