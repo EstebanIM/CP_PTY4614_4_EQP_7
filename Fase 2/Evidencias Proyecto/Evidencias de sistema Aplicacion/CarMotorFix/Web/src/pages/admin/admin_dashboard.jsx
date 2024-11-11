@@ -101,7 +101,7 @@ const DashboardAdmin = () => {
     const fetchOTCotizaciones = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[user][fields]=username&populate=estado_ot_id&filters[estado_ot_id][nom_estado][$eq]=cotizando`, {
+          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[user][fields]=username&populate=estado_ot_id&filters[estado_ot_id][nom_estado][$eq]=Cotizando`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
@@ -121,7 +121,7 @@ const DashboardAdmin = () => {
     const fetchOEnproceso = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[estado_ot_id][fields][0]=nom_estado&populate[user][fields][0]=username&populate[catalogo_servicios][fields]=tp_servicio&filters[estado_ot_id][nom_estado][$eq]=En proceso`, {
+          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[estado_ot_id][fields][0]=nom_estado&populate[user][fields][0]=username&populate[catalogo_servicios][fields]=tp_servicio&filters[estado_ot_id][nom_estado][$nei]=Cotizando`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
@@ -168,7 +168,6 @@ const DashboardAdmin = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return data.slice(startIndex, startIndex + itemsPerPage);
   };
-
 
   const currentAutos = paginate(vehiculos, currentPageAutos);
   const currentCotizaciones = paginate(Cotizaciones, currentPageCotizaciones);

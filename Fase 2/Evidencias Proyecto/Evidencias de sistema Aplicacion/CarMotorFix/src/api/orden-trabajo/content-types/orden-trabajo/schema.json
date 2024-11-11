@@ -67,6 +67,9 @@
       "relation": "manyToOne",
       "target": "api::vehiculo.vehiculo",
       "inversedBy": "ots"
+    },
+    "descripcion": {
+      "type": "text"
     }
   }
 }

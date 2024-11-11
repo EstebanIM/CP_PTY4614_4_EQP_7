@@ -4,12 +4,14 @@ import { Card } from "../../components/ui/tables/cards";
 import { useNavigate } from "react-router-dom";
 import { fetcher } from "../../lib/strApi";
 import { useParams } from "react-router-dom";
-import { getTokenFromLocalCookie } from "../../lib/cookies";
+import Modal from '../../components/forms/modal';
+import { getTokenFromLocalCookie, getDarkModeFromLocalCookie } from "../../lib/cookies";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import Loading from "../../components/animation/loading";
 
 export default function WorkOrderDetails() {
+  const [darkMode] = useState(getDarkModeFromLocalCookie());
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -19,6 +21,11 @@ export default function WorkOrderDetails() {
   const [vehiculo, setVehiculo] = useState(null);
   const [VehiculoID, setVehiculoID] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
+  const [showAddEstado, setshowAddEstado] = useState(false);
+  const [newEstado, setNewEstado] = useState([]);
+  const [someValue, setSomeValue] = useState('');
+
 
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -53,7 +60,7 @@ export default function WorkOrderDetails() {
           },
         });
 
-        return response.data.role;
+        setUserRole(response.role.name);
       } catch (error) {
         console.error('Error fetching user role:', error);
       }
@@ -79,10 +86,31 @@ export default function WorkOrderDetails() {
     }
   };
 
+  const fetchEstados = async () => {
+    const jwt = getTokenFromLocalCookie();
+    if (jwt) {
+      try {
+        const response = await fetcher(`${STRAPI_URL}/api/estado-ots?fields=nom_estado`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+
+        setNewEstado(response.data || []);
+
+      } catch (error) {
+        console.error('Error fetching order states:', error);
+      }
+    }
+  };
+
+
   useEffect(() => {
     setLoading(true);
     fetchOrden();
     fetchUserRole();
+    fetchEstados();
   }, [id]);
 
   useEffect(() => {
@@ -124,8 +152,8 @@ export default function WorkOrderDetails() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
-      <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+    <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+      <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
       <div className="flex-1 flex flex-col">
         <DashboardHeader toggleSidebar={toggleSidebar} />
         <div className="p-4 sm:p-6 flex flex-col">
@@ -179,10 +207,45 @@ export default function WorkOrderDetails() {
             </div>
 
             <div className="mt-6 flex justify-end">
-              <Button className="mr-2">Actualizar Estado</Button>
+              <button
+                className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+                onClick={() => setshowAddEstado(true)}
+              >
+                Actualizar Orden
+              </button>
               <Button variant="outline">Agregar Nota</Button>
             </div>
           </Card>
+          <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
+            <h4 className="text-xl font-semibold mb-4">Actualizar Orden</h4>
+            <form>
+              <div className="grid gap-4">
+                <select
+                  name="estado"
+                  value={someValue}
+                  onChange={(e) => setSomeValue(e.target.value)}
+                  required
+                  className="p-2 border rounded"
+                >
+                  <option value="">Seleccione Tipo</option>
+                  {newEstado
+                    .filter(tipo => tipo.nom_estado !== Orden?.estado_ot_id?.nom_estado)
+                    .map(tipo => (
+                      <option key={tipo.id} value={tipo.id}>{tipo.nom_estado}</option>
+                    ))}
+                </select>
+                <textarea
+                  name="descripcion"
+                  placeholder="Ingrese descripción"
+                  required
+                  className="p-2 border rounded"
+                />
+              </div>
+              <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                Actualizar
+              </button>
+            </form>
+          </Modal>
         </div>
       </div>
     </div>

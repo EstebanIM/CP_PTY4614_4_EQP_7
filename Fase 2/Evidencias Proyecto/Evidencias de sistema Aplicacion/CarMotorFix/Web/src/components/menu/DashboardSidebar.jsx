@@ -21,7 +21,6 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
   }, []);
 
   useEffect(() => {
-    // Load dark mode setting from cookies
     setDarkMode(getDarkModeFromLocalCookie());
   }, []);
 
@@ -35,7 +34,7 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
       className={`w-64 md:w-64 md:flex-shrink-0 md:flex md:flex-col p-4 
       fixed left-0 top-0 bottom-0 z-50 md:relative no-scrollbar 
       ${isDesktop || sidebarOpen ? 'block' : 'hidden'} md:block
-      ${darkMode ? 'dark' : ''}`} // Apply "dark" mode class here
+      ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}
       initial={sidebarOpen || isDesktop ? "open" : "closed"}
       animate={sidebarOpen || isDesktop ? "open" : "closed"}
       variants={sidebarVariants}
@@ -61,11 +60,11 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
           </Link>
         </div>
 
-        {/* Auto */}
         <div>
           <Link to="/dashboard" className="w-full block">
             <Button variant="ghost" className="justify-start flex items-center">
-              <CarFront className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Mis Vehículos
+              <CarFront className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} />
+              {userRole === "Admin" || userRole === "Mechanic" ? "Dashboard" : "Mis Vehículos"}
             </Button>
           </Link>
         </div>

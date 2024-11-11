@@ -84,7 +84,8 @@
       "type": "string"
     },
     "run": {
-      "type": "integer"
+      "type": "integer",
+      "unique": true
     },
     "mecanico": {
       "type": "relation",

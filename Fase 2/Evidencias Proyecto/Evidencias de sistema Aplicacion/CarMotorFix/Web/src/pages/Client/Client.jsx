@@ -4,13 +4,13 @@ import { getTokenFromLocalCookie } from '../../lib/cookies';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import Tablas from '../../components/Tablas';
-import Modal from '../../components/forms/modal'; 
+import Modal from '../../components/forms/modal';
 import { toast } from 'react-toastify';
 import { getDarkModeFromLocalCookie } from '../../lib/cookies'; 
 
 function Client() {
   const [vehiculos, setVehiculos] = useState([]);
-  const [isAdding, setIsAdding] = useState(false);
+  // const [isAdding, setIsAdding] = useState(false);
   const [totalServicios, setTotalServicios] = useState(0);
   const [servicios, setServicios] = useState([]);
   const [marcas, setMarcas] = useState([]);
@@ -44,22 +44,23 @@ function Client() {
     const selectedTipo = tiposVehiculo.find(
       (tipo) => tipo.id === Number(newVehiculo.tp_vehiculo_id)
     );
-
+  
     if (selectedTipo && selectedTipo.nom_tp_vehiculo === "Moto/motocicleta") {
-      const motoPattern = /^[A-Z]{3}-\d{2}$/;
+      const motoPattern = /^[A-Z]{2}\d{3}$|^[A-Z]{3}\d{2}$/;
       if (!motoPattern.test(newVehiculo.patente)) {
-        toast.error("Formato de patente para moto no válido. Debe ser en formato AAA-11 en mayúsculas.");
+        toast.error("Formato de patente para moto no válido. Debe ser en formato AA-000 o AAA-00 en mayúsculas.");
         return false;
       }
     } else {
-      const autoPattern = /^(?:[A-Z]{4}-\d{2}|[A-Z]{2}-\d{4})$/;
+      const autoPattern = /^[A-Z]{2}\d{4}$|^[A-Z]{4}\d{2}$/;
       if (!autoPattern.test(newVehiculo.patente)) {
-        toast.error("Formato de patente no válido. Debe ser en formato AABB-00 o AA-0000.");
+        toast.error("Formato de patente no válido. Debe ser en formato AA-0000 o AAAA-00 en mayúsculas.");
         return false;
       }
     }
     return true;
   };
+  
 
   const isPatenteDuplicada = (patente) => {
     return vehiculos.some((vehiculo) => vehiculo.patente === patente);
@@ -214,6 +215,10 @@ function Client() {
 
   const handleViewVehiculo = (vehiculo) => {
     navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
+  };
+
+  const handleViewCotizacion = (cotizacion) => {
+    navigate(`/detalle_ot/${cotizacion.documentId}`);
   };
 
   const formatPatente = (patente) => {
@@ -429,7 +434,7 @@ function Client() {
                 <h4 className="text-xl">No tienes Cotizaciones.</h4>
               </div>
             ) : (
-              <Tablas servicio={OT} handleViewTabla={handleViewVehiculo} columns={columns2} />
+              <Tablas servicio={OT} handleViewTabla={handleViewCotizacion} columns={columns2} />
             )}
           </div>
         </div>

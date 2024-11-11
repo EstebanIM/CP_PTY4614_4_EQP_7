@@ -82,8 +82,8 @@ const DashboardAutos = () => {
         
         setTotalVehiculos(vehiculosUnicos.size);
         
-        const Cotizacion = OT.filter(cotizacion => cotizacion.estado_ot_id === 'cotizando');
-        const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'cotizando');
+        const Cotizacion = OT.filter(cotizacion => cotizacion.estado_ot_id === 'Cotizando');
+        const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'Cotizando');
 
         setOrdenes(Ordenes);
         setTotalOrdenes(Ordenes.length);

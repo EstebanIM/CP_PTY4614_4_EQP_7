@@ -488,7 +488,7 @@ export interface PluginUsersPermissionsUser
     >;
     nombre: Schema.Attribute.String;
     apellido: Schema.Attribute.String;
-    run: Schema.Attribute.Integer;
+    run: Schema.Attribute.Integer & Schema.Attribute.Unique;
     mecanico: Schema.Attribute.Relation<'oneToOne', 'api::mecanico.mecanico'>;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
@@ -832,6 +832,7 @@ export interface ApiOrdenTrabajoOrdenTrabajo
       'plugin::users-permissions.user'
     >;
     vehiculo: Schema.Attribute.Relation<'manyToOne', 'api::vehiculo.vehiculo'>;
+    descripcion: Schema.Attribute.Text;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
