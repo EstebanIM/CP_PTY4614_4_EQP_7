@@ -1,7 +1,6 @@
 import { supabase } from '../lib/supabaseClient';
 import { fetcher } from '../lib/strApi';
 import { setToken } from '../lib/cookies';
-
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export const login = async (email, password) => {
@@ -57,11 +56,27 @@ export const register = async (email, password, name, surname, rut) => {
     throw new Error(accountResponse.error.message);
   }
 
-
   const { error: supabaseError } = await supabase.auth.signUp({ email, password });
   if (supabaseError) {
     throw new Error(supabaseError.message);
   }
 
   return strapiResponse.user;
+};
+
+export const resetPassword = async (email) => {
+  try {
+    await fetcher(`${STRAPI_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) {
+      throw new Error(`Supabase error: ${error.message}`);
+    }
+  } catch (error) {
+    throw new Error(`Error en la recuperación de contraseña: ${error.message}`);
+  }
 };

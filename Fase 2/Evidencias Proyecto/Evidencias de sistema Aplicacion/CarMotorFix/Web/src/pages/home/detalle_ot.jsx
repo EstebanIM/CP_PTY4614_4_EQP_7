@@ -33,7 +33,7 @@ export default function WorkOrderDetails() {
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
       try {
-        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos/${id}?pLevel=3`, {
+        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos/${id}?pLevel`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

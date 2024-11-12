@@ -27,15 +27,15 @@
       "target": "api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio",
       "inversedBy": "catalogo_servicios_id"
     },
-    "ot": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::orden-trabajo.orden-trabajo",
-      "inversedBy": "catalogo_servicios"
-    },
     "Estado": {
       "type": "boolean",
       "default": true
+    },
+    "ots": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::orden-trabajo.orden-trabajo",
+      "inversedBy": "catalogo_servicios"
     }
   }
 }

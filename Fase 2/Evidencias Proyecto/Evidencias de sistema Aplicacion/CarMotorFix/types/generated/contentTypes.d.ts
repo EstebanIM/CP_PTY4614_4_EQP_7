@@ -573,11 +573,11 @@ export interface ApiCatalogoServicioCatalogoServicio
       'manyToOne',
       'api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio'
     >;
-    ot: Schema.Attribute.Relation<
-      'manyToOne',
+    Estado: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    ots: Schema.Attribute.Relation<
+      'manyToMany',
       'api::orden-trabajo.orden-trabajo'
     >;
-    Estado: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -824,7 +824,7 @@ export interface ApiOrdenTrabajoOrdenTrabajo
       'api::mecanico.mecanico'
     >;
     catalogo_servicios: Schema.Attribute.Relation<
-      'oneToMany',
+      'manyToMany',
       'api::catalogo-servicio.catalogo-servicio'
     >;
     user: Schema.Attribute.Relation<

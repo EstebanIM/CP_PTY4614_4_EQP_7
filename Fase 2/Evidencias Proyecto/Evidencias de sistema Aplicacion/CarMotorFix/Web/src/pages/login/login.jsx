@@ -6,7 +6,7 @@ import { LoginForm } from '../../components/forms/logins';
 import { RegisterForm } from '../../components/forms/register';
 import { ResetPasswordForm } from '../../components/forms/reset';
 import AnimatedBackground from '../../components/animation/animated-background';
-import { login, register } from '../../services/authService';
+import { login, register, resetPassword } from '../../services/authService';
 import { handleRutChange } from '../../utils/rutHandler';
 import { validateRut, validateEmail } from '../../utils/validation_rut';
 import { Button } from '../../components/ui/button';
@@ -46,6 +46,7 @@ export default function ResponsiveAuthForm({ className = "" }) {
         toast.success("Registro exitoso, revisa tu correo para confirmar tu cuenta");
         navigate("/verify-email");
       } else if (mode === "reset") {
+        await resetPassword(email); // Llama a resetPassword para iniciar el proceso de recuperación
         toast.success("Correo de recuperación enviado");
       }
     } catch (error) {
@@ -61,7 +62,6 @@ export default function ResponsiveAuthForm({ className = "" }) {
       return false;
     }
 
-    // Verificar las reglas de la contraseña y mostrar mensajes específicos de error si no cumple las reglas
     const unmetRules = getUnmetPasswordRules(passwordRules);
     if (unmetRules.length > 0) {
       toast.error(`Contraseña no segura. Te recomendamos que: ${unmetRules.join(", ")}`);

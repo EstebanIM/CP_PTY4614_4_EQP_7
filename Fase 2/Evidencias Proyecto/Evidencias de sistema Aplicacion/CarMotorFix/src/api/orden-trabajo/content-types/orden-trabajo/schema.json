@@ -52,9 +52,9 @@
     },
     "catalogo_servicios": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "api::catalogo-servicio.catalogo-servicio",
-      "mappedBy": "ot"
+      "mappedBy": "ots"
     },
     "user": {
       "type": "relation",

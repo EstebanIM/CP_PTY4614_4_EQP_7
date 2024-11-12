@@ -32,12 +32,12 @@ function Client() {
     motor: '',
     color: ''
   });
+
   const [formData, setFormData] = useState({
-    fechainicio: "",
-    costo: "",
-    estado_ot_id: "",
-    ordentrabajo_catalogoservicio_id: "",
-    mecanico_id: ""
+    costo: '',
+    mecanico_id: '',
+    vehiculo: '',
+    catalogo_servicios: []
   });
 
   const [darkMode] = useState(getDarkModeFromLocalCookie());
@@ -63,7 +63,6 @@ function Client() {
     return true;
   };
 
-
   const isPatenteDuplicada = (patente) => {
     return vehiculos.some((vehiculo) => vehiculo.patente === patente);
   };
@@ -72,13 +71,12 @@ function Client() {
 
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
-    console.log(jwt);
 
     const fetchVehiculos = async () => {
       if (jwt) {
         setLoading(true);
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
+          const response = await fetcher(`${STRAPI_URL}/api/users/me?pLevel=3`, {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
@@ -88,12 +86,10 @@ function Client() {
           const vehiculoIds = response.vehiculo_ids || [];
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
           const OT = response.ots || [];
-          console.log(OT);
-
-          console.log(response);
 
           SetOT(OT);
           setVehiculos(validVehiculoIds);
+
         } catch (error) {
           console.error('Error fetching vehicles:', error);
           toast.error("Error al obtener la lista de vehículos.");
@@ -154,7 +150,7 @@ function Client() {
 
     const fetchMecanicos = async () => {
       try {
-        const response = await fetcher(`${STRAPI_URL}/api/mecanicos`, {
+        const response = await fetcher(`${STRAPI_URL}/api/mecanicos?fields=id,prim_nom,prim_apell`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${jwt}`,
@@ -176,11 +172,34 @@ function Client() {
   }, [STRAPI_URL]);
 
   const handleServicioSelect = (e, servicio) => {
-    setTotalServicios((prevTotal) => e.target.checked ? prevTotal + servicio.costserv : prevTotal - servicio.costserv);
+    setTotalServicios((prevTotal) =>
+      e.target.checked ? prevTotal + servicio.costserv : prevTotal - servicio.costserv
+    );
+  
+    setFormData((prevData) => {
+      const isSelected = prevData.catalogo_servicios.some((item) => item.id === servicio.id);
+      const newServicios = isSelected
+        ? prevData.catalogo_servicios.filter((item) => item.id !== servicio.id)
+        : [...prevData.catalogo_servicios, { id: servicio.id }];
+  
+      return {
+        ...prevData,
+        catalogo_servicios: newServicios,
+        costo: totalServicios + (e.target.checked ? servicio.costserv : -servicio.costserv),
+      };
+    });
   };
 
   const handleChange = (e) => {
     setNewVehiculo({ ...newVehiculo, [e.target.name]: e.target.value });
+  };
+
+  const handleChangeCotizacion = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleAddVehiculo = async (e) => {
@@ -238,7 +257,7 @@ function Client() {
       } catch (error) {
         console.error('Error adding vehicle:', error);
         toast.error("Error al agregar el vehículo");
-      }finally {
+      } finally {
         setLoading(false);
       }
     }
@@ -256,19 +275,58 @@ function Client() {
     const letras = patente.substring(0, 4);
     const numeros = patente.substring(4);
     return (letras.length === 4 && numeros.length === 2) || (letras.length === 2 && numeros.length === 4) ? `${letras}-${numeros}` : patente;
-  };
+  }; 4
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmitCotizacion = (e) => {
+  const handleSubmitCotizacion = async (e) => {
     e.preventDefault();
-    console.log(formData);
-
-    setShowCotizacionModal(false);
+    
+    const jwt = getTokenFromLocalCookie();
+    if (jwt) {
+      try {
+        setLoading(true);
+        const CotizacionData = {
+          data: {
+            fechainicio: new Date().toISOString().split('T')[0],
+            costo: formData.costo,
+            mecanico_id: formData.mecanico_id,
+            vehiculo: formData.vehiculo,
+            estado_ot_id: 1,
+            user: Cookies.get('id'),
+            catalogo_servicios: formData.catalogo_servicios.map((servicio) => servicio.id)
+          }
+        };
+  
+        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(CotizacionData),
+        });
+  
+        if (response && response.data) {
+          SetOT((prevOT) => [...prevOT, response.data]);
+        }
+  
+        setFormData({
+          costo: '',
+          mecanico_id: '',
+          vehiculo: '',
+          catalogo_servicios: []
+        });
+  
+        setShowCotizacionModal(false);
+        toast.success("Cotización creada correctamente");
+      } catch (error) {
+        console.error('Error al crear la cotización:', error);
+        toast.error("Hubo un error al intentar crear la cotización");
+      } finally {
+        setLoading(false);
+      }
+    }
   };
+  
 
   const columns = [
     {
@@ -297,7 +355,6 @@ function Client() {
     {
       header: "Servicio",
       key: "servicio",
-      // render: (OT) => OT.catalogo_servicios ? OT.catalogo_servicios.tp_servicio : 'Servicio no disponible'
       render: (OT) => {
         if (OT.catalogo_servicios && OT.catalogo_servicios.length > 0) {
           const firstService = OT.catalogo_servicios[0].tp_servicio;
@@ -454,6 +511,7 @@ function Client() {
           <Modal isOpen={showCotizacionModal} onClose={() => setShowCotizacionModal(false)}>
             <h4 className="text-xl font-semibold mb-4">Nueva Cotización</h4>
             <form onSubmit={handleSubmitCotizacion}>
+              {/* Selección de Servicios */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700">Seleccionar Servicios</label>
                 <div className="mt-1">
@@ -463,32 +521,60 @@ function Client() {
                         type="checkbox"
                         id={`servicio-${servicio.id}`}
                         value={servicio.id}
+                        checked={formData.catalogo_servicios.some((item) => item.id === servicio.id)}
                         onChange={(e) => handleServicioSelect(e, servicio)}
                         className="h-4 w-4 text-blue-600 border-gray-300 rounded"
                       />
                       <label htmlFor={`servicio-${servicio.id}`} className="ml-2 block text-sm text-gray-900">
-                        {servicio.tp_servicio} - ${servicio.costserv}
+                        {servicio.tp_servicio} - {servicio.costserv && new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(servicio.costserv)}
                       </label>
                     </div>
                   ))}
                 </div>
               </div>
 
+              {/* Total de Servicios */}
               <div className="mt-4">
-                <h2 className="text-xl font-semibold">Total de Servicios: ${totalServicios}</h2>
+                <h2 className="text-xl font-semibold">Total de Servicios: {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalServicios)}</h2>
               </div>
 
+              {/* Vehículo */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Mecánico ID</label>
-                <input
-                  type="text"
-                  name="mecanico_id"
-                  value={formData.mecanico_id}
-                  onChange={handleInputChange}
-                  placeholder="ID del mecánico"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                <label className="block text-sm font-medium text-gray-700">Vehículo</label>
+                <select
+                  id="vehiculo-select"
+                  name="vehiculo"
+                  onChange={handleChangeCotizacion}
+                  className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   required
-                />
+                >
+                  <option value="">Selecciona un vehículo</option>
+                  {vehiculos.map((vehiculo) => (
+                    <option key={vehiculo.id} value={vehiculo.id}>
+                      {vehiculo.marca_id.nombre_marca} {vehiculo.modelo} - {formatPatente(vehiculo.patente)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Mecánico ID */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Seleccionar Mecánico</label>
+                <div className="mt-1">
+                  <select
+                    id="mecanico-select"
+                    name="mecanico_id"
+                    onChange={handleChangeCotizacion}
+                    className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  >
+                    <option value="">Selecciona un mecánico</option>
+                    {mecanico.map((mec) => (
+                      <option key={mec.id} value={mec.id}>
+                        {mec.prim_nom} {mec.prim_apell}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <button
