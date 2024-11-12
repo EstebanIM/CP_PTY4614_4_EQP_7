@@ -310,7 +310,7 @@ export default function Config() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="dark-mode">Modo Oscuro</Label>
+                      <Label htmlFor="dark-mode">Modo Oscuro (beta)</Label>
                       <Switch id="dark-mode" checked={darkMode} onCheckedChange={handleDarkModeToggle} />
                     </div>
                   </CardContent>

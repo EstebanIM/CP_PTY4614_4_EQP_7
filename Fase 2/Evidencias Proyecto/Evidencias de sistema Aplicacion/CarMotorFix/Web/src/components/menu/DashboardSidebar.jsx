@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button";
-import { Users, CarFront, File, Store, Bug, X, List, Home } from "lucide-react";
+import { Users, CarFront, File, X, List, Home } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getDarkModeFromLocalCookie } from '../../lib/cookies';
@@ -95,24 +95,6 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
                 <List className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Servicio
               </Button>
             </Link>
-          </div>
-        ) : null}
-
-        {/* Taller */}
-        {userRole === "Admin" ? (
-          <div>
-            <Button variant="ghost" className="justify-start flex items-center">
-              <Store className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Taller
-            </Button>
-          </div>
-        ) : null}
-
-        {/* Bugs */}
-        {userRole === "Admin" ? (
-          <div>
-            <Button variant="ghost" className="justify-start flex items-center">
-              <Bug className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Bugs
-            </Button>
           </div>
         ) : null}
 
