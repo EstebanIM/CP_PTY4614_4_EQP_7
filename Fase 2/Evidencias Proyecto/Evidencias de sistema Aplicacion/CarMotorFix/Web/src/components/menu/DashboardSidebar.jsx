@@ -72,9 +72,11 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
         {/* Mecanico */}
         {userRole === "Admin" ? (
           <div>
-            <Button variant="ghost" className="justify-start flex items-center">
-              <Users className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Mecanico
-            </Button>
+            <Link to="/asignar_mecanico" className="w-full block">
+              <Button variant="ghost" className="justify-start flex items-center">
+                <Users className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Mecanico
+              </Button>
+            </Link>
           </div>
         ) : null}
 

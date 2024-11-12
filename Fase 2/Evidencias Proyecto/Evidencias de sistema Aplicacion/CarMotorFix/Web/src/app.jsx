@@ -18,6 +18,7 @@ import Dashboard from './pages/home/dashboard';
 import Catalogo_servicio from './pages/admin/Catalogo_servicio';
 import Detalle_servicio from './pages/admin/detalle-servicio';
 import Detalle_Orden from './pages/home/detalle_ot';
+import AsignarMecanico from './pages/admin/asignar_mecanico';
 
 function App() {
   return (
@@ -34,7 +35,7 @@ function App() {
             }
           />
 
-<Route
+          <Route
             path="/verify-email"
             element={
               <PublicRoute>
@@ -96,6 +97,14 @@ function App() {
             element={
               <PrivateRoute>
                 <Detalle_Orden />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/asignar_mecanico"
+            element={
+              <PrivateRoute>
+                <AsignarMecanico />
               </PrivateRoute>
             }
           />
