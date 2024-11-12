@@ -17,7 +17,7 @@ const DashboardAutos = () => {
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
   const [Cotizaciones, setCotizaciones] = useState([]);
   const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
-  const [idMecanico, setIdMecanico] = useState(0);
+  const [idMecanico, setIdMecanico] = useState(null);
   const [ordenes, setOrdenes] = useState([]);
   const [TotalOrdenes, setTotalOrdenes] = useState(0);
 
@@ -25,79 +25,71 @@ const DashboardAutos = () => {
     const jwt = getTokenFromLocalCookie();
 
     const fetchIDMecanico = async () => {
-        try {
-          const response = await fetcher(`${STRAPI_URL}/api/users/me?populate[mecanico][fields]=documentId`, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${jwt}`,
-            },
-          });
-
-          setIdMecanico(response.mecanico.documentId);
-
-        } catch (error) {
-          console.error('Error fetching IDMecanico:', error);
+      try {
+        const response = await fetcher(`${STRAPI_URL}/api/users/me?populate[mecanico][fields]=documentId`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+        setIdMecanico(response.mecanico.documentId);
+      } catch (error) {
+        console.error('Error fetching IDMecanico:', error);
       }
     };
 
+    fetchIDMecanico();
+  }, []);
+
+  useEffect(() => {
+    if (!idMecanico) return;
+
+    const jwt = getTokenFromLocalCookie();
+
     const fetchOT = async () => {
-        try {
-            const response = await fetcher(  `${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&populate[estado_ot_id][fields]=nom_estado&populate[vehiculo][populate][marca_id][fields]=nombre_marca&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${jwt}`,
-            },
-          });
-          
-          const OT = response.data.map((OT) => {
-            return {
-              ...OT,
-              user: OT.user.username,
-              estado_ot_id: OT.estado_ot_id.nom_estado,
-              catalogo_servicios: OT.catalogo_servicios.map(servicio => servicio.tp_servicio),
-              costo: OT.costo,
-              fechainicio: OT.fechainicio,
-              vehiculo: {
-                anio: OT.vehiculo.anio,
-                documentId: OT.vehiculo.documentId,
-                modelo: OT.vehiculo.modelo,
-                motor: OT.vehiculo.motor,
-                patente: OT.vehiculo.patente,
-                marca_id: OT.vehiculo.marca_id.nombre_marca,
-              }
-            };
-          });
+      try {
+        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&populate[estado_ot_id][fields]=nom_estado&populate[vehiculo][populate][marca_id][fields]=nombre_marca&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
 
-        const vehiculosUnicos = response.data.reduce((acc, OT) => {
-          const documentId = OT.vehiculo.documentId;
-        
-          if (!acc.has(documentId)) {
-            acc.add(documentId);
+        const OT = response.data.map((OT) => ({
+          ...OT,
+          user: OT.user.username,
+          estado_ot_id: OT.estado_ot_id.nom_estado,
+          catalogo_servicios: OT.catalogo_servicios.map(servicio => servicio.tp_servicio),
+          costo: OT.costo,
+          fechainicio: OT.fechainicio,
+          vehiculo: {
+            anio: OT.vehiculo.anio,
+            documentId: OT.vehiculo.documentId,
+            modelo: OT.vehiculo.modelo,
+            motor: OT.vehiculo.motor,
+            patente: OT.vehiculo.patente,
+            marca_id: OT.vehiculo.marca_id.nombre_marca,
           }
-        
-          return acc;
-        }, new Set());
+        }));
 
-        setVehiculos(OT.map(item => item.vehiculo));
-        
+        const vehiculosUnicos = new Set(OT.map(OT => OT.vehiculo.documentId));
+
+        setVehiculos(Array.from(new Map(OT.map(item => [item.vehiculo.documentId, item.vehiculo])).values()));
         setTotalVehiculos(vehiculosUnicos.size);
-        
+
         const Cotizacion = OT.filter(cotizacion => cotizacion.estado_ot_id === 'Cotizando');
         const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'Cotizando');
 
         setOrdenes(Ordenes);
         setTotalOrdenes(Ordenes.length);
-
         setCotizaciones(Cotizacion);
         setTotalCotizaciones(Cotizacion.length);
 
-          
-        } catch (error) {
-          console.error('Error fetching vehicles:', error);
-        }
+      } catch (error) {
+        console.error('Error fetching vehicles:', error);
+      }
     };
 
-    fetchIDMecanico();
     fetchOT();
   }, [idMecanico]);
 
@@ -105,7 +97,10 @@ const DashboardAutos = () => {
     navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
   };
 
-  // Datos para los cuadros de resumen
+  const handleViewOT = (DetalleOT) => {
+    navigate(`/detalle_ot/${DetalleOT.documentId}`);
+  };
+
   const stats = [
     { title: "Total de Autos", value: TotalVehiculos },
     { title: "Órdenes Activas", value: TotalOrdenes },
@@ -153,12 +148,12 @@ const DashboardAutos = () => {
         return 'Servicio no disponible';
       },
     },
-    { 
-      header: "Valor", 
-      key: "valor", 
-      render: (ordenes) => 
-        ordenes.costo 
-          ? new Intl.NumberFormat('es-CL').format(ordenes.costo) 
+    {
+      header: "Valor",
+      key: "valor",
+      render: (ordenes) =>
+        ordenes.costo
+          ? new Intl.NumberFormat('es-CL').format(ordenes.costo)
           : 'Valor no disponible',
     },
     {
@@ -186,27 +181,16 @@ const DashboardAutos = () => {
         return 'Servicio no disponible';
       },
     },
-    { 
-      header: "Valor", 
-      key: "valor", 
-      render: (Cotizaciones) => 
-        Cotizaciones.costo 
-          ? new Intl.NumberFormat('es-CL').format(Cotizaciones.costo) 
+    {
+      header: "Valor",
+      key: "valor",
+      render: (Cotizaciones) =>
+        Cotizaciones.costo
+          ? new Intl.NumberFormat('es-CL').format(Cotizaciones.costo)
           : 'Valor no disponible',
     },
-    // { 
-    //   header: "Fecha", 
-    //   key: "fecha", 
-    //   render: (Cotizaciones) => {
-    //     if (!Cotizaciones.fechainicio) return 'Fecha no disponible';
-        
-    //     const [year, month, day] = Cotizaciones.fechainicio.split('-');
-    //     return `${day}-${month}-${year}`;
-    //   }
-    // },
   ];
 
-  // Animation settings for framer-motion
   const cardVariants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
@@ -251,11 +235,18 @@ const DashboardAutos = () => {
         {/* Órdenes Activas y Cotizaciones Pendientes Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <motion.div initial="hidden" animate="visible" variants={cardVariants}>
-            <h2 className="text-xl font-bold mb-4">Órdenes Activas</h2>
+            <h2 className="pb-3 text-xl font-bold mb-4">Órdenes Activas</h2>
             <Card>
               <CardContent className="overflow-x-auto">
                 <Table className="min-w-full">
-                  <Tablas servicio={ordenes} handleViewTabla={handleViewVehiculo} columns={columns2} />
+                  {ordenes.length === 0 ? (
+                    <div className="text-center text-gray-500 mt-4">
+                      <h4 className="text-xl">No hay ordenes activas.</h4>
+                    </div>
+                  ) : (
+
+                    <Tablas servicio={ordenes} handleViewTabla={handleViewOT} columns={columns2} />
+                  )}
                 </Table>
               </CardContent>
             </Card>
@@ -272,7 +263,7 @@ const DashboardAutos = () => {
             <Card>
               <CardContent className="overflow-x-auto">
                 <Table className="min-w-full">
-                    <Tablas servicio={Cotizaciones} handleViewTabla={handleViewVehiculo} columns={columns3} />
+                  <Tablas servicio={Cotizaciones} handleViewTabla={handleViewOT} columns={columns3} />
                 </Table>
               </CardContent>
             </Card>

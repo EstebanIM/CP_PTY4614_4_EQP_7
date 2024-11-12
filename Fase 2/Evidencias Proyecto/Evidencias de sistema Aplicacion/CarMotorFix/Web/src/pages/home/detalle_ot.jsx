@@ -208,15 +208,17 @@ export default function WorkOrderDetails() {
               </ul>
             </div>
 
-            <div className="mt-6 flex justify-end">
-              <button
-                className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
-                onClick={() => setshowAddEstado(true)}
-              >
-                Actualizar Orden
-              </button>
-              <Button variant="outline">Agregar Nota</Button>
-            </div>
+            {['admin', 'Mechanic'].includes(userRole) && (
+              <div className="mt-6 flex justify-end">
+                <button
+                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+                  onClick={() => setshowAddEstado(true)}
+                >
+                  Actualizar Orden
+                </button>
+                <Button variant="outline">Agregar Nota</Button>
+              </div>
+            )}
           </Card>
           <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
             <h4 className="text-xl font-semibold mb-4">Actualizar Orden</h4>

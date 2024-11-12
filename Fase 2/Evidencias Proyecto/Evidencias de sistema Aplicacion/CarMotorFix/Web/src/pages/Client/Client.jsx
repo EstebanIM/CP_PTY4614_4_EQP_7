@@ -275,7 +275,7 @@ function Client() {
     const letras = patente.substring(0, 4);
     const numeros = patente.substring(4);
     return (letras.length === 4 && numeros.length === 2) || (letras.length === 2 && numeros.length === 4) ? `${letras}-${numeros}` : patente;
-  }; 4
+  };
 
   const handleSubmitCotizacion = async (e) => {
     e.preventDefault();

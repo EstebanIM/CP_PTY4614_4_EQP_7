@@ -37,6 +37,7 @@ function AsignarMecanico() {
                         Authorization: `Bearer ${jwt}`,
                     },
                 });
+                setUserRole(response.role.name);
 
                 if (response.error || response.length === 0) {
                     toast.error("Usuario no encontrado.");
@@ -52,7 +53,6 @@ function AsignarMecanico() {
             }
         }
     };
-
 
     const handleAssignRole = async () => {
         const jwt = getTokenFromLocalCookie();
