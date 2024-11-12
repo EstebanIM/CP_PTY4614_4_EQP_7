@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { fetcher } from '../../lib/strApi';
-import { getTokenFromLocalCookie } from '../../lib/cookies';
+import { getTokenFromLocalCookie, getDarkModeFromLocalCookie, setDarkMode as saveDarkModePreference } from '../../lib/cookies';
 import { toast } from 'react-toastify';
 import DashboardSidebar from '../../components/menu/DashboardSidebar';
 import DashboardHeader from '../../components/menu/DashboardHeader';
 import { Button } from '../../components/ui/button';
 
 function AsignarMecanico() {
+    const [darkMode, setDarkMode] = useState(getDarkModeFromLocalCookie());
     const [run, setRun] = useState('');
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -37,7 +38,6 @@ function AsignarMecanico() {
                         Authorization: `Bearer ${jwt}`,
                     },
                 });
-                setUserRole(response.role.name);
 
                 if (response.error || response.length === 0) {
                     toast.error("Usuario no encontrado.");
@@ -78,6 +78,31 @@ function AsignarMecanico() {
                     const updatedUser = await response.json();
                     toast.success("Rol de mecánico asignado exitosamente.");
                     setUser({ ...user, role: { id: '3', name: 'Mecánico' } });
+
+                    // Insertar datos en la tabla Mecanico
+                    const mecanicoResponse = await fetch(`${STRAPI_URL}/api/mecanicos`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${jwt}`,
+                        },
+                        body: JSON.stringify({
+                            data: {
+                                run: user.run,
+                                prim_nom: user.nombre,
+                                prim_apell: user.apellido,
+                                correo: user.email,
+                            }
+                        }),
+                    });
+
+                    if (!mecanicoResponse.ok) {
+                        const errorData = await mecanicoResponse.json().catch(() => ({ message: "Error desconocido" }));
+                        console.error("Error al insertar en la tabla Mecanico:", errorData);
+                        toast.error(errorData.message || "Error al insertar en la tabla Mecanico.");
+                    } else {
+                        toast.success("Datos insertados en la tabla Mecanico exitosamente.");
+                    }
                 }
             } catch (error) {
                 console.error("Error al asignar rol:", error);
@@ -89,11 +114,19 @@ function AsignarMecanico() {
         }
     };
 
+    const handleDarkModeToggle = (enabled) => {
+        setDarkMode(enabled);
+        saveDarkModePreference(enabled); // Save preference to cookie
+
+        // Reload the page to apply dark mode changes immediately
+        window.location.reload();
+    };
+
     return (
-        <div className="flex h-screen bg-gray-100">
-            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
+        <div className={`flex h-screen bg-gray-100 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} darkMode={darkMode} />
             <div className="flex-1 flex flex-col">
-                <DashboardHeader toggleSidebar={toggleSidebar} />
+                <DashboardHeader toggleSidebar={toggleSidebar} darkMode={darkMode} />
                 <div className="p-8 bg-white rounded-lg shadow-lg mx-6 my-6">
                     <h1 className="text-3xl font-bold text-gray-700 mb-6">Asignar Rol de Mecánico</h1>
 

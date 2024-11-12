@@ -18,6 +18,7 @@ const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function Config() {
   const [darkMode, setDarkMode] = useState(getDarkModeFromLocalCookie()); // Initial dark mode state from cookie
+  const [userRole, setUserRole] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userData, setUserData] = useState({
@@ -38,6 +39,23 @@ export default function Config() {
     nuevaContrasena: "",
     repetirNuevaContrasena: "",
   });
+
+  const fetchUserRole = async () => {
+    const jwt = getTokenFromLocalCookie();
+    if (jwt) {
+      try {
+        const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+        setUserRole(response.role.name);
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+      }
+    }
+  };
 
   useEffect(() => {
     // Fetch user data
@@ -63,7 +81,7 @@ export default function Config() {
         }
       }
     };
-
+    fetchUserRole();
     fetchUserData();
   }, []);
 
@@ -172,7 +190,7 @@ export default function Config() {
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} closeOnClick pauseOnFocusLoss draggable pauseOnHover />
       <div className="flex flex-col h-screen md:flex-row">
-        <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} darkMode={darkMode} />
+        <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} darkMode={darkMode} userRole={userRole} />
         <div className="flex-1 flex flex-col overflow-hidden">
           <DashboardHeader toggleSidebar={() => setSidebarOpen(!sidebarOpen)} darkMode={darkMode} />
 
