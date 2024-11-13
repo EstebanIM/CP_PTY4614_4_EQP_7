@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
 import { Table } from "../../components/ui/tables/table";
-import { Button } from "../../components/ui/button";
+import Modal from "../../components/forms/modal";
 import Tablas from "../../components/Tablas";
 import { getTokenFromLocalCookie } from "../../lib/cookies";
 import { fetcher } from "../../lib/strApi";
@@ -13,6 +13,7 @@ const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 const DashboardAutos = () => {
   const navigate = useNavigate();
 
+  const [totalServicios, setTotalServicios] = useState(0);
   const [vehiculos, setVehiculos] = useState([]);
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
   const [Cotizaciones, setCotizaciones] = useState([]);
@@ -20,6 +21,17 @@ const DashboardAutos = () => {
   const [idMecanico, setIdMecanico] = useState(null);
   const [ordenes, setOrdenes] = useState([]);
   const [TotalOrdenes, setTotalOrdenes] = useState(0);
+  const [showCotizacionModal, setShowCotizacionModal] = useState(false);
+  const [servicios, setServicios] = useState([]);
+
+  const [formData, setFormData] = useState({
+    costo: '',
+    vehiculo: '',
+    descripcion: '',
+    fecharecepcion: '',
+    fechaentrega: '',
+    catalogo_servicios: []
+  });
 
   useEffect(() => {
     const jwt = getTokenFromLocalCookie();
@@ -48,7 +60,7 @@ const DashboardAutos = () => {
 
     const fetchOT = async () => {
       try {
-        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&populate[estado_ot_id][fields]=nom_estado&populate[vehiculo][populate][marca_id][fields]=nombre_marca&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
+        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&populate[estado_ot_id][fields]=nom_estado&populate[vehiculo][fields]=id,anio,modelo,motor,patente&populate[vehiculo][populate][marca_id][fields]=nombre_marca&populate[vehiculo][populate][user_id][fields]=id&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${jwt}`,
@@ -63,11 +75,13 @@ const DashboardAutos = () => {
           costo: OT.costo,
           fechainicio: OT.fechainicio,
           vehiculo: {
+            id: OT.vehiculo.id,
             anio: OT.vehiculo.anio,
             documentId: OT.vehiculo.documentId,
             modelo: OT.vehiculo.modelo,
             motor: OT.vehiculo.motor,
             patente: OT.vehiculo.patente,
+            user_id: OT.vehiculo.user_id.id,
             marca_id: OT.vehiculo.marca_id.nombre_marca,
           }
         }));
@@ -81,6 +95,7 @@ const DashboardAutos = () => {
         const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'Cotizando');
 
         setOrdenes(Ordenes);
+
         setTotalOrdenes(Ordenes.length);
         setCotizaciones(Cotizacion);
         setTotalCotizaciones(Cotizacion.length);
@@ -90,6 +105,20 @@ const DashboardAutos = () => {
       }
     };
 
+    const fetchServicios = async () => {
+      try {
+        const response = await fetcher(`${STRAPI_URL}/api/catalogo-servicios`, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        });
+        setServicios(response.data || []);
+      } catch (error) {
+        console.error('Error fetching servicios:', error);
+      }
+    };
+
+    fetchServicios();
     fetchOT();
   }, [idMecanico]);
 
@@ -100,6 +129,26 @@ const DashboardAutos = () => {
   const handleViewOT = (DetalleOT) => {
     navigate(`/detalle_ot/${DetalleOT.documentId}`);
   };
+
+  const handleServicioSelect = (e, servicio) => {
+    const { checked } = e.target;
+
+    setFormData((prevData) => {
+      const newCatalogoServicios = checked
+        ? [...prevData.catalogo_servicios, { id: servicio.id }]
+        : prevData.catalogo_servicios.filter((item) => item.id !== servicio.id);
+
+      return {
+        ...prevData,
+        catalogo_servicios: newCatalogoServicios,
+      };
+    });
+
+    setTotalServicios((prevTotal) =>
+      checked ? prevTotal + servicio.costserv : prevTotal - servicio.costserv
+    );
+  };
+
 
   const stats = [
     { title: "Total de Autos", value: TotalVehiculos },
@@ -196,6 +245,90 @@ const DashboardAutos = () => {
     visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
   };
 
+  const handleSubmitCotizacion = async (e) => {
+    e.preventDefault();
+
+    const jwt = getTokenFromLocalCookie();
+    if (jwt) {
+      try {
+        const CotizacionData = {
+          data: {
+            fechainicio: new Date().toISOString().split('T')[0],
+            costo: totalServicios,
+            mecanico_id: idMecanico,
+            vehiculo: formData.vehiculo.id,
+            estado_ot_id: 1,
+            user: formData.vehiculo.user_id,
+            fecharecepcion: formData.fecharecepcion,
+            fechaentrega: formData.fechaentrega,
+            descripcion: formData.descripcion,
+            catalogo_servicios: formData.catalogo_servicios.map((servicio) => servicio.id)
+          }
+        };
+
+        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(CotizacionData),
+        });
+
+        console.log('Cotización creada:', CotizacionData);
+
+        if (response && response.data) {
+          setCotizaciones((prevOT) => [...prevOT, response.data]);
+        }
+
+        setFormData({
+          costo: '',
+          vehiculo: '',
+          descripcion: '',
+          fecharecepcion: '',
+          fechaentrega: '',
+          catalogo_servicios: []
+        });
+        setTotalServicios(0);
+
+        setShowCotizacionModal(false);
+
+      } catch (error) {
+        console.error('Error al crear la cotización:', error);
+      }
+    }
+  };
+
+  const handleChangeCotizacion = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prevData) => {
+      if (name === "vehiculo") {
+        const selectedVehiculo = vehiculos.find(v => v.id === Number(value));
+
+        if (selectedVehiculo) {
+          return {
+            ...prevData,
+            vehiculo: {
+              id: selectedVehiculo.id,
+              user_id: selectedVehiculo.user_id
+            }
+          };
+        } else {
+          console.warn("Vehículo no encontrado");
+          return prevData;
+        }
+      }
+
+      return {
+        ...prevData,
+        [name]: value,
+      };
+    });
+  };
+
+
+
   return (
     <div className="flex">
 
@@ -256,9 +389,12 @@ const DashboardAutos = () => {
           <motion.div initial="hidden" animate="visible" variants={cardVariants}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Cotizaciones Pendientes</h2>
-              <Button className="text-sm font-medium border border-black text-black">
+              <button
+                onClick={() => setShowCotizacionModal(true)}
+                className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+              >
                 Nueva Cotización
-              </Button>
+              </button>
             </div>
             <Card>
               <CardContent className="overflow-x-auto">
@@ -270,6 +406,115 @@ const DashboardAutos = () => {
           </motion.div>
         </div>
       </div>
+
+      <Modal isOpen={showCotizacionModal} onClose={() => setShowCotizacionModal(false)}>
+        <h4 className="text-xl font-semibold mb-4">Nueva Cotización</h4>
+        <form onSubmit={handleSubmitCotizacion}>
+          {/* Selección de Servicios */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Seleccionar Servicios</label>
+            <div className="mt-1">
+              {servicios.map((servicio) => (
+                <div key={servicio.id} className="flex items-center mb-2">
+                  <input
+                    type="checkbox"
+                    id={`servicio-${servicio.id}`}
+                    value={servicio.id}
+                    checked={formData.catalogo_servicios.some((item) => item.id === servicio.id)}
+                    onChange={(e) => handleServicioSelect(e, servicio)}
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                  />
+                  <label htmlFor={`servicio-${servicio.id}`} className="ml-2 block text-sm text-gray-900">
+                    {servicio.tp_servicio} - {servicio.costserv && new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(servicio.costserv)}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Total de Servicios */}
+          <div className="mt-4">
+            <h2 className="text-xl font-semibold">Total de Servicios: {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalServicios)}</h2>
+          </div>
+
+          {/* Vehículo */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Vehículo</label>
+            <select
+              id="vehiculo-select"
+              name="vehiculo"
+              value={formData.vehiculo?.id || ""}
+              onChange={handleChangeCotizacion}
+              className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            >
+              <option value="">Selecciona un vehículo</option>
+              {vehiculos.map((vehiculo) => (
+                <option key={vehiculo.id} value={vehiculo.id}>
+                  {vehiculo.marca_id.nombre_marca} {vehiculo.modelo} - {vehiculo.patente}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Fecha de Recepción */}
+          <div className="mb=4">
+            <label htmlFor="fecharecepcion" className="block text-sm font-medium text-gray-700">
+              Fecha de Recepción
+            </label>
+            <input
+              type="date"
+              id="fecharecepcion"
+              name="fecharecepcion"
+              value={formData.fecharecepcion}
+              onChange={handleChangeCotizacion}
+              className="mt-1 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md"
+              required
+            />
+          </div>
+
+          {/* Fecha de Entrega */}
+          <div className="mb=4">
+            <label htmlFor="fechaentrega" className="block text-sm font-medium text-gray-700">
+              Fecha de Entrega
+            </label>
+            <input
+              type="date"
+              id="fechaentrega"
+              name="fechaentrega"
+              value={formData.fechaentrega}
+              onChange={handleChangeCotizacion}
+              className="mt-1 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md"
+              required
+            />
+          </div>
+
+          {/* Descripción */}
+          <div className="mb-4">
+            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
+              Descripción
+            </label>
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              rows={3}
+              value={formData.descripcion}
+              onChange={handleChangeCotizacion}
+              className="mt-1 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md"
+              placeholder="Descripción de la cotización"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Agregar Cotización
+          </button>
+        </form>
+      </Modal>
+
     </div>
   );
 };

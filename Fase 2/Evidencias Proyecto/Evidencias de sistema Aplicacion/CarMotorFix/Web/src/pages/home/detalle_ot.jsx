@@ -43,7 +43,7 @@ export default function WorkOrderDetails() {
 
         setOrden(response.data);
         console.log(response.data);
-        
+
         setVehiculoID(response.data.vehiculo.documentId);
       } catch (error) {
         console.error('Error fetching order:', error);
@@ -216,7 +216,10 @@ export default function WorkOrderDetails() {
                 >
                   Actualizar Orden
                 </button>
-                <Button variant="outline">Agregar Nota</Button>
+                <button
+                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700">
+                  Agregar Nota
+                </button>
               </div>
             )}
           </Card>
@@ -224,7 +227,9 @@ export default function WorkOrderDetails() {
             <h4 className="text-xl font-semibold mb-4">Actualizar Orden</h4>
             <form>
               <div className="grid gap-4">
+                <label htmlFor="estado" className="text-sm font-medium">Estado</label>
                 <select
+                  id="estado"
                   name="estado"
                   value={someValue}
                   onChange={(e) => setSomeValue(e.target.value)}
@@ -238,12 +243,27 @@ export default function WorkOrderDetails() {
                       <option key={tipo.id} value={tipo.id}>{tipo.nom_estado}</option>
                     ))}
                 </select>
-                <textarea
-                  name="descripcion"
-                  placeholder="Ingrese descripción"
+                <label htmlFor="fecha" className="text-sm font-medium">Fecha</label>
+                <input
+                  type="date"
+                  id="fecha"
+                  name="fecha"
+                  value={someValue}
+                  onChange={(e) => setSomeValue(e.target.value)}
                   required
                   className="p-2 border rounded"
                 />
+                {someValue !== 'Nueva Cotización' && (
+                  <>
+                    <label htmlFor="descripcion" className="text-sm font-medium">Descripción</label>
+                    <textarea
+                      id="descripcion"
+                      name="descripcion"
+                      placeholder="Ingrese descripción"
+                      className="p-2 border rounded"
+                    />
+                  </>
+                )}
               </div>
               <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
                 Actualizar
