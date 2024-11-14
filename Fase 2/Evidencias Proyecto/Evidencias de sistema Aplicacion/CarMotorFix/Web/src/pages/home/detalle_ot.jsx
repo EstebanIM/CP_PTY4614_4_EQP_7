@@ -5,13 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { fetcher } from "../../lib/strApi";
 import { useParams } from "react-router-dom";
 import Modal from '../../components/forms/modal';
-import { getTokenFromLocalCookie, getDarkModeFromLocalCookie } from "../../lib/cookies";
+import { getTokenFromLocalCookie } from "../../lib/cookies";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import Loading from "../../components/animation/loading";
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 export default function WorkOrderDetails() {
-  const [darkMode] = useState(getDarkModeFromLocalCookie());
+  const { darkMode } = useContext(DarkModeContext);
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -223,29 +224,29 @@ export default function WorkOrderDetails() {
           estado_ot_id: nuevoEstado,
         },
       };
-  
+
       // Actualizamos el estado de la orden en Strapi
-      const response = await fetch(`${STRAPI_URL}/api/orden-trabajos/${id}`, { 
-        method: 'PUT', 
+      const response = await fetch(`${STRAPI_URL}/api/orden-trabajos/${id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${jwt}`,
         },
-        body: JSON.stringify(updateData), 
+        body: JSON.stringify(updateData),
       });
-  
+
       // console.log('response:', response);
       // console.log('updateData:', updateData);
-  
+
       if (!response.ok) {
         throw new Error(`Error al actualizar la orden: ${response.statusText}`);
       }
-  
+
       const data = await response.json();
       console.log('Orden actualizada exitosamente:', data);
-  
+
       // const { clienteEmail, mecanicoEmail } = data; // Asegúrate de que esta respuesta contiene los emails correctos
-      
+
       const clienteEmail = Orden.user.email;
       const mecanicoEmail = Orden.mecanico_id.correo;
 
@@ -257,7 +258,7 @@ export default function WorkOrderDetails() {
         <p>El estado de su orden de trabajo ha sido actualizado.</p>
         <p>El estado de su orden de trabajo ha sido actualizado a: ${nuevoEstado === 2 ? 'Aceptado' : 'Rechazado'}</p>`,
       };
-  
+
       const clienteEmailResponse = await fetch(`http://localhost:1337/api/email/`, {
         method: 'POST',
         headers: {
@@ -266,13 +267,13 @@ export default function WorkOrderDetails() {
         },
         body: JSON.stringify(clienteEmailData),
       });
-  
+
       if (!clienteEmailResponse.ok) {
         throw new Error(`Error al enviar el email al cliente: ${clienteEmailResponse.statusText}`);
       }
-  
+
       console.log('Email enviado exitosamente al cliente');
-  
+
       // Enviar email al mecánico
       const mecanicoEmailData = {
         to: mecanicoEmail,
@@ -281,7 +282,7 @@ export default function WorkOrderDetails() {
         <p>El estado de la orden de trabajo que estás gestionando ha sido actualizado.</p>
         <p>El estado de la orden de trabajo ha sido actualizado a: ${nuevoEstado === 2 ? 'Aceptado' : 'Rechazado'}</p>`,
       };
-  
+
       const mecanicoEmailResponse = await fetch(`http://localhost:1337/api/email/`, {
         method: 'POST',
         headers: {
@@ -290,25 +291,25 @@ export default function WorkOrderDetails() {
         },
         body: JSON.stringify(mecanicoEmailData),
       });
-  
+
       if (!mecanicoEmailResponse.ok) {
         throw new Error(`Error al enviar el email al mecánico: ${mecanicoEmailResponse.statusText}`);
       }
-  
+
       console.log('Email enviado exitosamente al mecánico');
-  
+
       // Actualizamos el estado local de la orden
       setOrden((prevOrden) => ({
         ...prevOrden,
         estado_ot_id: { nom_estado: nuevoEstado === 2 ? 'Aceptado' : 'Rechazado' },
       }));
-  
+
       return data;
     } catch (error) {
       console.error('Error en la actualización de la orden o envío de email:', error);
     }
   };
-  
+
 
 
   return (
@@ -319,32 +320,11 @@ export default function WorkOrderDetails() {
         <div className="p-4 sm:p-6 flex flex-col">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
             <Button onClick={handleBack} variant="outline" size="md" className="mb-2 sm:mb-0">Volver</Button>
-            <h1 className="text-2xl sm:text-4xl font-bold text-black text-center sm:w-full">Detalle de Orden de Trabajo</h1>
+            <h1 className={`text-2xl sm:text-4xl font-bold text-center sm:w-full ${darkMode ? 'text-white' : 'text-black'}`}>Detalle de Orden de Trabajo</h1>
           </div>
 
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Orden #{Orden.id}</h2>
-              {Orden.descripcion &&
-                userRole === 'Authenticated' &&
-                Orden.estado_ot_id?.nom_estado !== 'Aceptado' &&
-                Orden.estado_ot_id?.nom_estado !== 'Rechazado' && (
-                  <div className="space-x-4">
-                    <button className="px-4 py-2 bg-green-700 text-white rounded"
-                    onClick={() => actualizarEstadoOrden(Orden.documentId, 2)} // 2 para "Aceptado"
-                    >
-                      Aceptar
-                    </button>
-                    <button className="px-4 py-2 bg-red-700 text-white rounded"
-                    onClick={() => actualizarEstadoOrden(Orden.documentId, 4)} // 4 para "Rechazado"
-                    >
-                      Rechazar
-                    </button>
-                  </div>
-                )}
-
-            </div>
-
+          <Card className={`p-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
+            <h2 className="text-2xl font-bold mb-6">Orden #{Orden.id}</h2>
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
                 <div className="text-sm text-muted-foreground">Cliente</div>
@@ -388,12 +368,6 @@ export default function WorkOrderDetails() {
                   {Orden.costo !== undefined && Orden.costo !== null ? Orden.costo.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' }) : 'No disponible'}
                 </div>
               </div>
-              {Orden.descripcion && (
-                <div>
-                  <div className="text-sm text-muted-foreground">Descripción</div>
-                  <div className="font-medium">{Orden.descripcion}</div>
-                </div>
-              )}
             </div>
 
             <div className="space-y-4">
@@ -409,16 +383,16 @@ export default function WorkOrderDetails() {
               </ul>
             </div>
 
-            {['admin', 'Mechanic'].includes(userRole) && (
+            {['Admin', 'Mechanic'].includes(userRole) && ( // Ajustado a mayúsculas correctas
               <div className="mt-6 flex justify-end">
                 <button
-                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+                  className={`px-4 py-2 ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-black text-white hover:bg-gray-700'} rounded`}
                   onClick={() => setshowAddEstado(true)}
                 >
                   Actualizar Orden
                 </button>
                 <button
-                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+                  className={`ml-2 px-4 py-2 ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-black text-white hover:bg-gray-700'} rounded`}
                 >
                   Agregar Nota
                 </button>
@@ -427,17 +401,17 @@ export default function WorkOrderDetails() {
           </Card>
 
           <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
-            <h4 className="text-xl font-semibold mb-4">Actualizar Orden</h4>
-            <form onSubmit={handleSubmitEstado}>
+            <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Actualizar Orden</h4>
+            <form>
               <div className="grid gap-4">
-                <label htmlFor="estado" className="text-sm font-medium">Estado</label>
+                <label htmlFor="estado" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>Estado</label>
                 <select
                   id="estado"
                   name="estado"
-                  value=""
-                  onChange=""
+                  value={someValue}
+                  onChange={(e) => setSomeValue(e.target.value)}
                   required
-                  className="p-2 border rounded"
+                  className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                 >
                   <option value="">Seleccione Tipo</option>
                   {newEstado
@@ -446,16 +420,15 @@ export default function WorkOrderDetails() {
                       <option key={tipo.id} value={tipo.id}>{tipo.nom_estado}</option>
                     ))}
                 </select>
-
-                <label htmlFor="fecha" className="text-sm font-medium">Fecha</label>
+                <label htmlFor="fecha" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>Fecha</label>
                 <input
                   type="date"
                   id="fecha"
                   name="fecha"
-                  value=""
-                  onChange=""
+                  value={someValue}
+                  onChange={(e) => setSomeValue(e.target.value)}
                   required
-                  className="p-2 border rounded"
+                  className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                 />
 
                 {/* {estado === 'Nueva Cotización' && (
