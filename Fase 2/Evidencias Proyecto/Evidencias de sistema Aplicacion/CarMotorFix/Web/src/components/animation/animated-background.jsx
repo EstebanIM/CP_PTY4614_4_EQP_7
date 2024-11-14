@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { motion } from "framer-motion";
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 // Lista de formas posibles, manteniendo un estilo minimalista
 const SHAPES = ["circle", "square", "triangle"];
@@ -16,6 +17,7 @@ const generateShape = (id) => ({
 });
 
 const AnimatedBackground = () => {
+  const { darkMode } = useContext(DarkModeContext);
   const [shapes, setShapes] = useState([]);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ const AnimatedBackground = () => {
             height: shape.size,
             left: `${shape.x}%`,
             top: `${shape.y}%`,
-            backgroundColor: shape.shape === "circle" ? shape.color : "transparent",
+            backgroundColor: darkMode ? '#ffffff' : shape.color, // Ajuste de color basado en el modo
             borderRadius: shape.shape === "circle" ? "50%" : "0%",
             clipPath:
               shape.shape === "triangle"

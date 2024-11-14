@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
@@ -9,8 +9,10 @@ import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import opcionesServicios from '../../lib/servicios.json';
 import Modal from '../../components/forms/modal';
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 function Servicios() {
+    const { darkMode } = useContext(DarkModeContext);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userRole, setUserRole] = useState(null);
     const navigate = useNavigate();
@@ -151,28 +153,28 @@ function Servicios() {
     };
 
     return (
-        <div className="flex h-screen">
-            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
+        <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} darkMode={darkMode} />
             <div className="flex-1 flex flex-col">
-                <DashboardHeader toggleSidebar={toggleSidebar} />
+                <DashboardHeader toggleSidebar={toggleSidebar} darkMode={darkMode} />
                 <div className="container mx-auto p-4">
-                    <h1 className="text-2xl font-bold mb-4">Servicios Disponibles</h1>
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6 w-full">
+                    <h1 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Servicios Disponibles</h1>
+                    <div className={`rounded-lg border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-card text-card-foreground border-gray-200'} shadow-sm p-6 w-full`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-2xl font-semibold leading-none tracking-tight">Lista de Servicios</h3>
+                            <h3 className={`text-2xl font-semibold leading-none tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>Lista de Servicios</h3>
                             <Button onClick={() => setIsModalOpen(true)}>
                                 Agregar Servicio
                             </Button>
                         </div>
 
                         {servicios && servicios.length === 0 ? (
-                            <div className="text-center text-gray-500 mt-4">
+                            <div className={`text-center mt-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                 <h4 className="text-xl">No hay servicios registrados.</h4>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
-                                <Table className="min-w-full divide-y divide-gray-200 table-fixed">
-                                    <TableHeader className="bg-gray-100 sticky top-0 z-10">
+                                <Table className={`min-w-full divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'} table-fixed`}>
+                                    <TableHeader className={`bg-gray-100 sticky top-0 z-10 ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
                                         <TableRow>
                                             <TableHead className="p-2 w-1/4">Tipo de Servicio</TableHead>
                                             <TableHead className="p-2 w-1/4">Estado</TableHead>
@@ -182,13 +184,13 @@ function Servicios() {
                                     </TableHeader>
                                     <TableBody>
                                         {currentServicios.map((servicio) => (
-                                            <TableRow key={servicio.id} className="hover:bg-gray-100">
+                                            <TableRow key={servicio.id} className={`hover:bg-gray-100 ${darkMode ? 'hover:bg-gray-700' : ''}`}>
                                                 <TableCell className="w-1/4">{servicio.tp_servicio || 'Sin especificar'}</TableCell>
                                                 <TableCell className="w-1/4">{servicio.Estado ? 'Activo' : 'Inactivo'}</TableCell>
                                                 <TableCell className="w-1/4">${servicio.costserv || 'N/A'}</TableCell>
                                                 <TableCell className="w-1/4 px-6 py-4 font-medium text-right pr-4">
                                                     <ArrowRight
-                                                        className="inline-block cursor-pointer"
+                                                        className={`inline-block cursor-pointer ${darkMode ? 'text-white' : 'text-gray-600'}`}
                                                         onClick={() => handleViewServicio(servicio.documentId)}
                                                     />
                                                 </TableCell>
@@ -196,7 +198,6 @@ function Servicios() {
                                         ))}
                                     </TableBody>
                                 </Table>
-
                             </div>
                         )}
 
@@ -205,15 +206,15 @@ function Servicios() {
                             <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
-                                className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={`p-1 hover:text-gray-700 ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
                                 <ArrowLeft className="h-5 w-5" />
                             </button>
-                            <span className="text-xs text-gray-500">Página {currentPage} de {Math.ceil(servicios.length / itemsPerPage)}</span>
+                            <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Página {currentPage} de {Math.ceil(servicios.length / itemsPerPage)}</span>
                             <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === Math.ceil(servicios.length / itemsPerPage)}
-                                className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={`p-1 hover:text-gray-700 ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
                             >
                                 <ArrowRight className="h-5 w-5" />
                             </button>
@@ -226,7 +227,7 @@ function Servicios() {
                                         value={selectedCategory}
                                         onChange={handleCategoryChange}
                                         required
-                                        className="p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                                        className={`p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
                                     >
                                         <option value="" className="text-gray-500">Seleccione una categoría</option>
                                         {opcionesServicios.map((categoria) => (
@@ -241,7 +242,7 @@ function Servicios() {
                                             value={newServicio.tp_servicio}
                                             onChange={handleOptionChange}
                                             required
-                                            className="p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                                            className={`p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
                                         >
                                             <option value="" className="text-gray-500">Seleccione un tipo de servicio</option>
                                             {opcionesServicios.find(cat => cat.categoria === selectedCategory)?.opciones.map((opcion) => (
@@ -251,8 +252,8 @@ function Servicios() {
                                             ))}
                                         </select>
                                     )}
-                                    <label className="flex items-center gap-2">
-                                        <span className="text-gray-700">Activo</span>
+                                    <label className={`flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        <span>Activo</span>
                                         <div className="relative">
                                             <input
                                                 type="checkbox"
@@ -262,8 +263,7 @@ function Servicios() {
                                                 className="sr-only"
                                             />
                                             <div
-                                                className={`w-10 h-6 bg-gray-300 rounded-full transition duration-200 ${newServicio.Estado ? 'bg-green-500' : 'bg-gray-300'
-                                                    }`}
+                                                className={`w-10 h-6 bg-gray-300 rounded-full transition duration-200 ${newServicio.Estado ? 'bg-green-500' : 'bg-gray-300'}`}
                                             ></div>
                                             <div
                                                 className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${newServicio.Estado ? 'translate-x-4' : 'translate-x-0'
@@ -278,11 +278,11 @@ function Servicios() {
                                         value={newServicio.costserv}
                                         onChange={handleChange}
                                         required
-                                        className="p-2 border rounded w-full"
+                                        className={`p-2 border rounded w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                                     />
                                 </div>
                                 {!isLoading && (
-                                    <Button type="submit" className="mt-4 px-4 py-2 text-white rounded w-full">
+                                    <Button type="submit" className={`mt-4 px-4 py-2 text-white rounded w-full ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'}`}>
                                         Agregar Servicio
                                     </Button>
                                 )}
@@ -292,7 +292,7 @@ function Servicios() {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
 export default Servicios;

@@ -1,14 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button";
 import { Users, CarFront, File, X, List, Home } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getDarkModeFromLocalCookie } from '../../lib/cookies';
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
-  const [darkMode, setDarkMode] = useState(false); 
+  const { darkMode } = useContext(DarkModeContext);
 
   const handleResize = () => {
     const newIsDesktop = window.innerWidth >= 768;
@@ -18,10 +19,6 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
   useEffect(() => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    setDarkMode(getDarkModeFromLocalCookie());
   }, []);
 
   const sidebarVariants = {

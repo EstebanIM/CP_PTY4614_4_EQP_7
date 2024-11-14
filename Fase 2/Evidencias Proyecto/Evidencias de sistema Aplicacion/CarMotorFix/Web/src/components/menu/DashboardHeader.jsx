@@ -1,15 +1,16 @@
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button"; 
 import { Menu, Bell, User, Settings, LogOut } from "lucide-react";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { unsetToken, getTokenFromLocalCookie, getDarkModeFromLocalCookie } from '../../lib/cookies';
+import { unsetToken, getTokenFromLocalCookie } from '../../lib/cookies';
 import { fetcher } from '../../lib/strApi';
+import { DarkModeContext } from '../../context/DarkModeContext'; // Importar el contexto
 
 export default function DashboardHeader({ toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userName, setUserName] = useState('');
-  const [darkMode, setDarkMode] = useState(getDarkModeFromLocalCookie()); // Set initial state based on cookie
+  const { darkMode } = useContext(DarkModeContext); // Usar el contexto
   const navigate = useNavigate();
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -37,11 +38,6 @@ export default function DashboardHeader({ toggleSidebar }) {
 
     fetchUser();
   }, [STRAPI_URL]);
-
-  useEffect(() => {
-    const darkModeEnabled = getDarkModeFromLocalCookie();
-    setDarkMode(darkModeEnabled);
-  }, []);
 
   const logout = async () => {
     try {

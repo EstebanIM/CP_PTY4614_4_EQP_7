@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+// src/components/Client.jsx
+import { useEffect, useState, useContext } from 'react';
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
 import Cookies from 'js-cookie';
@@ -6,10 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import Tablas from '../../components/Tablas';
 import Modal from '../../components/forms/modal';
 import { toast } from 'react-toastify';
-import { getDarkModeFromLocalCookie } from '../../lib/cookies';
 import Spinner from '../../components/animation/spinner';
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 function Client() {
+  const { darkMode } = useContext(DarkModeContext);
   const [vehiculos, setVehiculos] = useState([]);
   const [totalServicios, setTotalServicios] = useState(0);
   const [servicios, setServicios] = useState([]);
@@ -39,8 +41,6 @@ function Client() {
     vehiculo: '',
     catalogo_servicios: []
   });
-
-  const [darkMode] = useState(getDarkModeFromLocalCookie());
 
   const validatePatente = () => {
     const selectedTipo = tiposVehiculo.find(
@@ -326,7 +326,6 @@ function Client() {
       }
     }
   };
-  
 
   const columns = [
     {
@@ -380,12 +379,12 @@ function Client() {
 
       <div className='grid gap-4 md:grid-cols-2'>
         {/* Mis Autos  */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+        <div className={`rounded-lg border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-card text-card-foreground border-gray-200'} shadow-sm p-6`}>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight">Mis Autos</h3>
+            <h3 className={`text-2xl font-semibold leading-none tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>Mis Autos</h3>
             {vehiculos.length < 4 && (
               <button
-                className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+                className={`px-4 py-2 rounded hover:bg-gray-700 ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-black text-white hover:bg-gray-700'}`}
                 onClick={() => setShowAddVehiculoModal(true)}
               >
                 Agregar
@@ -394,27 +393,27 @@ function Client() {
           </div>
 
           {vehiculos.length === 0 ? (
-            <div className="text-center text-gray-500 mt-4">
+            <div className={`text-center mt-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
               <h4 className="text-xl">No tienes vehículos registrados.</h4>
             </div>
           ) : (
             <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
           )}
 
-          {/* modal del vehiculo */}
+          {/* Modal del Vehiculo */}
           <Modal isOpen={showAddVehiculoModal} onClose={() => setShowAddVehiculoModal(false)} loading={loading}>
-            <h4 className="text-xl font-semibold mb-4">Agregar Vehículo</h4>
+            <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Agregar Vehículo</h4>
             {loading ? (
               <Spinner size="large" />
             ) : (
               <form onSubmit={handleAddVehiculo}>
-                <div className="grid gap-4">
+                <div className={`grid gap-4 ${darkMode ? 'text-white' : 'text-black'}`}>
                   <select
                     name="tp_vehiculo_id"
                     value={newVehiculo.tp_vehiculo_id}
                     onChange={handleChange}
                     required
-                    className="p-2 border rounded"
+                    className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   >
                     <option value="">Seleccione Tipo</option>
                     {tiposVehiculo.map((tipo) => (
@@ -426,7 +425,7 @@ function Client() {
                     value={newVehiculo.marca_id}
                     onChange={handleChange}
                     required
-                    className="p-2 border rounded"
+                    className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   >
                     <option value="">Seleccione Marca</option>
                     {marcas.map((marca) => (
@@ -440,7 +439,7 @@ function Client() {
                     value={newVehiculo.modelo}
                     onChange={handleChange}
                     required
-                    className="p-2 border rounded"
+                    className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   />
                   <input
                     type="text"
@@ -449,16 +448,16 @@ function Client() {
                     value={newVehiculo.patente}
                     onChange={handleChange}
                     required
-                    className="p-2 border rounded"
+                    className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   />
                   <input
-                    type="numeric"
+                    type="number"
                     name="anio"
                     placeholder="Año"
                     value={newVehiculo.anio}
                     onChange={handleChange}
                     required
-                    className="p-2 border rounded"
+                    className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   />
                   <input
                     type="number"
@@ -467,7 +466,7 @@ function Client() {
                     value={newVehiculo.kilometraje}
                     onChange={handleChange}
                     required
-                    className="p-2 border rounded"
+                    className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   />
                   <input
                     type="text"
@@ -476,7 +475,7 @@ function Client() {
                     value={newVehiculo.motor}
                     onChange={handleChange}
                     required
-                    className="p-2 border rounded"
+                    className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   />
                   <input
                     type="text"
@@ -485,10 +484,13 @@ function Client() {
                     value={newVehiculo.color}
                     onChange={handleChange}
                     required
-                    className="p-2 border rounded"
+                    className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   />
                 </div>
-                <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                <button
+                  type="submit"
+                  className={`mt-4 px-4 py-2 rounded hover:bg-blue-500 ${darkMode ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+                >
                   Agregar Vehículo
                 </button>
               </form>
@@ -497,23 +499,23 @@ function Client() {
         </div>
 
         {/* Cotizaciones Section */}
-        <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
+        <div className={`rounded-lg border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-card text-card-foreground border-gray-200'} shadow-sm p-6`}>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-2xl font-semibold leading-none tracking-tight">Mis Cotizaciones</h3>
+            <h3 className={`text-2xl font-semibold leading-none tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>Mis Cotizaciones</h3>
             <button
               onClick={() => setShowCotizacionModal(true)}
-              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+              className={`px-4 py-2 rounded hover:bg-gray-700 ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-black text-white hover:bg-gray-700'}`}
             >
               Solicitar
             </button>
           </div>
 
           <Modal isOpen={showCotizacionModal} onClose={() => setShowCotizacionModal(false)}>
-            <h4 className="text-xl font-semibold mb-4">Nueva Cotización</h4>
+            <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Nueva Cotización</h4>
             <form onSubmit={handleSubmitCotizacion}>
               {/* Selección de Servicios */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Seleccionar Servicios</label>
+                <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Seleccionar Servicios</label>
                 <div className="mt-1">
                   {servicios.map((servicio) => (
                     <div key={servicio.id} className="flex items-center mb-2">
@@ -523,9 +525,9 @@ function Client() {
                         value={servicio.id}
                         checked={formData.catalogo_servicios.some((item) => item.id === servicio.id)}
                         onChange={(e) => handleServicioSelect(e, servicio)}
-                        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                        className={`h-4 w-4 ${darkMode ? 'text-blue-600 bg-gray-700 border-gray-600' : 'text-blue-600 bg-white border-gray-300'} rounded`}
                       />
-                      <label htmlFor={`servicio-${servicio.id}`} className="ml-2 block text-sm text-gray-900">
+                      <label htmlFor={`servicio-${servicio.id}`} className={`ml-2 block text-sm ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                         {servicio.tp_servicio} - {servicio.costserv && new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(servicio.costserv)}
                       </label>
                     </div>
@@ -534,18 +536,18 @@ function Client() {
               </div>
 
               {/* Total de Servicios */}
-              <div className="mt-4">
+              <div className={`mt-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 <h2 className="text-xl font-semibold">Total de Servicios: {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalServicios)}</h2>
               </div>
 
               {/* Vehículo */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Vehículo</label>
+                <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Vehículo</label>
                 <select
                   id="vehiculo-select"
                   name="vehiculo"
                   onChange={handleChangeCotizacion}
-                  className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className={`block w-full py-2 px-3 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   required
                 >
                   <option value="">Selecciona un vehículo</option>
@@ -559,13 +561,13 @@ function Client() {
 
               {/* Mecánico ID */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Seleccionar Mecánico</label>
+                <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Seleccionar Mecánico</label>
                 <div className="mt-1">
                   <select
                     id="mecanico-select"
                     name="mecanico_id"
                     onChange={handleChangeCotizacion}
-                    className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className={`block w-full py-2 px-3 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   >
                     <option value="">Selecciona un mecánico</option>
                     {mecanico.map((mec) => (
@@ -579,7 +581,7 @@ function Client() {
 
               <button
                 type="submit"
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className={`w-full px-4 py-2 rounded hover:bg-blue-700 ${darkMode ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
               >
                 Agregar Cotización
               </button>
@@ -588,7 +590,7 @@ function Client() {
 
           <div>
             {OT.length === 0 ? (
-              <div className="text-center text-gray-500 mt-4">
+              <div className={`text-center mt-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 <h4 className="text-xl">No tienes Cotizaciones.</h4>
               </div>
             ) : (

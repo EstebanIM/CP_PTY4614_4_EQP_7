@@ -1,13 +1,12 @@
 import { ArrowRight } from 'lucide-react';
 import PropTypes from 'prop-types';
-import { getDarkModeFromLocalCookie } from '../lib/cookies';
+import React, { useContext } from 'react';
+import { DarkModeContext } from '../context/DarkModeContext';
 
 const Tablas = ({ servicio, handleViewTabla, columns }) => {
-    if (!Array.isArray(servicio)) return null;
-    if (!Array.isArray(columns)) return null;
-    if (typeof handleViewTabla !== 'function') return null;
+    const { darkMode } = useContext(DarkModeContext);
 
-    const darkMode = getDarkModeFromLocalCookie();
+    if (!Array.isArray(servicio) || !Array.isArray(columns) || typeof handleViewTabla !== 'function') return null;
 
     return (
         <div className={`w-full ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
@@ -49,10 +48,9 @@ const Tablas = ({ servicio, handleViewTabla, columns }) => {
                             ) : null
                         ))}
                     </tbody>
-
                 </table>
 
-                {/* Mobile view - Display cards */}
+                {/* Vista móvil - Mostrar tarjetas */}
                 <div className="md:hidden">
                     {servicio.map((item) => (
                         item ? (
@@ -76,7 +74,6 @@ const Tablas = ({ servicio, handleViewTabla, columns }) => {
                         ) : null
                     ))}
                 </div>
-
             </div>
         </div>
     );

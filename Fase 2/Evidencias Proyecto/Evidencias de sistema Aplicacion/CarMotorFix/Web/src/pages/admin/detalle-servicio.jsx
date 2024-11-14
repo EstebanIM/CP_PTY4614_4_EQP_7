@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
@@ -8,8 +8,10 @@ import { Button } from '../../components/ui/button';
 import LoadingComponent from '../../components/animation/loading';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 function DetalleServicio() {
+    const { darkMode } = useContext(DarkModeContext);
     const { id } = useParams();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userRole, setUserRole] = useState(null);
@@ -120,37 +122,46 @@ function DetalleServicio() {
     if (!servicio) return <LoadingComponent />;
 
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
             <ToastContainer />
-            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
+            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} darkMode={darkMode} />
             <div className="flex-1 flex flex-col">
-                <DashboardHeader />
-                <div className="p-8 flex flex-col items-start">
+                <DashboardHeader toggleSidebar={toggleSidebar} darkMode={darkMode} />
+                <div className={`p-8 flex flex-col items-start ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'} mt-4`}>
                     <Button
                         onClick={() => navigate(-1)}
-                        className="mb-4 px-4 py-2 bg-gray-800 text-white font-semibold rounded-lg shadow hover:bg-gray-700 transition duration-300"
+                        className={`mb-4 px-4 py-2 font-semibold rounded-lg shadow ${darkMode
+                            ? 'bg-gray-700 text-white hover:bg-gray-600'
+                            : 'bg-gray-800 text-white hover:bg-gray-700'
+                            } transition duration-300`}
                     >
                         Volver
                     </Button>
-                    
+
                     {/* Card de Detalle de Servicio */}
-                    <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-8 border border-gray-200 mt-4">
-                        <h1 className="text-3xl font-extrabold mb-6 text-center text-gray-800">{servicio.tp_servicio}</h1>
-                        
+                    <div className={`w-full max-w-2xl rounded-lg p-8 border ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'} shadow-lg`}>
+                        <h1 className={`text-3xl font-extrabold mb-6 text-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>{servicio.tp_servicio}</h1>
+
                         {!isEditing ? (
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-lg font-semibold text-gray-600">Costo:</span>
+                                    <span className={`text-lg font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Costo:</span>
                                     <span className="text-xl font-bold text-green-600">${servicio.costserv}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-lg font-semibold text-gray-600">Estado:</span>
+                                    <span className={`text-lg font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Estado:</span>
                                     <span className={`text-xl font-bold ${servicio.Estado ? 'text-green-600' : 'text-red-600'}`}>
                                         {servicio.Estado ? 'Activo' : 'Inactivo'}
                                     </span>
                                 </div>
                                 <div className="flex justify-center mt-6">
-                                    <Button onClick={handleEditClick} className="px-6 py-2 text-white font-semibold rounded-lg shadow hover:bg-blue-500 transition duration-300">
+                                    <Button
+                                        onClick={handleEditClick}
+                                        className={`px-6 py-2 font-semibold rounded-lg shadow ${darkMode
+                                            ? 'bg-blue-600 text-white hover:bg-blue-500'
+                                            : 'bg-blue-500 text-white hover:bg-blue-600'
+                                            } transition duration-300`}
+                                    >
                                         Modificar
                                     </Button>
                                 </div>
@@ -158,32 +169,50 @@ function DetalleServicio() {
                         ) : (
                             <div className="space-y-4">
                                 <div>
-                                    <label className="text-lg font-semibold text-gray-600"><strong>Costo:</strong></label>
+                                    <label className={`text-lg font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}><strong>Costo:</strong></label>
                                     <input
                                         type="number"
                                         name="costserv"
                                         value={editData.costserv || ''}
                                         onChange={handleInputChange}
-                                        className="w-full p-3 border rounded-lg mt-1 text-gray-800 focus:border-blue-500"
+                                        className={`w-full p-3 border rounded-lg mt-1 focus:border-blue-500 ${darkMode
+                                            ? 'bg-gray-600 border-gray-500 text-white'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                            }`}
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-lg font-semibold text-gray-600"><strong>Estado:</strong></label>
+                                    <label className={`text-lg font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}><strong>Estado:</strong></label>
                                     <select
                                         name="Estado"
                                         value={editData.Estado}
                                         onChange={(e) => setEditData(prev => ({ ...prev, Estado: e.target.value === 'true' }))}
-                                        className="w-full p-3 border rounded-lg mt-1 text-gray-800 focus:border-blue-500"
+                                        className={`w-full p-3 border rounded-lg mt-1 focus:border-blue-500 ${darkMode
+                                            ? 'bg-gray-600 border-gray-500 text-white'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                            }`}
                                     >
                                         <option value="true">Activo</option>
                                         <option value="false">Inactivo</option>
                                     </select>
                                 </div>
                                 <div className="flex justify-center space-x-4 mt-6">
-                                    <Button onClick={handleSave} className="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-500 transition duration-300">
+                                    <Button
+                                        onClick={handleSave}
+                                        className={`px-6 py-2 font-semibold rounded-lg shadow ${darkMode
+                                            ? 'bg-green-600 text-white hover:bg-green-500'
+                                            : 'bg-green-600 text-white hover:bg-green-500'
+                                            } transition duration-300`}
+                                    >
                                         Guardar
                                     </Button>
-                                    <Button onClick={() => setIsEditing(false)} className="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow hover:bg-red-500 transition duration-300">
+                                    <Button
+                                        onClick={() => setIsEditing(false)}
+                                        className={`px-6 py-2 font-semibold rounded-lg shadow ${darkMode
+                                            ? 'bg-red-600 text-white hover:bg-red-500'
+                                            : 'bg-red-600 text-white hover:bg-red-500'
+                                            } transition duration-300`}
+                                    >
                                         Cancelar
                                     </Button>
                                 </div>
@@ -194,5 +223,6 @@ function DetalleServicio() {
             </div>
         </div>
     );
-}    
+}
+
 export default DetalleServicio;

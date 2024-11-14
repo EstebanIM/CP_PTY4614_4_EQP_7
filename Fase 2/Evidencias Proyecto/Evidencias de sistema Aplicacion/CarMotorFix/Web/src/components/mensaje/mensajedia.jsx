@@ -1,16 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import consejosDeAuto from '../../lib/consejos.json';
-import { getDarkModeFromLocalCookie } from '../../lib/cookies';
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 const ConsejoAutoDelDia = () => {
+    const { darkMode } = useContext(DarkModeContext);
     const [consejo, setConsejo] = useState("");
-    const [darkMode, setDarkMode] = useState(getDarkModeFromLocalCookie());
 
     useEffect(() => {
         const indice = new Date().getDate() % consejosDeAuto.length;
         setConsejo(consejosDeAuto[indice]);
-
-        setDarkMode(getDarkModeFromLocalCookie());
     }, []);
 
     return (

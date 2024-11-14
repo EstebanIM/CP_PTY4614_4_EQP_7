@@ -1,17 +1,15 @@
 import { Car } from "lucide-react";
-import { useEffect, useState } from "react";
-import { getDarkModeFromLocalCookie } from '../../lib/cookies';
+import { useEffect, useState, useContext } from "react";
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 export default function LoadingComponent() {
   const [dots, setDots] = useState('.');
-  const [darkMode, setDarkMode] = useState(getDarkModeFromLocalCookie());
+  const { darkMode } = useContext(DarkModeContext);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setDots(prev => (prev.length < 3 ? prev + '.' : '.'));
     }, 500);
-
-    setDarkMode(getDarkModeFromLocalCookie());
 
     return () => clearInterval(interval);
   }, []);

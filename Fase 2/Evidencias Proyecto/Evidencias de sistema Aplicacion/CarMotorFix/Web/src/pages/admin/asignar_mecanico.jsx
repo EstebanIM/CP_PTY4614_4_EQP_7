@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { fetcher } from '../../lib/strApi';
-import { getTokenFromLocalCookie, getDarkModeFromLocalCookie, setDarkMode as saveDarkModePreference } from '../../lib/cookies';
+import { getTokenFromLocalCookie } from '../../lib/cookies';
 import { toast } from 'react-toastify';
 import DashboardSidebar from '../../components/menu/DashboardSidebar';
 import DashboardHeader from '../../components/menu/DashboardHeader';
 import { Button } from '../../components/ui/button';
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 function AsignarMecanico() {
-    const [darkMode, setDarkMode] = useState(getDarkModeFromLocalCookie());
+    const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
     const [run, setRun] = useState('');
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -114,40 +115,31 @@ function AsignarMecanico() {
         }
     };
 
-    const handleDarkModeToggle = (enabled) => {
-        setDarkMode(enabled);
-        saveDarkModePreference(enabled); // Save preference to cookie
-
-        // Reload the page to apply dark mode changes immediately
-        window.location.reload();
-    };
-
     return (
-        <div className={`flex h-screen bg-gray-100 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+        <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
             <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} darkMode={darkMode} />
             <div className="flex-1 flex flex-col">
-                <DashboardHeader toggleSidebar={toggleSidebar} darkMode={darkMode} />
-                <div className="p-8 bg-white rounded-lg shadow-lg mx-6 my-6">
-                    <h1 className="text-3xl font-bold text-gray-700 mb-6">Asignar Rol de Mecánico</h1>
+                <DashboardHeader toggleSidebar={toggleSidebar} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+                <div className={`p-8 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg mx-6 my-6`}>
+                    <h1 className={`text-3xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Asignar Rol de Mecánico</h1>
 
                     {/* Sección de Buscar Usuario */}
-                    <div className="p-6 bg-gray-100 rounded-lg shadow-md mb-6">
-                        <h2 className="text-2xl font-semibold text-blue-700 mb-4">Buscar Usuario</h2>
-                        <label htmlFor="run" className="block text-sm font-medium text-gray-600 mb-2">
+                    <div className={`p-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg shadow-md mb-6`}>
+                        <h2 className={`text-2xl font-semibold mb-4 ${darkMode ? 'text-blue-300' : 'text-blue-700'}`}>Buscar Usuario</h2>
+                        <label htmlFor="run" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Ingrese el RUN del Usuario
                         </label>
                         <input
                             type="text"
                             id="run"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                             placeholder="123456789 - Sin punto ni guión"
                             value={run}
                             onChange={(e) => setRun(e.target.value)}
                         />
                         <Button
                             onClick={handleSearchUser}
-                            className={`w-1/8 mt-4 py-2 px-4 rounded-lg transition ${loading ? 'cursor-not-allowed' : ''
-                                } text-white font-semibold`}
+                            className={`w-1/8 mt-4 py-2 px-4 rounded-lg transition ${loading ? 'cursor-not-allowed bg-gray-500' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}
                             disabled={loading}
                         >
                             {loading ? 'Buscando...' : 'Buscar Usuario'}
@@ -156,9 +148,9 @@ function AsignarMecanico() {
 
                     {/* Sección de Asignar Rol */}
                     {user && (
-                        <div className="p-6 bg-gray-100 rounded-lg shadow-md">
-                            <h2 className="text-2xl font-semibold text-green-700 mb-4">Información del Usuario</h2>
-                            <div className="text-gray-700 space-y-2">
+                        <div className={`p-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg shadow-md`}>
+                            <h2 className={`text-2xl font-semibold mb-4 ${darkMode ? 'text-green-300' : 'text-green-700'}`}>Información del Usuario</h2>
+                            <div className={`space-y-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 <p><strong>Nombre:</strong> {user.nombre} {user.apellido}</p>
                                 <p><strong>Email:</strong> {user.email}</p>
                                 <p><strong>RUN:</strong> {user.run}</p>
@@ -167,7 +159,7 @@ function AsignarMecanico() {
 
                             <Button
                                 onClick={() => setConfirmModalOpen(true)}
-                                className={`w-1/8 mt-6 py-2 px-4 rounded-lg transition ${assigning ? 'cursor-not-allowed' : ''} text-white font-semibold`}
+                                className={`w-1/8 mt-6 py-2 px-4 rounded-lg transition ${assigning ? 'cursor-not-allowed bg-gray-500' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold`}
                                 disabled={assigning}
                             >
                                 {assigning ? 'Asignando...' : 'Asignar Rol de Mecánico'}
@@ -180,20 +172,20 @@ function AsignarMecanico() {
             {/* Modal de Confirmación */}
             {confirmModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full">
-                        <h3 className="text-xl font-semibold text-gray-700 mb-4">¿Confirmar Asignación de Rol?</h3>
-                        <p className="text-gray-600 mb-6">¿Estás seguro de que deseas asignar el rol de mecánico a este usuario?</p>
+                    <div className={`p-6 rounded-lg shadow-lg max-w-sm w-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+                        <h3 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-700'}`}>¿Confirmar Asignación de Rol?</h3>
+                        <p className="mb-6">¿Estás seguro de que deseas asignar el rol de mecánico a este usuario?</p>
                         <div className="flex justify-end space-x-4">
                             <Button
                                 onClick={handleAssignRole}
-                                className="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white"
+                                className={`px-4 py-2 rounded-lg ${assigning ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'} text-white`}
                                 disabled={assigning}
                             >
                                 Confirmar
                             </Button>
                             <Button
                                 onClick={() => setConfirmModalOpen(false)}
-                                className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800"
+                                className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'}`}
                             >
                                 Cancelar
                             </Button>
@@ -202,7 +194,7 @@ function AsignarMecanico() {
                 </div>
             )}
         </div>
-    );
+    )
 }
 
 export default AsignarMecanico;

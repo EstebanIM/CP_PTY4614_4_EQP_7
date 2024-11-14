@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 
@@ -8,15 +8,15 @@ import Admin_dashboard from "../admin/admin_dashboard";
 
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
-import { getDarkModeFromLocalCookie } from '../../lib/cookies'; // Import the dark mode cookie getter
+// Eliminado: import { getDarkModeFromLocalCookie } from '../../lib/cookies';
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function MisVehiculos() {
+    const { darkMode } = useContext(DarkModeContext); // Usar DarkModeContext
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userRole, setUserRole] = useState(null); // Para guardar el rol del usuario
-    const [darkMode] = useState(getDarkModeFromLocalCookie()); // Get dark mode from cookies
-
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
