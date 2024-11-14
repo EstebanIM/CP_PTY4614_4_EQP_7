@@ -175,13 +175,13 @@ function Client() {
     setTotalServicios((prevTotal) =>
       e.target.checked ? prevTotal + servicio.costserv : prevTotal - servicio.costserv
     );
-
+  
     setFormData((prevData) => {
       const isSelected = prevData.catalogo_servicios.some((item) => item.id === servicio.id);
       const newServicios = isSelected
         ? prevData.catalogo_servicios.filter((item) => item.id !== servicio.id)
         : [...prevData.catalogo_servicios, { id: servicio.id }];
-
+  
       return {
         ...prevData,
         catalogo_servicios: newServicios,
@@ -279,7 +279,7 @@ function Client() {
 
   const handleSubmitCotizacion = async (e) => {
     e.preventDefault();
-
+    
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
       try {
@@ -295,7 +295,7 @@ function Client() {
             catalogo_servicios: formData.catalogo_servicios.map((servicio) => servicio.id)
           }
         };
-
+  
         const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos`, {
           method: 'POST',
           headers: {
@@ -304,18 +304,18 @@ function Client() {
           },
           body: JSON.stringify(CotizacionData),
         });
-
+  
         if (response && response.data) {
           SetOT((prevOT) => [...prevOT, response.data]);
         }
-
+  
         setFormData({
           costo: '',
           mecanico_id: '',
           vehiculo: '',
           catalogo_servicios: []
         });
-
+  
         setShowCotizacionModal(false);
         toast.success("Cotización creada correctamente");
       } catch (error) {
@@ -326,13 +326,13 @@ function Client() {
       }
     }
   };
-
+  
 
   const columns = [
     {
       header: "Marca",
       key: "marca",
-      render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id?.nombre_marca : 'Marca desconocida'
+      render: (vehiculo) => vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida'
     },
     {
       header: "Modelo",
@@ -551,10 +551,9 @@ function Client() {
                   <option value="">Selecciona un vehículo</option>
                   {vehiculos.map((vehiculo) => (
                     <option key={vehiculo.id} value={vehiculo.id}>
-                      {vehiculo.marca_id?.nombre_marca || 'Marca no disponible'} {vehiculo.modelo} - {formatPatente(vehiculo.patente)}
+                      {vehiculo.marca_id.nombre_marca} {vehiculo.modelo} - {formatPatente(vehiculo.patente)}
                     </option>
                   ))}
-
                 </select>
               </div>
 

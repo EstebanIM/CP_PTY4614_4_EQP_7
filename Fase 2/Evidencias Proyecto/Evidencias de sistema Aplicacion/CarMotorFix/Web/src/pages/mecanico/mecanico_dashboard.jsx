@@ -7,6 +7,7 @@ import Tablas from "../../components/Tablas";
 import { getTokenFromLocalCookie } from "../../lib/cookies";
 import { fetcher } from "../../lib/strApi";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -23,6 +24,10 @@ const DashboardAutos = () => {
   const [TotalOrdenes, setTotalOrdenes] = useState(0);
   const [showCotizacionModal, setShowCotizacionModal] = useState(false);
   const [servicios, setServicios] = useState([]);
+  const [tiposVehiculo, setTiposVehiculo] = useState([]);
+  const [marcas, setMarcas] = useState([]);
+  const [showVehiculoModal, setShowVehiculoModal] = useState(false);
+  const [users, setUsers] = useState([]);
 
   const [formData, setFormData] = useState({
     costo: '',
@@ -31,6 +36,17 @@ const DashboardAutos = () => {
     fecharecepcion: '',
     fechaentrega: '',
     catalogo_servicios: []
+  });
+
+  const [newVehiculo, setNewVehiculo] = useState({
+    marca_id: '',
+    tp_vehiculo_id: '',
+    modelo: '',
+    patente: '',
+    anio: '',
+    kilometraje: '',
+    motor: '',
+    color: ''
   });
 
   useEffect(() => {
@@ -118,6 +134,67 @@ const DashboardAutos = () => {
       }
     };
 
+    const fetchMarcas = async () => {
+      if (jwt) {
+        try {
+          const response = await fetcher(`${STRAPI_URL}/api/marcas`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+          setMarcas(response.data);
+        } catch (error) {
+          console.error('Error fetching marcas:', error);
+          toast.error("Error al obtener la lista de marcas.");
+        }
+      }
+    };
+
+    const fetchTiposVehiculo = async () => {
+      if (jwt) {
+        try {
+          const response = await fetcher(`${STRAPI_URL}/api/tp-vehiculos`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+          setTiposVehiculo(response.data);
+        } catch (error) {
+          console.error('Error fetching tipos vehiculo:', error);
+        }
+      }
+    };
+
+    const fetchUsers = async () => {
+      if (jwt) {
+        try {
+          const response = await fetcher(`${STRAPI_URL}/api/users`, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+
+          const users = response.map(user => ({
+            apellido: user.apellido,
+            documentId: user.documentId,
+            id: user.id,
+            nombre: user.nombre,
+          }));
+
+          setUsers(users);
+
+        } catch (error) {
+          console.error('Error fetching Users:', error);
+        }
+      }
+    };
+
+    fetchUsers();
+    fetchMarcas();
+    fetchTiposVehiculo();
     fetchServicios();
     fetchOT();
   }, [idMecanico]);
@@ -149,7 +226,6 @@ const DashboardAutos = () => {
     );
   };
 
-
   const stats = [
     { title: "Total de Autos", value: TotalVehiculos },
     { title: "Órdenes Activas", value: TotalOrdenes },
@@ -160,22 +236,22 @@ const DashboardAutos = () => {
     {
       header: "Marca",
       key: "marca",
-      render: (vehiculo) => vehiculo.marca_id || 'Marca desconocida',
+      render: (vehiculo) => (vehiculo && vehiculo.marca_id) ? vehiculo.marca_id : 'Marca desconocida',
     },
     {
       header: "Modelo",
       key: "modelo",
-      render: (vehiculo) => vehiculo.modelo || 'Modelo no disponible',
+      render: (vehiculo) => (vehiculo && vehiculo.modelo) ? vehiculo.modelo : 'Modelo no disponible',
     },
     {
       header: "Patente",
       key: "patente",
-      render: (vehiculo) => vehiculo.patente || 'Patente no disponible',
+      render: (vehiculo) => (vehiculo && vehiculo.patente) ? vehiculo.patente : 'Patente no disponible',
     },
     {
       header: "Año",
       key: "anio",
-      render: (vehiculo) => vehiculo.anio || 'Año no disponible',
+      render: (vehiculo) => (vehiculo && vehiculo.anio) ? vehiculo.anio : 'Año no disponible',
     },
   ];
 
@@ -243,6 +319,31 @@ const DashboardAutos = () => {
   const cardVariants = {
     hidden: { opacity: 0, scale: 0.95 },
     visible: { opacity: 1, scale: 1, transition: { duration: 0.5 } },
+  };
+
+  const isPatenteDuplicada = (patente) => {
+    return vehiculos.some((vehiculo) => vehiculo.patente === patente);
+  };
+
+  const validatePatente = () => {
+    const selectedTipo = tiposVehiculo.find(
+      (tipo) => tipo.id === Number(newVehiculo.tp_vehiculo_id)
+    );
+
+    if (selectedTipo && selectedTipo.nom_tp_vehiculo === "Moto/motocicleta") {
+      const motoPattern = /^[A-Z]{2}\d{3}$|^[A-Z]{3}\d{2}$/;
+      if (!motoPattern.test(newVehiculo.patente)) {
+        toast.error("Formato de patente para moto no válido. Debe ser en formato AA-000 o AAA-00 en mayúsculas.");
+        return false;
+      }
+    } else {
+      const autoPattern = /^[A-Z]{2}\d{4}$|^[A-Z]{4}\d{2}$/;
+      if (!autoPattern.test(newVehiculo.patente)) {
+        toast.error("Formato de patente no válido. Debe ser en formato AA-0000 o AAAA-00 en mayúsculas.");
+        return false;
+      }
+    }
+    return true;
   };
 
   const handleSubmitCotizacion = async (e) => {
@@ -327,11 +428,79 @@ const DashboardAutos = () => {
     });
   };
 
+  const handleAddVehiculo = async (e) => {
+    e.preventDefault();
 
+    if (isPatenteDuplicada(newVehiculo.patente)) {
+      toast.error("La patente ya está registrada. Intente con otra.");
+      return;
+    }
+
+    if (!validatePatente()) {
+      return;
+    }
+
+    const jwt = getTokenFromLocalCookie();
+    if (jwt) {
+      try {
+        // setLoading(true);
+        const vehiculoData = {
+          data: {
+            user_id: newVehiculo.user_id,
+            marca_id: newVehiculo.marca_id,
+            mecanicos: idMecanico,
+            tp_vehiculo_id: newVehiculo.tp_vehiculo_id,
+            modelo: newVehiculo.modelo,
+            patente: newVehiculo.patente,
+            anio: newVehiculo.anio,
+            kilometraje: Number(newVehiculo.kilometraje),
+            motor: newVehiculo.motor,
+            color: newVehiculo.color
+          }
+        };
+
+        const response = await fetcher(`${STRAPI_URL}/api/vehiculos`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(vehiculoData),
+        });
+
+        setVehiculos([...vehiculos, response.data]);
+        setNewVehiculo({
+          patente: '',
+          anio: '',
+          kilometraje: '',
+          modelo: '',
+          motor: '',
+          color: '',
+          marca_id: '',
+          tp_vehiculo_id: ''
+        });
+
+        // console.log('Vehículo creado:', vehiculoData);
+
+
+        setShowVehiculoModal(false);
+        toast.success("Vehículo agregado correctamente");
+      } catch (error) {
+        console.error('Error adding vehicle:', error);
+        toast.error("Error al agregar el vehículo");
+      }
+      // finally {
+      //   // setLoading(false);
+      // }
+    }
+  };
+
+  const handleChange = (e) => {
+    setNewVehiculo({ ...newVehiculo, [e.target.name]: e.target.value });
+  };
 
   return (
     <div className="flex">
-
       <div className="container mx-auto p-4">
 
         {/* Estadísticas principales con animación */}
@@ -355,7 +524,15 @@ const DashboardAutos = () => {
 
         {/* Autos Registrados */}
         <motion.div initial="hidden" animate="visible" variants={cardVariants} className="mb-6">
-          <h2 className="text-xl font-bold mb-4">Autos Registrados</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold mb-4">Autos Registrados</h2>
+            <button
+              onClick={() => setShowVehiculoModal(true)}
+              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+            >
+              Registrar Auto
+            </button>
+          </div>
           <Card>
             <CardContent className="overflow-x-auto">
               <Table className="min-w-full">
@@ -407,6 +584,108 @@ const DashboardAutos = () => {
         </div>
       </div>
 
+      {/* modal del vehiculo */}
+      <Modal isOpen={showVehiculoModal} onClose={() => setShowVehiculoModal(false)}>
+        <h4 className="text-xl font-semibold mb-4">Agregar Vehículo</h4>
+        <form onSubmit={handleAddVehiculo}>
+          <div className="grid gap-4">
+            <select
+              name="tp_vehiculo_id"
+              value={newVehiculo.tp_vehiculo_id}
+              onChange={handleChange}
+              required
+              className="p-2 border rounded"
+            >
+              <option value="">Seleccione Tipo</option>
+              {tiposVehiculo.map((tipo) => (
+                <option key={tipo.id} value={tipo.id}>{tipo.nom_tp_vehiculo}</option>
+              ))}
+            </select>
+            <select
+              name="marca_id"
+              value={newVehiculo.marca_id}
+              onChange={handleChange}
+              required
+              className="p-2 border rounded"
+            >
+              <option value="">Seleccione Marca</option>
+              {marcas.map((marca) => (
+                <option key={marca.id} value={marca.id}>{marca.nombre_marca}</option>
+              ))}
+            </select>
+            <select
+              name="user_id"
+              value={newVehiculo.user_id}
+              onChange={handleChange}
+              required
+              className="p-2 border rounded"
+            >
+              <option value="">Seleccione un cliente</option>
+              {users.map((users) => (
+                <option key={users.id} value={users.id}>{users.nombre} {users.apellido}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              name="modelo"
+              placeholder="Modelo"
+              value={newVehiculo.modelo}
+              onChange={handleChange}
+              required
+              className="p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="patente"
+              placeholder="Patente"
+              value={newVehiculo.patente}
+              onChange={handleChange}
+              required
+              className="p-2 border rounded"
+            />
+            <input
+              type="numeric"
+              name="anio"
+              placeholder="Año"
+              value={newVehiculo.anio}
+              onChange={handleChange}
+              required
+              className="p-2 border rounded"
+            />
+            <input
+              type="number"
+              name="kilometraje"
+              placeholder="Kilometraje"
+              value={newVehiculo.kilometraje}
+              onChange={handleChange}
+              required
+              className="p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="motor"
+              placeholder="Motor"
+              value={newVehiculo.motor}
+              onChange={handleChange}
+              required
+              className="p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="color"
+              placeholder="Color"
+              value={newVehiculo.color}
+              onChange={handleChange}
+              required
+              className="p-2 border rounded"
+            />
+          </div>
+          <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+            Agregar Vehículo
+          </button>
+        </form>
+      </Modal>
+
       <Modal isOpen={showCotizacionModal} onClose={() => setShowCotizacionModal(false)}>
         <h4 className="text-xl font-semibold mb-4">Nueva Cotización</h4>
         <form onSubmit={handleSubmitCotizacion}>
@@ -450,9 +729,11 @@ const DashboardAutos = () => {
             >
               <option value="">Selecciona un vehículo</option>
               {vehiculos.map((vehiculo) => (
-                <option key={vehiculo.id} value={vehiculo.id}>
-                  {vehiculo.marca_id.nombre_marca} {vehiculo.modelo} - {vehiculo.patente}
-                </option>
+                vehiculo && vehiculo.id && vehiculo.marca_id && vehiculo.marca_id.nombre_marca ? (
+                  <option key={vehiculo.id} value={vehiculo.id}>
+                    {vehiculo.marca_id.nombre_marca} {vehiculo.modelo} - {vehiculo.patente}
+                  </option>
+                ) : null
               ))}
             </select>
           </div>

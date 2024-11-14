@@ -80,7 +80,12 @@ export default function WorkOrderDetails() {
               Authorization: `Bearer ${jwt}`,
             },
           });
+
           setVehiculo(response.data);
+
+          console.log(response.data);
+
+
         } catch (error) {
           console.error('Error fetching vehicle:', error);
         }
@@ -187,6 +192,22 @@ export default function WorkOrderDetails() {
                   {Orden.fechainicio ? new Date(Orden.fechainicio).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Fecha no disponible'}
                 </div>
               </div>
+              {Orden.fechaentrega && (
+                <div>
+                  <div className="text-sm text-muted-foreground">Fecha de Entrega</div>
+                  <div className="font-medium">
+                    {Orden.fechaentrega ? new Date(Orden.fechaentrega).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Fecha no disponible'}
+                  </div>
+                </div>
+              )}
+              {Orden.fecharecepcion && (
+                <div>
+                  <div className="text-sm text-muted-foreground">Fecha de Recepción</div>
+                  <div className="font-medium">
+                    {new Date(Orden.fecharecepcion).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                  </div>
+                </div>
+              )}
               <div>
                 <div className="text-sm text-muted-foreground">Valor</div>
                 <div className="font-medium">
@@ -217,12 +238,14 @@ export default function WorkOrderDetails() {
                   Actualizar Orden
                 </button>
                 <button
-                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700">
+                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
+                >
                   Agregar Nota
                 </button>
               </div>
             )}
           </Card>
+
           <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
             <h4 className="text-xl font-semibold mb-4">Actualizar Orden</h4>
             <form>
@@ -270,6 +293,7 @@ export default function WorkOrderDetails() {
               </button>
             </form>
           </Modal>
+
         </div>
       </div>
     </div>
