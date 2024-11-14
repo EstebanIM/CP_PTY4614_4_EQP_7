@@ -10,6 +10,7 @@ import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import Loading from "../../components/animation/loading";
 import { DarkModeContext } from '../../context/DarkModeContext';
+import { useContext } from 'react';
 
 export default function WorkOrderDetails() {
   const { darkMode } = useContext(DarkModeContext);
@@ -225,7 +226,6 @@ export default function WorkOrderDetails() {
         },
       };
 
-      // Actualizamos el estado de la orden en Strapi
       const response = await fetch(`${STRAPI_URL}/api/orden-trabajos/${id}`, {
         method: 'PUT',
         headers: {
@@ -235,9 +235,6 @@ export default function WorkOrderDetails() {
         body: JSON.stringify(updateData),
       });
 
-      // console.log('response:', response);
-      // console.log('updateData:', updateData);
-
       if (!response.ok) {
         throw new Error(`Error al actualizar la orden: ${response.statusText}`);
       }
@@ -245,12 +242,9 @@ export default function WorkOrderDetails() {
       const data = await response.json();
       console.log('Orden actualizada exitosamente:', data);
 
-      // const { clienteEmail, mecanicoEmail } = data; // Asegúrate de que esta respuesta contiene los emails correctos
-
       const clienteEmail = Orden.user.email;
       const mecanicoEmail = Orden.mecanico_id.correo;
 
-      // Enviar email al cliente
       const clienteEmailData = {
         to: clienteEmail,
         subject: "Actualización de Estado de su Orden de Trabajo",
@@ -272,9 +266,6 @@ export default function WorkOrderDetails() {
         throw new Error(`Error al enviar el email al cliente: ${clienteEmailResponse.statusText}`);
       }
 
-      console.log('Email enviado exitosamente al cliente');
-
-      // Enviar email al mecánico
       const mecanicoEmailData = {
         to: mecanicoEmail,
         subject: "Notificación de Actualización de Orden de Trabajo",
@@ -296,9 +287,6 @@ export default function WorkOrderDetails() {
         throw new Error(`Error al enviar el email al mecánico: ${mecanicoEmailResponse.statusText}`);
       }
 
-      console.log('Email enviado exitosamente al mecánico');
-
-      // Actualizamos el estado local de la orden
       setOrden((prevOrden) => ({
         ...prevOrden,
         estado_ot_id: { nom_estado: nuevoEstado === 2 ? 'Aceptado' : 'Rechazado' },
@@ -309,8 +297,6 @@ export default function WorkOrderDetails() {
       console.error('Error en la actualización de la orden o envío de email:', error);
     }
   };
-
-
 
   return (
     <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
@@ -324,7 +310,26 @@ export default function WorkOrderDetails() {
           </div>
 
           <Card className={`p-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
-            <h2 className="text-2xl font-bold mb-6">Orden #{Orden.id}</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Orden #{Orden.id}</h2>
+              {Orden.descripcion &&
+                userRole === 'Authenticated' &&
+                Orden.estado_ot_id?.nom_estado !== 'Aceptado' &&
+                Orden.estado_ot_id?.nom_estado !== 'Rechazado' && (
+                  <div className="space-x-4">
+                    <button className="px-4 py-2 bg-green-700 text-white rounded"
+                    onClick={() => actualizarEstadoOrden(Orden.documentId, 2)} // 2 para "Aceptado"
+                    >
+                      Aceptar
+                    </button>
+                    <button className="px-4 py-2 bg-red-700 text-white rounded"
+                    onClick={() => actualizarEstadoOrden(Orden.documentId, 4)} // 4 para "Rechazado"
+                    >
+                      Rechazar
+                    </button>
+                  </div>
+                )}
+            </div>
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
                 <div className="text-sm text-muted-foreground">Cliente</div>
@@ -383,7 +388,7 @@ export default function WorkOrderDetails() {
               </ul>
             </div>
 
-            {['Admin', 'Mechanic'].includes(userRole) && ( // Ajustado a mayúsculas correctas
+            {['Admin', 'Mechanic'].includes(userRole) && (
               <div className="mt-6 flex justify-end">
                 <button
                   className={`px-4 py-2 ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-black text-white hover:bg-gray-700'} rounded`}
@@ -400,7 +405,7 @@ export default function WorkOrderDetails() {
             )}
           </Card>
 
-          <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
+          {/* <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
             <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Actualizar Orden</h4>
             <form>
               <div className="grid gap-4">
@@ -431,7 +436,7 @@ export default function WorkOrderDetails() {
                   className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                 />
 
-                {/* {estado === 'Nueva Cotización' && (
+                {estado === 'Nueva Cotización' && (
                   <>
                     <label htmlFor="descripcion" className="text-sm font-medium">Descripción</label>
                     <textarea
@@ -443,13 +448,13 @@ export default function WorkOrderDetails() {
                       className="p-2 border rounded"
                     />
                   </>
-                )} */}
+                )}
               </div>
               <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
                 Actualizar
               </button>
             </form>
-          </Modal>
+          </Modal> */}
 
         </div>
       </div>
