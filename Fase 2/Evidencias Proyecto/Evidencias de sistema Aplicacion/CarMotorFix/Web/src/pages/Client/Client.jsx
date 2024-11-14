@@ -1,4 +1,3 @@
-// src/components/Client.jsx
 import { useEffect, useState, useContext } from 'react';
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
