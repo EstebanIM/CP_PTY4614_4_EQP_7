@@ -54,13 +54,32 @@ const DashboardAutos = () => {
 
     const fetchIDMecanico = async () => {
       try {
-        const response = await fetcher(`${STRAPI_URL}/api/users/me?populate[mecanico][fields]=documentId`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${jwt}`,
-          },
-        });
+        const response = await fetcher(
+          `${STRAPI_URL}/api/users/me?populate[mecanico][populate][vehiculos][fields]=id,anio,documentId,modelo,motor,patente&populate[mecanico][populate][vehiculos][populate][user_id][fields]=id&populate[mecanico][populate][vehiculos][populate][marca_id][fields]=nombre_marca`
+          , {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${jwt}`,
+            },
+          });
+
         setIdMecanico(response.mecanico.documentId);
+
+        const Vehiculos = response.mecanico.vehiculos.map((vehiculo) => ({
+          ...vehiculo,
+          id: vehiculo.id,
+          anio: vehiculo.anio,
+          modelo: vehiculo.modelo,
+          motor: vehiculo.motor,
+          patente: vehiculo.patente,
+          user_id: vehiculo.user_id.id,
+          marca_id: vehiculo.marca_id.nombre_marca,
+        }));
+
+        const vehiculosUnicos = new Set(Vehiculos.map(vehiculo => vehiculo.id));
+        setTotalVehiculos(vehiculosUnicos.size);
+        setVehiculos(Vehiculos);
+
       } catch (error) {
         console.error('Error fetching IDMecanico:', error);
       }
@@ -101,11 +120,6 @@ const DashboardAutos = () => {
             marca_id: OT.vehiculo.marca_id.nombre_marca,
           }
         }));
-
-        const vehiculosUnicos = new Set(OT.map(OT => OT.vehiculo.documentId));
-
-        setVehiculos(Array.from(new Map(OT.map(item => [item.vehiculo.documentId, item.vehiculo])).values()));
-        setTotalVehiculos(vehiculosUnicos.size);
 
         const Cotizacion = OT.filter(cotizacion => cotizacion.estado_ot_id === 'Cotizando');
         const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'Cotizando');
