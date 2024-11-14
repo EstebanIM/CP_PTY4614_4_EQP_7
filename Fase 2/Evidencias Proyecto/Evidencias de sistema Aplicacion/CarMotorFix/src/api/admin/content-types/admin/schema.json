@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "admins",
+  "info": {
+    "singularName": "admin",
+    "pluralName": "admins",
+    "displayName": "Admin"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "rut": {
+      "type": "integer",
+      "max": 10,
+      "required": true
+    },
+    "prim_nom": {
+      "type": "string",
+      "required": true,
+      "maxLength": 30
+    },
+    "prim_apell": {
+      "type": "string",
+      "required": true,
+      "maxLength": 30
+    },
+    "correo": {
+      "type": "email",
+      "required": true
+    },
+    "clave": {
+      "type": "password",
+      "required": true
+    }
+  }
+}

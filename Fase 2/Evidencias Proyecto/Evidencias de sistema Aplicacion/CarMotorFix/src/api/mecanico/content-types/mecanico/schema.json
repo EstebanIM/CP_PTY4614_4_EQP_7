@@ -1,0 +1,59 @@
+{
+  "kind": "collectionType",
+  "collectionName": "mecanicos",
+  "info": {
+    "singularName": "mecanico",
+    "pluralName": "mecanicos",
+    "displayName": "Mecanico",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "run": {
+      "type": "integer",
+      "required": true
+    },
+    "prim_nom": {
+      "type": "string",
+      "required": true,
+      "maxLength": 30
+    },
+    "prim_apell": {
+      "type": "string",
+      "required": true,
+      "maxLength": 30
+    },
+    "correo": {
+      "type": "email",
+      "required": true,
+      "maxLength": 60
+    },
+    "orden_trabajos_id": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::orden-trabajo.orden-trabajo",
+      "mappedBy": "mecanico_id"
+    },
+    "taller_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::taller.taller",
+      "inversedBy": "mecanicos_id"
+    },
+    "vehiculos": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::vehiculo.vehiculo",
+      "inversedBy": "mecanicos"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "mecanico"
+    }
+  }
+}
