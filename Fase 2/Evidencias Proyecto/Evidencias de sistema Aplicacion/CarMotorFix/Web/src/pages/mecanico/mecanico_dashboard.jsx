@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
 import { Table } from "../../components/ui/tables/table";
@@ -8,12 +8,13 @@ import { getTokenFromLocalCookie } from "../../lib/cookies";
 import { fetcher } from "../../lib/strApi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 const DashboardAutos = () => {
   const navigate = useNavigate();
-
+  const { darkMode } = useContext(DarkModeContext);
   const [totalServicios, setTotalServicios] = useState(0);
   const [vehiculos, setVehiculos] = useState([]);
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
@@ -514,7 +515,7 @@ const DashboardAutos = () => {
   };
 
   return (
-    <div className="flex">
+    <div className={`flex ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <div className="container mx-auto p-4">
 
         {/* Estadísticas principales con animación */}
@@ -525,7 +526,7 @@ const DashboardAutos = () => {
           variants={cardVariants}
         >
           {stats.map((item, index) => (
-            <Card key={index} className="bg-white">
+            <Card key={index} className={`${darkMode ? 'bg-gray-800' : 'bg-white'} `}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
               </CardHeader>
@@ -560,7 +561,7 @@ const DashboardAutos = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <motion.div initial="hidden" animate="visible" variants={cardVariants}>
             <h2 className="pb-3 text-xl font-bold mb-4">Órdenes Activas</h2>
-            <Card>
+            <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'} `}>
               <CardContent className="overflow-x-auto">
                 <Table className="min-w-full">
                   {ordenes.length === 0 ? (
@@ -587,7 +588,7 @@ const DashboardAutos = () => {
                 Nueva Cotización
               </button>
             </div>
-            <Card>
+            <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'} `}>
               <CardContent className="overflow-x-auto">
                 <Table className="min-w-full">
                   <Tablas servicio={Cotizaciones} handleViewTabla={handleViewOT} columns={columns3} />
@@ -738,7 +739,7 @@ const DashboardAutos = () => {
               name="vehiculo"
               value={formData.vehiculo?.id || ""}
               onChange={handleChangeCotizacion}
-              className="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className={`block w-full py-2 px-3 border ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
               required
             >
               <option value="">Selecciona un vehículo</option>
@@ -763,7 +764,7 @@ const DashboardAutos = () => {
               name="fecharecepcion"
               value={formData.fecharecepcion}
               onChange={handleChangeCotizacion}
-              className="mt-1 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md"
+              className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700' : 'focus:ring-blue-500 focus:border-blue-500 bg-white border-gray-300'} rounded-md`}
               required
             />
           </div>
@@ -779,7 +780,7 @@ const DashboardAutos = () => {
               name="fechaentrega"
               value={formData.fechaentrega}
               onChange={handleChangeCotizacion}
-              className="mt-1 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md"
+              className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700' : 'focus:ring-blue-500 focus:border-blue-500 bg-white border-gray-300'} rounded-md`}
               required
             />
           </div>

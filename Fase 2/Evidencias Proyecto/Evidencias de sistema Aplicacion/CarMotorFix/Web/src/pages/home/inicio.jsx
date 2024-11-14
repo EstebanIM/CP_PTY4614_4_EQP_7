@@ -1,17 +1,18 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import { FaTools, FaUsers, FaFileInvoiceDollar } from "react-icons/fa";
 import { fetcher } from '../../lib/strApi';
-import { getTokenFromLocalCookie, getDarkModeFromLocalCookie } from '../../lib/cookies';
+import { getTokenFromLocalCookie } from '../../lib/cookies';
 import ConsejoAutoDelDia from '../../components/mensaje/mensajedia';
+import { DarkModeContext } from '../../context/DarkModeContext'; // Asegúrate de la ruta correcta
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function Inicio() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userRole, setUserRole] = useState(null);
-  const [darkMode] = useState(getDarkModeFromLocalCookie()); 
+  const { darkMode } = useContext(DarkModeContext); 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };

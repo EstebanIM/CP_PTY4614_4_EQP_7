@@ -12,7 +12,6 @@ export const DarkModeProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        // Aplica o remueve la clase 'dark' al elemento <html>
         if (darkMode) {
             document.documentElement.classList.add('dark');
         } else {

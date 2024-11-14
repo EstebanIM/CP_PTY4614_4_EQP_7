@@ -1,11 +1,8 @@
 import PropTypes from 'prop-types';
 import { InputField } from './InputField';
 import { Button } from '../ui/button';
-import { useContext } from 'react';
-import { DarkModeContext } from '../../context/DarkModeContext';
 
 export const LoginForm = ({ email, setEmail, password, setPassword, handleSubmit }) => {
-  const { darkMode } = useContext(DarkModeContext);
 
   return (
     <>
@@ -27,7 +24,7 @@ export const LoginForm = ({ email, setEmail, password, setPassword, handleSubmit
       />
       <Button
         type="submit"
-        className={`w-full mt-4 ${darkMode ? 'bg-gray-700 text-white' : 'bg-indigo-600 text-white'} hover:bg-indigo-700`}
+        className="w-full mt-4" 
         onClick={handleSubmit}
       >
         Iniciar Sesión
