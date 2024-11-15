@@ -381,7 +381,7 @@ function Client() {
         <div className={`rounded-lg border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-card text-card-foreground border-gray-200'} shadow-sm p-6`}>
           <div className="flex justify-between items-center mb-4">
             <h3 className={`text-2xl font-semibold leading-none tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>Mis Autos</h3>
-            {vehiculos.length < 4 && (
+            {vehiculos.length < 3 && (
               <button
                 className={`px-4 py-2 rounded hover:bg-gray-700 ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-black text-white hover:bg-gray-700'}`}
                 onClick={() => setShowAddVehiculoModal(true)}
