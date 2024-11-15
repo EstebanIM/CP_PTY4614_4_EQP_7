@@ -83,17 +83,20 @@ const DashboardAdmin = () => {
     const fetchVehiculos = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/vehiculos?populate[user_id][fields]=username&populate[marca_id][fields]=nombre_marca`, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${jwt}`,
-            },
-          });
+          const response = await fetcher(
+            `${STRAPI_URL}/api/vehiculos?filters[estado][$eq]=true&populate[user_id][fields]=username&populate[marca_id][fields]=nombre_marca`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${jwt}`,
+              },
+            }
+          );
 
           const vehiculoIds = response.data || [];
-          const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
+          const validVehiculoIds = vehiculoIds.filter(v => v && v.id && v.estado === true); // Asegurarse de que estado sea true
 
-          setTotalVehiculos(response.data.length);
+          setTotalVehiculos(validVehiculoIds.length); // Actualizar con la cantidad filtrada
           setVehiculos(validVehiculoIds);
         } catch (error) {
           console.error('Error fetching vehicles:', error);
@@ -415,7 +418,7 @@ const DashboardAdmin = () => {
                   <CardContent className="overflow-x-auto">
                     <Table className={`min-w-full divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'} table-fixed`}>
                       {/* No se ve no hay cotizaciones */}
-                      {currentOrdenes.length === 0  ? (
+                      {currentOrdenes.length === 0 ? (
                         <div className={`p-4 text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No hay órdenes registradas</div>
                       ) : (
                         <Tablas servicio={currentOrdenes} handleViewTabla={handleViewCotizacion} columns={columns3} />

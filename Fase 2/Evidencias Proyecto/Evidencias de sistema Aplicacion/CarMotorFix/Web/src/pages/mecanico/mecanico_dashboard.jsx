@@ -58,13 +58,14 @@ const DashboardAutos = () => {
     const fetchIDMecanico = async () => {
       try {
         const response = await fetcher(
-          `${STRAPI_URL}/api/users/me?populate[mecanico][populate][vehiculos][fields]=id,anio,documentId,modelo,motor,patente&populate[mecanico][populate][vehiculos][populate][user_id][fields]=id&populate[mecanico][populate][vehiculos][populate][marca_id][fields]=nombre_marca`
-          , {
+          `${STRAPI_URL}/api/users/me?populate[mecanico][populate][vehiculos][filters][estado][$eq]=true&populate[mecanico][populate][vehiculos][fields]=id,anio,documentId,modelo,motor,patente,estado&populate[mecanico][populate][vehiculos][populate][user_id][fields]=id&populate[mecanico][populate][vehiculos][populate][marca_id][fields]=nombre_marca`,
+          {
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
             },
-          });
+          }
+        );
 
         setIdMecanico(response.mecanico.documentId);
 
@@ -77,12 +78,15 @@ const DashboardAutos = () => {
           patente: vehiculo.patente,
           user_id: vehiculo.user_id.id,
           marca_id: vehiculo.marca_id.nombre_marca,
+          estado: vehiculo.estado,
         }));
 
-        const vehiculosUnicos = new Set(Vehiculos.map(vehiculo => vehiculo.id));
+        const vehiculosHabilitados = Vehiculos.filter((vehiculo) => vehiculo.estado === true);
+
+        const vehiculosUnicos = new Set(vehiculosHabilitados.map(vehiculo => vehiculo.id));
         setTotalVehiculos(vehiculosUnicos.size);
-        setVehiculos(Vehiculos);
-        
+        setVehiculos(vehiculosHabilitados);
+
 
       } catch (error) {
         console.error('Error fetching IDMecanico:', error);
