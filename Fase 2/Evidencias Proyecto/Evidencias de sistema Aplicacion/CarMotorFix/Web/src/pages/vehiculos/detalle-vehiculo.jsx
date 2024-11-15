@@ -10,6 +10,7 @@ import Tablas from "../../components/Tablas";
 import LoadingComponent from '../../components/animation/loading';
 import { getDarkModeFromLocalCookie } from '../../lib/cookies';
 import Modal from "../../components/forms/modal";
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function DetalleVehiculo() {
@@ -22,6 +23,8 @@ function DetalleVehiculo() {
     const [ots, setOts] = useState([]);
     const navigate = useNavigate();
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [isConfirmEnableModalOpen, setIsConfirmEnableModalOpen] = useState(false);
+    const [isConfirmDisableModalOpen, setIsConfirmDisableModalOpen] = useState(false);
     const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
     const [searchRun, setSearchRun] = useState('');
     const [searchResult, setSearchResult] = useState(null);
@@ -130,31 +133,12 @@ function DetalleVehiculo() {
         }
     };
 
-
+    const handleEnableVehicle = () => {
+        setIsConfirmEnableModalOpen(true);
+    };
 
     const handleDisableVehicle = async () => {
-        const jwt = getTokenFromLocalCookie();
-        try {
-            const response = await fetch(`${STRAPI_URL}/api/vehiculos/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${jwt}`,
-                },
-                body: JSON.stringify({ data: { disabled: true } }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Error al deshabilitar el vehículo:', errorData);
-                return;
-            }
-
-            await fetchVehiculo();
-            alert('Vehículo deshabilitado exitosamente.');
-        } catch (error) {
-            console.error('Error al deshabilitar el vehículo:', error);
-        }
+        setIsConfirmDisableModalOpen(true);
     };
 
     const handleSearchUser = async () => {
@@ -171,10 +155,66 @@ function DetalleVehiculo() {
                 setSearchResult(response[0]);
             } else {
                 setSearchResult(null);
-                alert('Usuario no encontrado.');
+                toast.error('Usuario no encontrado.');
             }
         } catch (error) {
             console.error("Error al buscar usuario:", error);
+        }
+    };
+
+    const confirmEnableVehicle = async () => {
+        const jwt = getTokenFromLocalCookie();
+        try {
+            const response = await fetch(`${STRAPI_URL}/api/vehiculos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${jwt}`,
+                },
+                body: JSON.stringify({ data: { estado: true } }), // Establecer a true para habilitar
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error al habilitar el vehículo:', errorData);
+                toast.error('Error al habilitar el vehículo.');
+                return;
+            }
+
+            await fetchVehiculo();
+            setIsConfirmEnableModalOpen(false);
+            toast.success('Vehículo habilitado exitosamente.');
+        } catch (error) {
+            console.error('Error al habilitar el vehículo:', error);
+            toast.error('Error al habilitar el vehículo.');
+        }
+    };
+
+    const confirmDisableVehicle = async () => {
+        const jwt = getTokenFromLocalCookie();
+        try {
+            const response = await fetch(`${STRAPI_URL}/api/vehiculos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${jwt}`,
+                },
+                body: JSON.stringify({ data: { estado: false } }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error al deshabilitar el vehículo:', errorData);
+                toast.error('Error al deshabilitar el vehículo.');
+                return;
+            }
+
+            await fetchVehiculo();
+            setIsConfirmDisableModalOpen(false);
+            toast.success('Vehículo deshabilitado exitosamente.');
+        } catch (error) {
+            console.error('Error al deshabilitar el vehículo:', error);
+            toast.error('Error al deshabilitar el vehículo.');
         }
     };
 
@@ -279,6 +319,7 @@ function DetalleVehiculo() {
                                 <p><strong>Color:</strong> {vehiculo.color}</p>
                                 <p><strong>Motor:</strong> {vehiculo.motor}</p>
                                 <p><strong>Kilometraje:</strong> {vehiculo.kilometraje}</p>
+                                <p><strong>Estado:</strong> {vehiculo.estado ? 'Habilitado' : 'Deshabilitado'}</p>
                                 <div className="col-span-full flex justify-between items-center">
                                     <div className="flex space-x-2">
                                         <Button
@@ -298,14 +339,25 @@ function DetalleVehiculo() {
                                             Transferir Vehículo
                                         </Button>
                                     </div>
-                                    <Button
-                                        onClick={handleDisableVehicle}
-                                        className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-800'}`}
-                                        variant="default"
-                                        size="md"
-                                    >
-                                        Deshabilitar Vehículo
-                                    </Button>
+                                    {vehiculo.estado ? (
+                                        <Button
+                                            onClick={handleDisableVehicle}
+                                            className={`${darkMode ? 'bg-red-600 text-white' : 'bg-red-500'}`}
+                                            variant="default"
+                                            size="md"
+                                        >
+                                            Deshabilitar Vehículo
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            onClick={handleEnableVehicle} // Necesitarás implementar esta función
+                                            className={`${darkMode ? 'bg-green-600 text-white' : 'bg-green-500'}`}
+                                            variant="default"
+                                            size="md"
+                                        >
+                                            Habilitar Vehículo
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         ) : (
@@ -382,18 +434,97 @@ function DetalleVehiculo() {
                     </Modal>
                 )}
 
+                {/* Modal de Transferir Vehículo */}
                 {isConfirmModalOpen && (
-                    <Modal isOpen={isConfirmModalOpen} onClose={() => setIsConfirmModalOpen(false)}>
-                        <div className="p-4">
-                            <h2 className="text-xl font-semibold mb-4">Confirmar Transferencia</h2>
-                            <p>¿Estás seguro de que deseas transferir el vehículo a {searchResult.username}?</p>
-                            <div className="flex space-x-4 mt-4">
-                                <Button onClick={confirmTransfer} variant="default" size="md" className={`p-2 rounded ${darkMode ? 'bg-green-600 text-white' : 'bg-green-500'}`}>Sí</Button>
-                                <Button onClick={() => setIsConfirmModalOpen(false)} variant="default" size="md" className={`p-2 rounded ${darkMode ? 'bg-red-600 text-white' : 'bg-red-500'}`}>No</Button>
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6 max-w-md w-full">
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 text-center">
+                                Confirmar Transferencia
+                            </h2>
+                            <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
+                                ¿Estás seguro de que deseas transferir el vehículo a
+                                <span className="font-semibold text-gray-800 dark:text-gray-100"> {searchResult.username}</span>?
+                            </p>
+                            <div className="flex justify-center space-x-4">
+                                <button
+                                    onClick={confirmTransfer}
+                                    className={`px-6 py-2 rounded-lg font-semibold transition-colors duration-200 ${darkMode
+                                        ? 'bg-green-600 hover:bg-green-700 text-white'
+                                        : 'bg-green-500 hover:bg-green-600 text-white'
+                                        }`}
+                                >
+                                    Sí
+                                </button>
+                                <button
+                                    onClick={() => setIsConfirmModalOpen(false)}
+                                    className={`px-6 py-2 rounded-lg font-semibold transition-colors duration-200 ${darkMode
+                                        ? 'bg-red-600 hover:bg-red-700 text-white'
+                                        : 'bg-red-500 hover:bg-red-600 text-white'
+                                        }`}
+                                >
+                                    No
+                                </button>
                             </div>
                         </div>
-                    </Modal>
+                    </div>
                 )}
+
+                {/* Modal de Confirmación de Habilitar Vehículo */}
+                {isConfirmEnableModalOpen && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 text-center">
+                                Confirmar Habilitación
+                            </h2>
+                            <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
+                                ¿Estás seguro de que deseas habilitar este vehículo?
+                            </p>
+                            <div className="flex justify-center space-x-4">
+                                <button
+                                    onClick={confirmEnableVehicle}
+                                    className="px-6 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition-colors duration-200"
+                                >
+                                    Sí
+                                </button>
+                                <button
+                                    onClick={() => setIsConfirmEnableModalOpen(false)}
+                                    className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 dark:bg-gray-700 dark:text-white rounded-lg font-semibold transition-colors duration-200"
+                                >
+                                    No
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Modal de Confirmación de Deshabilitar Vehículo */}
+                {isConfirmDisableModalOpen && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-sm w-full">
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-4 text-center">
+                                Confirmar Deshabilitación
+                            </h2>
+                            <p className="text-gray-600 dark:text-gray-300 text-center mb-6">
+                                ¿Estás seguro de que deseas deshabilitar este vehículo?
+                            </p>
+                            <div className="flex justify-center space-x-4">
+                                <button
+                                    onClick={confirmDisableVehicle}
+                                    className="px-6 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition-colors duration-200"
+                                >
+                                    Sí
+                                </button>
+                                <button
+                                    onClick={() => setIsConfirmDisableModalOpen(false)}
+                                    className="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 dark:bg-gray-700 dark:text-white rounded-lg font-semibold transition-colors duration-200"
+                                >
+                                    No
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
             </div>
         </div>
     );

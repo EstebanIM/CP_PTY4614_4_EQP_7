@@ -67,7 +67,8 @@
       "inversedBy": "vehiculo_ids"
     },
     "estado": {
-      "type": "boolean"
+      "type": "boolean",
+      "default": true
     }
   }
 }
