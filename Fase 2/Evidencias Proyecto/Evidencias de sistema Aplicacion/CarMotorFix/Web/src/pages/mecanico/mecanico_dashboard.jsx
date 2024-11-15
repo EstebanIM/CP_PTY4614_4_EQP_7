@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
 import { Table } from "../../components/ui/tables/table";
@@ -8,13 +8,14 @@ import { getTokenFromLocalCookie } from "../../lib/cookies";
 import { fetcher } from "../../lib/strApi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { DarkModeContext } from '../../context/DarkModeContext';
+import { DarkModeContext } from '../../context/DarkModeContext'; // Importar el contexto
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 const DashboardAutos = () => {
+  const { darkMode } = useContext(DarkModeContext); // Obtener el estado de darkMode
   const navigate = useNavigate();
-  const { darkMode } = useContext(DarkModeContext);
+
   const [totalServicios, setTotalServicios] = useState(0);
   const [vehiculos, setVehiculos] = useState([]);
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
@@ -458,7 +459,6 @@ const DashboardAutos = () => {
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
       try {
-        // setLoading(true);
         const vehiculoData = {
           data: {
             user_id: newVehiculo.user_id,
@@ -495,18 +495,12 @@ const DashboardAutos = () => {
           tp_vehiculo_id: ''
         });
 
-        // console.log('Vehículo creado:', vehiculoData);
-
-
         setShowVehiculoModal(false);
         toast.success("Vehículo agregado correctamente");
       } catch (error) {
         console.error('Error adding vehicle:', error);
         toast.error("Error al agregar el vehículo");
       }
-      // finally {
-      //   // setLoading(false);
-      // }
     }
   };
 
@@ -548,7 +542,7 @@ const DashboardAutos = () => {
               Registrar Auto
             </button>
           </div>
-          <Card>
+          <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <CardContent className="overflow-x-auto">
               <Table className="min-w-full">
                 <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
@@ -561,7 +555,7 @@ const DashboardAutos = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <motion.div initial="hidden" animate="visible" variants={cardVariants}>
             <h2 className="pb-3 text-xl font-bold mb-4">Órdenes Activas</h2>
-            <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'} `}>
+            <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <CardContent className="overflow-x-auto">
                 <Table className="min-w-full">
                   {ordenes.length === 0 ? (
@@ -569,7 +563,6 @@ const DashboardAutos = () => {
                       <h4 className="text-xl">No hay ordenes activas.</h4>
                     </div>
                   ) : (
-
                     <Tablas servicio={ordenes} handleViewTabla={handleViewOT} columns={columns2} />
                   )}
                 </Table>
@@ -588,7 +581,7 @@ const DashboardAutos = () => {
                 Nueva Cotización
               </button>
             </div>
-            <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'} `}>
+            <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <CardContent className="overflow-x-auto">
                 <Table className="min-w-full">
                   <Tablas servicio={Cotizaciones} handleViewTabla={handleViewOT} columns={columns3} />
@@ -599,7 +592,7 @@ const DashboardAutos = () => {
         </div>
       </div>
 
-      {/* modal del vehiculo */}
+      {/* Modal del Vehículo */}
       <Modal isOpen={showVehiculoModal} onClose={() => setShowVehiculoModal(false)}>
         <h4 className="text-xl font-semibold mb-4">Agregar Vehículo</h4>
         <form onSubmit={handleAddVehiculo}>
@@ -609,7 +602,7 @@ const DashboardAutos = () => {
               value={newVehiculo.tp_vehiculo_id}
               onChange={handleChange}
               required
-              className="p-2 border rounded"
+              className={`p-2 border rounded ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
             >
               <option value="">Seleccione Tipo</option>
               {tiposVehiculo.map((tipo) => (
@@ -621,7 +614,7 @@ const DashboardAutos = () => {
               value={newVehiculo.marca_id}
               onChange={handleChange}
               required
-              className="p-2 border rounded"
+              className={`p-2 border rounded ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
             >
               <option value="">Seleccione Marca</option>
               {marcas.map((marca) => (
@@ -633,7 +626,7 @@ const DashboardAutos = () => {
               value={newVehiculo.user_id}
               onChange={handleChange}
               required
-              className="p-2 border rounded"
+              className={`p-2 border rounded ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
             >
               <option value="">Seleccione un cliente</option>
               {users.map((users) => (
@@ -647,7 +640,7 @@ const DashboardAutos = () => {
               value={newVehiculo.modelo}
               onChange={handleChange}
               required
-              className="p-2 border rounded"
+              className={`p-2 border rounded ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
             />
             <input
               type="text"
@@ -656,16 +649,16 @@ const DashboardAutos = () => {
               value={newVehiculo.patente}
               onChange={handleChange}
               required
-              className="p-2 border rounded"
+              className={`p-2 border rounded ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
             />
             <input
-              type="numeric"
+              type="number"
               name="anio"
               placeholder="Año"
               value={newVehiculo.anio}
               onChange={handleChange}
               required
-              className="p-2 border rounded"
+              className={`p-2 border rounded ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
             />
             <input
               type="number"
@@ -674,7 +667,7 @@ const DashboardAutos = () => {
               value={newVehiculo.kilometraje}
               onChange={handleChange}
               required
-              className="p-2 border rounded"
+              className={`p-2 border rounded ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
             />
             <input
               type="text"
@@ -683,7 +676,7 @@ const DashboardAutos = () => {
               value={newVehiculo.motor}
               onChange={handleChange}
               required
-              className="p-2 border rounded"
+              className={`p-2 border rounded ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
             />
             <input
               type="text"
@@ -692,7 +685,7 @@ const DashboardAutos = () => {
               value={newVehiculo.color}
               onChange={handleChange}
               required
-              className="p-2 border rounded"
+              className={`p-2 border rounded ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
             />
           </div>
           <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
@@ -701,12 +694,13 @@ const DashboardAutos = () => {
         </form>
       </Modal>
 
+      {/* Modal de Cotización */}
       <Modal isOpen={showCotizacionModal} onClose={() => setShowCotizacionModal(false)}>
-        <h4 className="text-xl font-semibold mb-4">Nueva Cotización</h4>
+        <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Nueva Cotización</h4>
         <form onSubmit={handleSubmitCotizacion}>
           {/* Selección de Servicios */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Seleccionar Servicios</label>
+            <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Seleccionar Servicios</label>
             <div className="mt-1">
               {servicios.map((servicio) => (
                 <div key={servicio.id} className="flex items-center mb-2">
@@ -716,9 +710,12 @@ const DashboardAutos = () => {
                     value={servicio.id}
                     checked={formData.catalogo_servicios.some((item) => item.id === servicio.id)}
                     onChange={(e) => handleServicioSelect(e, servicio)}
-                    className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                    className={`h-4 w-4 ${darkMode ? 'text-blue-600 border-gray-600 bg-gray-800' : 'text-blue-600 border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                   />
-                  <label htmlFor={`servicio-${servicio.id}`} className="ml-2 block text-sm text-gray-900">
+                  <label
+                    htmlFor={`servicio-${servicio.id}`}
+                    className={`ml-2 block text-sm ${darkMode ? 'text-gray-300' : 'text-gray-900'}`}
+                  >
                     {servicio.tp_servicio} - {servicio.costserv && new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(servicio.costserv)}
                   </label>
                 </div>
@@ -728,25 +725,27 @@ const DashboardAutos = () => {
 
           {/* Total de Servicios */}
           <div className="mt-4">
-            <h2 className="text-xl font-semibold">Total de Servicios: {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalServicios)}</h2>
+            <h2 className={`text-xl font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              Total de Servicios: {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(totalServicios)}
+            </h2>
           </div>
 
           {/* Vehículo */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Vehículo</label>
+            <label className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Vehículo</label>
             <select
               id="vehiculo-select"
               name="vehiculo"
               value={formData.vehiculo?.id || ""}
               onChange={handleChangeCotizacion}
-              className={`block w-full py-2 px-3 border ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+              className={`block w-full py-2 px-3 border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
               required
             >
               <option value="">Selecciona un vehículo</option>
               {vehiculos.map((vehiculo) => (
                 vehiculo && vehiculo.id && vehiculo.marca_id && vehiculo.marca_id.nombre_marca ? (
                   <option key={vehiculo.id} value={vehiculo.id}>
-                    {vehiculo.marca_id.nombre_marca} {vehiculo.modelo} - {vehiculo.patente}
+                    {vehiculo.marca_id} {vehiculo.modelo} - {vehiculo.patente}
                   </option>
                 ) : null
               ))}
@@ -754,8 +753,8 @@ const DashboardAutos = () => {
           </div>
 
           {/* Fecha de Recepción */}
-          <div className="mb=4">
-            <label htmlFor="fecharecepcion" className="block text-sm font-medium text-gray-700">
+          <div className="mb-4">
+            <label htmlFor="fecharecepcion" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Fecha de Recepción
             </label>
             <input
@@ -764,14 +763,14 @@ const DashboardAutos = () => {
               name="fecharecepcion"
               value={formData.fecharecepcion}
               onChange={handleChangeCotizacion}
-              className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700' : 'focus:ring-blue-500 focus:border-blue-500 bg-white border-gray-300'} rounded-md`}
+              className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white border-gray-600' : 'focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 border-gray-300'} rounded-md`}
               required
             />
           </div>
 
           {/* Fecha de Entrega */}
-          <div className="mb=4">
-            <label htmlFor="fechaentrega" className="block text-sm font-medium text-gray-700">
+          <div className="mb-4">
+            <label htmlFor="fechaentrega" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Fecha de Entrega
             </label>
             <input
@@ -780,14 +779,14 @@ const DashboardAutos = () => {
               name="fechaentrega"
               value={formData.fechaentrega}
               onChange={handleChangeCotizacion}
-              className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white border-gray-700' : 'focus:ring-blue-500 focus:border-blue-500 bg-white border-gray-300'} rounded-md`}
+              className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white border-gray-600' : 'focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 border-gray-300'} rounded-md`}
               required
             />
           </div>
 
           {/* Descripción */}
           <div className="mb-4">
-            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="descripcion" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Descripción
             </label>
             <textarea
@@ -796,7 +795,7 @@ const DashboardAutos = () => {
               rows={3}
               value={formData.descripcion}
               onChange={handleChangeCotizacion}
-              className="mt-1 block w-full shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300 rounded-md"
+              className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white border-gray-600' : 'focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 border-gray-300'} rounded-md`}
               placeholder="Descripción de la cotización"
               required
             />
