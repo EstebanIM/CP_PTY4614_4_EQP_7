@@ -15,6 +15,7 @@ export const login = async (email, password) => {
   }
 
   setToken(strapiResponse);
+  
 
   const { error: supabaseError } = await supabase.auth.signInWithPassword({ email, password });
   if (supabaseError) {

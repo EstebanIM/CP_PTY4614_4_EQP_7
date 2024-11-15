@@ -15,6 +15,7 @@ function OrdenDeTrabajo() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userRole, setUserRole] = useState(null);
     const [ordenTrabajo, setOrdenTrabajo] = useState([]);
+    const [mecanicoID, setMecanicoID] = useState(null);
     const navigate = useNavigate();
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
@@ -30,20 +31,53 @@ function OrdenDeTrabajo() {
                         Authorization: `Bearer ${jwt}`,
                     },
                 });
-
+    
                 setUserRole(response.role.name);
-                setOrdenTrabajo(response.mecanico.orden_trabajos_id || []);
-                console.log("User role:", response.mecanico.orden_trabajos_id);
+                if (response.mecanico) {
+                    setMecanicoID(response.mecanico.documentId);
+                } else {
+                setOrdenTrabajo(response.ots);
+                }
 
             } catch (error) {
                 console.error("Error fetching user role:", error);
             }
         }
     };
-
+    
+    const fetchOrdenesTrabajo = async () => {
+        const jwt = getTokenFromLocalCookie();
+        if (jwt && mecanicoID) {
+            try {
+                const response = await fetcher(`${STRAPI_URL}/api/mecanicos/${mecanicoID}?pLevel`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                });
+    
+                setOrdenTrabajo(response.data.orden_trabajos_id);
+                
+            } catch (error) {
+                console.error("Error fetching ordenes de trabajo:", error);
+            }
+        }
+    };
+    
     useEffect(() => {
-        fetchUser();
+        const fetchData = async () => {
+            await fetchUser();
+        };
+    
+        fetchData();
     }, []);
+    
+    useEffect(() => {
+        if (mecanicoID) {
+            fetchOrdenesTrabajo();
+        }
+    }, [mecanicoID]);
+    
 
     const handleViewOT = (ordenTrabajo) => {
         navigate(`/detalle_ot/${ordenTrabajo.documentId}`);
@@ -65,7 +99,7 @@ function OrdenDeTrabajo() {
         {
             header: "Estado",
             key: "estado",
-            render: (ordenTrabajo) => ordenTrabajo.estado || 'Estado no disponible',
+            render: (ordenTrabajo) => ordenTrabajo.estado_ot_id.nom_estado || 'Estado no disponible',
         },
         {
             header: "Costo",

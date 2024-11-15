@@ -4,7 +4,6 @@ import { Button } from "../ui/nadvar/button";
 import { Users, CarFront, File, X, List, Home } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getDarkModeFromLocalCookie } from '../../lib/cookies';
 import { DarkModeContext } from '../../context/DarkModeContext';
 
 const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
@@ -80,9 +79,11 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
         {/* Orden de Trabajo */}
         {userRole === "Mechanic" || userRole === "Admin" ? (
           <div>
+            <Link to="/orden-de-trabajo" className="w-full block">
             <Button variant="ghost" className="justify-start flex items-center">
               <File className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Orden de Trabajo
             </Button>
+            </Link>
           </div>
         ) : null}
 
