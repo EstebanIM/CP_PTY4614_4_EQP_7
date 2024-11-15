@@ -434,15 +434,14 @@ export default function WorkOrderDetails() {
                   <option value="">Seleccione Tipo</option>
                   {newEstado
                     .filter(
-                      tipo => tipo.nom_estado !== 'Aceptado' && tipo.nom_estado !== 'Rechazado' && tipo.nom_estado !== Orden?.estado_ot_id?.nom_estado &&
-                      Orden?.descripcion !== 'Nueva Cotización'
+                      tipo => tipo.nom_estado !== 'Aceptado' && tipo.nom_estado !== 'Rechazado' && tipo.nom_estado !== Orden?.estado_ot_id?.nom_estado
                     )
                     .map(tipo => (
                       <option key={tipo.id} value={tipo.id}>{tipo.nom_estado}</option>
                     ))}
                 </select>
 
-                {formData.descripcion === null && (
+                {(formData.estado === 3) && (
                   <>
                     <label htmlFor="descripcion" className="text-sm font-medium">Descripción</label>
                     <textarea
@@ -481,6 +480,7 @@ export default function WorkOrderDetails() {
               </button>
             </form>
           </Modal>
+
         </div>
       </div>
     </div>

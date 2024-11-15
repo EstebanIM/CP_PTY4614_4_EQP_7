@@ -20,6 +20,7 @@ import Detalle_servicio from './pages/admin/detalle-servicio';
 import Detalle_Orden from './pages/home/detalle_ot';
 import AsignarMecanico from './pages/admin/asignar_mecanico';
 import { DarkModeProvider } from './context/DarkModeContext';
+import OrdenDeTrabajo from './pages/mecanico/OrdenDeTrabajo';
 
 function App() {
   return (
@@ -107,6 +108,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <AsignarMecanico />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/orden-de-trabajo"
+              element={
+                <PrivateRoute>
+                  <OrdenDeTrabajo />
                 </PrivateRoute>
               }
             />

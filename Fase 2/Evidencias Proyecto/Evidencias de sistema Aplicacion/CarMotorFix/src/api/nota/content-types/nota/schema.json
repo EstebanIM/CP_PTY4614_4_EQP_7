@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notas",
+  "info": {
+    "singularName": "nota",
+    "pluralName": "notas",
+    "displayName": "nota",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "descripcion": {
+      "type": "text"
+    },
+    "mecanico": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::mecanico.mecanico",
+      "inversedBy": "notas"
+    },
+    "ot": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::orden-trabajo.orden-trabajo",
+      "inversedBy": "notas"
+    }
+  }
+}

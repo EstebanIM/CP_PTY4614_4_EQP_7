@@ -637,6 +637,7 @@ export interface ApiClasificacionOtClasificacionOt
     singularName: 'clasificacion-ot';
     pluralName: 'clasificacion-ots';
     displayName: 'Clasificacion_ot';
+    description: '';
   };
   options: {
     draftAndPublish: false;
@@ -655,7 +656,7 @@ export interface ApiClasificacionOtClasificacionOt
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 200;
       }>;
-    orden_trabajo_id: Schema.Attribute.Relation<
+    ot: Schema.Attribute.Relation<
       'oneToOne',
       'api::orden-trabajo.orden-trabajo'
     >;
@@ -778,6 +779,7 @@ export interface ApiMecanicoMecanico extends Struct.CollectionTypeSchema {
       'oneToOne',
       'plugin::users-permissions.user'
     >;
+    notas: Schema.Attribute.Relation<'oneToMany', 'api::nota.nota'>;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -790,6 +792,37 @@ export interface ApiMecanicoMecanico extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::mecanico.mecanico'
     > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiNotaNota extends Struct.CollectionTypeSchema {
+  collectionName: 'notas';
+  info: {
+    singularName: 'nota';
+    pluralName: 'notas';
+    displayName: 'nota';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    descripcion: Schema.Attribute.Text;
+    mecanico: Schema.Attribute.Relation<'manyToOne', 'api::mecanico.mecanico'>;
+    ot: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::orden-trabajo.orden-trabajo'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::nota.nota'> &
       Schema.Attribute.Private;
   };
 }
@@ -834,6 +867,11 @@ export interface ApiOrdenTrabajoOrdenTrabajo
     >;
     vehiculo: Schema.Attribute.Relation<'manyToOne', 'api::vehiculo.vehiculo'>;
     descripcion: Schema.Attribute.Text;
+    notas: Schema.Attribute.Relation<'oneToMany', 'api::nota.nota'>;
+    clasificacion_ot: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::clasificacion-ot.clasificacion-ot'
+    >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -1453,6 +1491,7 @@ declare module '@strapi/strapi' {
       'api::estado-ot.estado-ot': ApiEstadoOtEstadoOt;
       'api::marca.marca': ApiMarcaMarca;
       'api::mecanico.mecanico': ApiMecanicoMecanico;
+      'api::nota.nota': ApiNotaNota;
       'api::orden-trabajo.orden-trabajo': ApiOrdenTrabajoOrdenTrabajo;
       'api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio': ApiOrdentrabajoCatalogoservicioOrdentrabajoCatalogoservicio;
       'api::region.region': ApiRegionRegion;

@@ -70,6 +70,18 @@
     },
     "descripcion": {
       "type": "text"
+    },
+    "notas": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::nota.nota",
+      "mappedBy": "ot"
+    },
+    "clasificacion_ot": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::clasificacion-ot.clasificacion-ot",
+      "mappedBy": "ot"
     }
   }
 }
