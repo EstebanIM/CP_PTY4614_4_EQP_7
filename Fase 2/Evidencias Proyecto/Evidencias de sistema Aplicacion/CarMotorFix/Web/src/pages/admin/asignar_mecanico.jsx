@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
 import { toast } from 'react-toastify';
@@ -22,6 +22,28 @@ function AsignarMecanico() {
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
+
+    useEffect(() => {
+        const fetchUserRole = async () => {
+            const jwt = getTokenFromLocalCookie();
+            if (jwt) {
+                try {
+                    const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${jwt}`,
+                        },
+                    });
+
+                    setUserRole(response.role.name);
+                } catch (error) {
+                    console.error('Error fetching user role:', error);
+                }
+            }
+        };
+
+        fetchUserRole();
+    }, [STRAPI_URL]);
 
     const handleSearchUser = async () => {
         const jwt = getTokenFromLocalCookie();
@@ -76,7 +98,7 @@ function AsignarMecanico() {
                     console.error("Error al asignar rol:", errorData);
                     toast.error(errorData.message || "Error al asignar el rol de mecánico.");
                 } else {
-                    const updatedUser = await response.json();
+                    // const updatedUser = await response.json();
                     toast.success("Rol de mecánico asignado exitosamente.");
                     setUser({ ...user, role: { id: '3', name: 'Mecánico' } });
 

@@ -297,6 +297,11 @@ export default function WorkOrderDetails() {
     }
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
   return (
     <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
       <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
@@ -317,12 +322,12 @@ export default function WorkOrderDetails() {
                 Orden.estado_ot_id?.nom_estado !== 'Rechazado' && (
                   <div className="space-x-4">
                     <button className="px-4 py-2 bg-green-700 text-white rounded"
-                    onClick={() => actualizarEstadoOrden(Orden.documentId, 2)} // 2 para "Aceptado"
+                      onClick={() => actualizarEstadoOrden(Orden.documentId, 2)} // 2 para "Aceptado"
                     >
                       Aceptar
                     </button>
                     <button className="px-4 py-2 bg-red-700 text-white rounded"
-                    onClick={() => actualizarEstadoOrden(Orden.documentId, 4)} // 4 para "Rechazado"
+                      onClick={() => actualizarEstadoOrden(Orden.documentId, 4)} // 4 para "Rechazado"
                     >
                       Rechazar
                     </button>
@@ -404,16 +409,20 @@ export default function WorkOrderDetails() {
             )}
           </Card>
 
-          {/* <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
-            <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Actualizar Orden</h4>
+          <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
+            <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+              Actualizar Orden
+            </h4>
             <form>
               <div className="grid gap-4">
-                <label htmlFor="estado" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>Estado</label>
+                <label htmlFor="estado" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>
+                  Estado
+                </label>
                 <select
                   id="estado"
                   name="estado"
-                  value={someValue}
-                  onChange={(e) => setSomeValue(e.target.value)}
+                  value={formData.estado}
+                  onChange={handleChange}
                   required
                   className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                 >
@@ -421,29 +430,39 @@ export default function WorkOrderDetails() {
                   {newEstado
                     .filter(tipo => tipo.nom_estado !== Orden?.estado_ot_id?.nom_estado)
                     .map(tipo => (
-                      <option key={tipo.id} value={tipo.id}>{tipo.nom_estado}</option>
+                      <option key={tipo.id} value={tipo.nom_estado}>{tipo.nom_estado}</option>
                     ))}
                 </select>
-                <label htmlFor="fecha" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>Fecha</label>
-                <input
-                  type="date"
-                  id="fecha"
-                  name="fecha"
-                  value={someValue}
-                  onChange={(e) => setSomeValue(e.target.value)}
-                  required
-                  className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
-                />
 
-                {estado === 'Nueva Cotización' && (
+                {formData.estado === 'Nueva Cotización' && (
                   <>
                     <label htmlFor="descripcion" className="text-sm font-medium">Descripción</label>
                     <textarea
                       id="descripcion"
                       name="descripcion"
                       placeholder="Ingrese descripción"
-                      value={descripcion}
-                      onChange={(e) => setDescripcion(e.target.value)}
+                      value={formData.descripcion}
+                      onChange={handleChange}
+                      className="p-2 border rounded"
+                    />
+
+                    <label htmlFor="fecharecepcion" className="text-sm font-medium">Fecha de Recepción</label>
+                    <input
+                      type="date"
+                      id="fecharecepcion"
+                      name="fecharecepcion"
+                      value={formData.fecharecepcion}
+                      onChange={handleChange}
+                      className="p-2 border rounded"
+                    />
+
+                    <label htmlFor="fechaentrega" className="text-sm font-medium">Fecha de Entrega</label>
+                    <input
+                      type="date"
+                      id="fechaentrega"
+                      name="fechaentrega"
+                      value={formData.fechaentrega}
+                      onChange={handleChange}
                       className="p-2 border rounded"
                     />
                   </>
@@ -453,7 +472,8 @@ export default function WorkOrderDetails() {
                 Actualizar
               </button>
             </form>
-          </Modal> */}
+          </Modal>
+
 
         </div>
       </div>
