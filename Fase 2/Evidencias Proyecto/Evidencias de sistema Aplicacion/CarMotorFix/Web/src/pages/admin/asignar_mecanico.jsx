@@ -1,5 +1,4 @@
 import { useEffect, useState, useContext } from 'react';
-import { useState, useContext, useEffect } from 'react';
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
 import { toast } from 'react-toastify';
