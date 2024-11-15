@@ -1086,6 +1086,7 @@ export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
       'api::tp-vehiculo.tp-vehiculo'
     >;
     marca_id: Schema.Attribute.Relation<'manyToOne', 'api::marca.marca'>;
+    estado: Schema.Attribute.Boolean;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;

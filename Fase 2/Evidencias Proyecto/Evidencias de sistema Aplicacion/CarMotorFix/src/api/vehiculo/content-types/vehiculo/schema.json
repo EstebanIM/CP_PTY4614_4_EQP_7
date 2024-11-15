@@ -65,6 +65,9 @@
       "relation": "manyToOne",
       "target": "api::marca.marca",
       "inversedBy": "vehiculo_ids"
+    },
+    "estado": {
+      "type": "boolean"
     }
   }
 }
