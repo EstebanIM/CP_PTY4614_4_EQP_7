@@ -16,9 +16,9 @@
       "type": "string",
       "required": true
     },
-    "vehiculo_id": {
+    "vehiculo_ids": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::vehiculo.vehiculo",
       "mappedBy": "tp_vehiculo_id"
     }

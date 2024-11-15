@@ -4,7 +4,8 @@
   "info": {
     "singularName": "marca",
     "pluralName": "marcas",
-    "displayName": "Marca"
+    "displayName": "Marca",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -15,9 +16,9 @@
       "type": "string",
       "required": true
     },
-    "vehiculo_id": {
+    "vehiculo_ids": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::vehiculo.vehiculo",
       "mappedBy": "marca_id"
     }

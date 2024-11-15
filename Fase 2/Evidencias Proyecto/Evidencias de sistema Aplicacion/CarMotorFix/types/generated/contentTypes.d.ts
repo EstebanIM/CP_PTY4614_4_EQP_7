@@ -713,14 +713,15 @@ export interface ApiMarcaMarca extends Struct.CollectionTypeSchema {
     singularName: 'marca';
     pluralName: 'marcas';
     displayName: 'Marca';
+    description: '';
   };
   options: {
     draftAndPublish: false;
   };
   attributes: {
     nombre_marca: Schema.Attribute.String & Schema.Attribute.Required;
-    vehiculo_id: Schema.Attribute.Relation<
-      'oneToOne',
+    vehiculo_ids: Schema.Attribute.Relation<
+      'oneToMany',
       'api::vehiculo.vehiculo'
     >;
     createdAt: Schema.Attribute.DateTime;
@@ -983,8 +984,8 @@ export interface ApiTpVehiculoTpVehiculo extends Struct.CollectionTypeSchema {
   };
   attributes: {
     nom_tp_vehiculo: Schema.Attribute.String & Schema.Attribute.Required;
-    vehiculo_id: Schema.Attribute.Relation<
-      'oneToOne',
+    vehiculo_ids: Schema.Attribute.Relation<
+      'oneToMany',
       'api::vehiculo.vehiculo'
     >;
     createdAt: Schema.Attribute.DateTime;
@@ -1034,11 +1035,6 @@ export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
-    marca_id: Schema.Attribute.Relation<'oneToOne', 'api::marca.marca'>;
-    tp_vehiculo_id: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::tp-vehiculo.tp-vehiculo'
-    >;
     mecanicos: Schema.Attribute.Relation<
       'manyToMany',
       'api::mecanico.mecanico'
@@ -1047,6 +1043,11 @@ export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::orden-trabajo.orden-trabajo'
     >;
+    tp_vehiculo_id: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::tp-vehiculo.tp-vehiculo'
+    >;
+    marca_id: Schema.Attribute.Relation<'manyToOne', 'api::marca.marca'>;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;

@@ -42,18 +42,6 @@
       "target": "plugin::users-permissions.user",
       "inversedBy": "vehiculo_ids"
     },
-    "marca_id": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::marca.marca",
-      "inversedBy": "vehiculo_id"
-    },
-    "tp_vehiculo_id": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::tp-vehiculo.tp-vehiculo",
-      "inversedBy": "vehiculo_id"
-    },
     "mecanicos": {
       "type": "relation",
       "relation": "manyToMany",
@@ -65,6 +53,18 @@
       "relation": "oneToMany",
       "target": "api::orden-trabajo.orden-trabajo",
       "mappedBy": "vehiculo"
+    },
+    "tp_vehiculo_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::tp-vehiculo.tp-vehiculo",
+      "inversedBy": "vehiculo_ids"
+    },
+    "marca_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::marca.marca",
+      "inversedBy": "vehiculo_ids"
     }
   }
 }
