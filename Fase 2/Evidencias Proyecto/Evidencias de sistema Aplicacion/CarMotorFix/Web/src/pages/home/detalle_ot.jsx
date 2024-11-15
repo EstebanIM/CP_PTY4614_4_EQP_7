@@ -170,46 +170,43 @@ export default function WorkOrderDetails() {
     if (jwt) {
       try {
 
-        // setLoading(true);
-        // const vehiculoData = {
-        //   data: {
-        //     user_id: Cookies.get('id'),
-        //     marca_id: newVehiculo.marca_id,
-        //     tp_vehiculo_id: newVehiculo.tp_vehiculo_id,
-        //     modelo: newVehiculo.modelo,
-        //     patente: newVehiculo.patente,
-        //     anio: newVehiculo.anio,
-        //     kilometraje: Number(newVehiculo.kilometraje),
-        //     motor: newVehiculo.motor,
-        //     color: newVehiculo.color
-        //   }
-        // };
+        setLoading(true);
+        const EstadoData = {
+          data: Object.fromEntries(
+            Object.entries({
+              estado_ot_id: formData.estado,
+              descripcion: formData.descripcion,
+              fecharecepcion: formData.fecharecepcion,
+              fechaentrega: formData.fechaentrega
+            }).filter(
+              ([, value]) => value !== "" && value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+            )
+          )
+        };
 
-        // const response = await fetcher(`${STRAPI_URL}/api/vehiculos`, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${jwt}`,
-        //   },
-        //   body: JSON.stringify(vehiculoData),
-        // });
+        const response = await fetch(`${STRAPI_URL}/api/orden-trabajos/${Orden.documentId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(EstadoData),
+        });
 
-        // setVehiculos([...vehiculos, response.data]);
-        // setNewVehiculo({
-        //   patente: '',
-        //   anio: '',
-        //   kilometraje: '',
-        //   modelo: '',
-        //   motor: '',
-        //   color: '',
-        //   marca_id: '',
-        //   tp_vehiculo_id: ''
-        // });
-        // setShowAddVehiculoModal(false);
-        // toast.success("Vehículo agregado correctamente");
+        if (!response.ok) {
+          throw new Error(`Error al actualizar el Estado: ${response.statusText}`);
+        }
+
+        setFormData({
+          descripcion: '',
+          fecharecepcion: '',
+          fechaentrega: '',
+          catalogo_servicios: []
+        });
+
+        setshowAddEstado(false);
       } catch (error) {
-        console.error('Error adding vehicle:', error);
-        // toast.error("Error al agregar el vehículo");
+        console.error('Error adding Estado:', error);
       } finally {
         setLoading(false);
       }
@@ -355,11 +352,25 @@ export default function WorkOrderDetails() {
                   {Orden.fechainicio ? new Date(Orden.fechainicio).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Fecha no disponible'}
                 </div>
               </div>
+              <div>
+                <div className="text-sm text-muted-foreground">Valor</div>
+                <div className="font-medium">
+                  {Orden.costo !== undefined && Orden.costo !== null ? Orden.costo.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' }) : 'No disponible'}
+                </div>
+              </div>
               {Orden.fechaentrega && (
                 <div>
                   <div className="text-sm text-muted-foreground">Fecha de Entrega</div>
                   <div className="font-medium">
                     {Orden.fechaentrega ? new Date(Orden.fechaentrega).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Fecha no disponible'}
+                  </div>
+                </div>
+              )}
+              {Orden.descripcion && (
+                <div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Descripción</div>
+                    <div className="font-medium">{Orden.descripcion}</div>
                   </div>
                 </div>
               )}
@@ -371,12 +382,6 @@ export default function WorkOrderDetails() {
                   </div>
                 </div>
               )}
-              <div>
-                <div className="text-sm text-muted-foreground">Valor</div>
-                <div className="font-medium">
-                  {Orden.costo !== undefined && Orden.costo !== null ? Orden.costo.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' }) : 'No disponible'}
-                </div>
-              </div>
             </div>
 
             <div className="space-y-4">
@@ -413,7 +418,7 @@ export default function WorkOrderDetails() {
             <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
               Actualizar Orden
             </h4>
-            <form>
+            <form onSubmit={handleSubmitEstado}>
               <div className="grid gap-4">
                 <label htmlFor="estado" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>
                   Estado
@@ -428,13 +433,16 @@ export default function WorkOrderDetails() {
                 >
                   <option value="">Seleccione Tipo</option>
                   {newEstado
-                    .filter(tipo => tipo.nom_estado !== Orden?.estado_ot_id?.nom_estado)
+                    .filter(
+                      tipo => tipo.nom_estado !== 'Aceptado' && tipo.nom_estado !== 'Rechazado' && tipo.nom_estado !== Orden?.estado_ot_id?.nom_estado &&
+                      Orden?.descripcion !== 'Nueva Cotización'
+                    )
                     .map(tipo => (
-                      <option key={tipo.id} value={tipo.nom_estado}>{tipo.nom_estado}</option>
+                      <option key={tipo.id} value={tipo.id}>{tipo.nom_estado}</option>
                     ))}
                 </select>
 
-                {formData.estado === 'Nueva Cotización' && (
+                {formData.descripcion === null && (
                   <>
                     <label htmlFor="descripcion" className="text-sm font-medium">Descripción</label>
                     <textarea
@@ -473,8 +481,6 @@ export default function WorkOrderDetails() {
               </button>
             </form>
           </Modal>
-
-
         </div>
       </div>
     </div>

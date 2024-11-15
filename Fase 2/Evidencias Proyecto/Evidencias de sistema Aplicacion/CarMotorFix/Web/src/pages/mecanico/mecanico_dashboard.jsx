@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
 import { Table } from "../../components/ui/tables/table";
@@ -82,6 +82,7 @@ const DashboardAutos = () => {
         const vehiculosUnicos = new Set(Vehiculos.map(vehiculo => vehiculo.id));
         setTotalVehiculos(vehiculosUnicos.size);
         setVehiculos(Vehiculos);
+        
 
       } catch (error) {
         console.error('Error fetching IDMecanico:', error);
