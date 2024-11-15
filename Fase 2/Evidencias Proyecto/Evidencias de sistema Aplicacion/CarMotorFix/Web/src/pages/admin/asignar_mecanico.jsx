@@ -139,7 +139,7 @@ function AsignarMecanico() {
                         />
                         <Button
                             onClick={handleSearchUser}
-                            className={`w-1/8 mt-4 py-2 px-4 rounded-lg transition ${loading ? 'cursor-not-allowed bg-gray-500' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}
+                            className={`w-1/8 mt-4 py-2 px-4 rounded-lg transition ${loading ? 'cursor-not-allowed bg-gray-500' : 'bg-gray-700 hover:bg-gray-700'} text-white font-semibold`}
                             disabled={loading}
                         >
                             {loading ? 'Buscando...' : 'Buscar Usuario'}

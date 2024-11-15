@@ -19,9 +19,8 @@ export const InputField = ({ id, label, type, value, onChange, placeholder, requ
         onChange={onChange}
         placeholder={placeholder}
         required={required}
-        className={`mt-1 block w-full rounded-md border ${
-          darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'
-        } focus:ring-indigo-500 focus:border-indigo-500`}
+        className={`mt-1 block w-full rounded-md border ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300 text-gray-900'
+          } focus:ring-indigo-500 focus:border-indigo-500`}
       />
     </div>
   );

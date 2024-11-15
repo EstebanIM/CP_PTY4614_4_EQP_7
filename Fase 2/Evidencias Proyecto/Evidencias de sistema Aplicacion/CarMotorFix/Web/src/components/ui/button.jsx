@@ -15,10 +15,10 @@ export function Button({ children, variant = "default", className = "", ...props
       ? "bg-gray-800 text-white hover:bg-gray-700 focus:ring-gray-800" // Modo oscuro
       : "bg-black text-white hover:bg-gray-400 focus:ring-black",       // Modo claro
     link: darkMode
-      ? "text-white hover:underline"                                      // Modo oscuro
+      ? "text-black hover:underline"                                      // Modo oscuro
       : "text-black hover:underline",                                     // Modo claro
     outline: darkMode
-      ? "border border-white text-white hover:bg-gray-700 focus:ring-white" // Modo oscuro
+      ? "border bg-black border-gray-700 text-white hover:bg-gray-900 focus:ring-gray" // Modo oscuro
       : "border border-black text-black hover:bg-gray-100 focus:ring-black", // Modo claro
   };
 

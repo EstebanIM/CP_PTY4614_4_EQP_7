@@ -158,8 +158,8 @@ function DetalleServicio() {
                                     <Button
                                         onClick={handleEditClick}
                                         className={`px-6 py-2 font-semibold rounded-lg shadow ${darkMode
-                                            ? 'bg-blue-600 text-white hover:bg-blue-500'
-                                            : 'bg-blue-500 text-white hover:bg-blue-600'
+                                            ? 'bg-blue-600 text-white hover:bg-gray-900'
+                                            : 'bg-blue-500 text-white hover:bg-gray-800'
                                             } transition duration-300`}
                                     >
                                         Modificar

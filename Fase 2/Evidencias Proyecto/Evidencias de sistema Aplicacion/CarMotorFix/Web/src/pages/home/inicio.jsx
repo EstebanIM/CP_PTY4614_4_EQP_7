@@ -39,7 +39,7 @@ export default function Inicio() {
   }, []);
 
   return (
-    <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       {/* Sidebar */}
       <DashboardSidebar
         sidebarOpen={sidebarOpen}

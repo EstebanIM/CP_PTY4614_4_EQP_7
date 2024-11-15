@@ -8,7 +8,6 @@ import Admin_dashboard from "../admin/admin_dashboard";
 
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
-// Eliminado: import { getDarkModeFromLocalCookie } from '../../lib/cookies';
 import { DarkModeContext } from '../../context/DarkModeContext';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
@@ -72,21 +71,26 @@ export default function MisVehiculos() {
     };
 
     return (
-        <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+        <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
             {/* Sidebar */}
-            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
+            <div className="fixed inset-y-0 left-0 w-64 z-20">
+                <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
+            </div>
 
             {/* Main content area */}
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col ml-64">
                 {/* Header */}
-                <DashboardHeader toggleSidebar={toggleSidebar} />
+                <div className="fixed top-0 left-64 right-0 z-10 bg-white dark:bg-gray-900">
+                    <DashboardHeader toggleSidebar={toggleSidebar} />
+                </div>
 
                 {/* Main content */}
-                <div className="container mx-auto p-4">
+                <div className="flex-1 overflow-y-auto mt-16 p-4">
                     {/* Contenido del cliente modular */}
                     {renderComponentByRole(userRole)}
                 </div>
             </div>
         </div>
     );
+
 }

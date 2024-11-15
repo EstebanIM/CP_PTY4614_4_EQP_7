@@ -9,6 +9,7 @@ import { fetcher } from "../../lib/strApi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { DarkModeContext } from '../../context/DarkModeContext'; // Importar el contexto
+import { Button } from "../../components/ui/config/button";
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -535,12 +536,12 @@ const DashboardAutos = () => {
         <motion.div initial="hidden" animate="visible" variants={cardVariants} className="mb-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold mb-4">Autos Registrados</h2>
-            <button
+            <Button
               onClick={() => setShowVehiculoModal(true)}
               className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
             >
               Registrar Auto
-            </button>
+            </Button>
           </div>
           <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <CardContent className="overflow-x-auto">
@@ -574,12 +575,12 @@ const DashboardAutos = () => {
           <motion.div initial="hidden" animate="visible" variants={cardVariants}>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Cotizaciones Pendientes</h2>
-              <button
+              <Button
                 onClick={() => setShowCotizacionModal(true)}
                 className="px-4 py-2 bg-black text-white rounded hover:bg-gray-700"
               >
                 Nueva Cotización
-              </button>
+              </Button>
             </div>
             <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <CardContent className="overflow-x-auto">
@@ -688,9 +689,9 @@ const DashboardAutos = () => {
               className={`p-2 border rounded ${darkMode ? 'border-gray-700 bg-gray-800 text-white' : 'border-gray-300 bg-white'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
             />
           </div>
-          <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+          <Button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
             Agregar Vehículo
-          </button>
+          </Button>
         </form>
       </Modal>
 
@@ -801,12 +802,12 @@ const DashboardAutos = () => {
             />
           </div>
 
-          <button
+          <Button
             type="submit"
             className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Agregar Cotización
-          </button>
+          </Button>
         </form>
       </Modal>
 

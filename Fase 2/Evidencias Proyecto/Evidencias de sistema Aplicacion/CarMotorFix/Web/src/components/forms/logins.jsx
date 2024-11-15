@@ -1,30 +1,40 @@
 import PropTypes from 'prop-types';
-import { InputField } from './InputField';
 import { Button } from '../ui/button';
 
 export const LoginForm = ({ email, setEmail, password, setPassword, handleSubmit }) => {
-
   return (
     <>
-      <InputField
-        id="email"
-        label="Correo Electrónico"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <InputField
-        id="password"
-        label="Contraseña"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
+      <div className="mb-4">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          Correo Electrónico
+        </label>
+        <input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="p-1 focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full rounded-md border bg-white border-gray-300 text-gray-900"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          Contraseña
+        </label>
+        <input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="p-1 focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full rounded-md border bg-white border-gray-300 text-gray-900"
+        />
+      </div>
+
       <Button
         type="submit"
-        className="w-full mt-4" 
+        className="w-full mt-4"
         onClick={handleSubmit}
       >
         Iniciar Sesión

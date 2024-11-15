@@ -185,7 +185,7 @@ function DetalleVehiculo() {
                                 <p><strong>Motor:</strong> {vehiculo.motor}</p>
                                 <p><strong>Kilometraje:</strong> {vehiculo.kilometraje}</p>
                                 <div className="col-span-full flex justify-start">
-                                    <Button onClick={handleEditClick} variant="default" size="md">Modificar</Button>
+                                    <Button onClick={handleEditClick} className="bg-gray-800" variant="outline" size="md">Modificar</Button>
                                 </div>
                             </div>
                         ) : (
