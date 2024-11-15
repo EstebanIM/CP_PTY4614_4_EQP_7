@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import PropTypes from 'prop-types';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { DarkModeContext } from '../context/DarkModeContext';
 
 const Tablas = ({ servicio, handleViewTabla, columns }) => {
