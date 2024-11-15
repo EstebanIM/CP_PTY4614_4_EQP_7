@@ -8,8 +8,10 @@ import { Button } from '../../components/ui/button';
 import { Table } from "../../components/ui/tables/table";
 import Tablas from "../../components/Tablas";
 import LoadingComponent from '../../components/animation/loading';
-import { getDarkModeFromLocalCookie } from '../../lib/cookies'; 
-import Modal  from "../../components/forms/modal";
+import { getDarkModeFromLocalCookie } from '../../lib/cookies';
+import Modal from "../../components/forms/modal";
+import 'react-toastify/dist/ReactToastify.css';
+
 function DetalleVehiculo() {
     const { id } = useParams();
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -19,6 +21,10 @@ function DetalleVehiculo() {
     const [editData, setEditData] = useState({});
     const [ots, setOts] = useState([]);
     const navigate = useNavigate();
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+    const [searchRun, setSearchRun] = useState('');
+    const [searchResult, setSearchResult] = useState(null);
 
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -124,6 +130,95 @@ function DetalleVehiculo() {
         }
     };
 
+
+
+    const handleDisableVehicle = async () => {
+        const jwt = getTokenFromLocalCookie();
+        try {
+            const response = await fetch(`${STRAPI_URL}/api/vehiculos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${jwt}`,
+                },
+                body: JSON.stringify({ data: { disabled: true } }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error al deshabilitar el vehículo:', errorData);
+                return;
+            }
+
+            await fetchVehiculo();
+            alert('Vehículo deshabilitado exitosamente.');
+        } catch (error) {
+            console.error('Error al deshabilitar el vehículo:', error);
+        }
+    };
+
+    const handleSearchUser = async () => {
+        const jwt = getTokenFromLocalCookie();
+        try {
+            const response = await fetcher(`${STRAPI_URL}/api/users?filters[run][$eq]=${searchRun}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${jwt}`,
+                },
+            });
+
+            if (response && response.length > 0) {
+                setSearchResult(response[0]);
+            } else {
+                setSearchResult(null);
+                alert('Usuario no encontrado.');
+            }
+        } catch (error) {
+            console.error("Error al buscar usuario:", error);
+        }
+    };
+
+    const handleTransferVehicle = () => {
+        setIsTransferModalOpen(true);
+    };
+
+    const handleConfirmTransferClick = () => {
+        if (!searchResult) {
+            toast.error('No hay un usuario seleccionado para transferir el vehículo.');
+            return;
+        }
+        setIsConfirmModalOpen(true);
+    };
+
+    const confirmTransfer = async () => {
+        const jwt = getTokenFromLocalCookie();
+        try {
+            const response = await fetch(`${STRAPI_URL}/api/vehiculos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${jwt}`,
+                },
+                body: JSON.stringify({ data: { user_id: searchResult.id } }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error al transferir el vehículo:', errorData);
+                toast.error('Error al transferir el vehículo.');
+                return;
+            }
+
+            await fetchVehiculo();
+            setIsTransferModalOpen(false);
+            setIsConfirmModalOpen(false);
+            toast.success('Vehículo transferido exitosamente.');
+        } catch (error) {
+            console.error('Error al transferir el vehículo:', error);
+            toast.error('Error al transferir el vehículo.');
+        }
+    };
+
     const handleViewOT = (id) => {
         console.log("Ver OT:", id);
     };
@@ -171,11 +266,11 @@ function DetalleVehiculo() {
 
                 <div className={`p-4 sm:p-6 flex flex-col ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                     <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-                        <Button onClick={handleBack} variant="default" size="md">Volver</Button>
+                        <Button className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-800'}`} onClick={handleBack} variant="default" size="md">Volver</Button>
                         <h1 className="text-2xl sm:text-4xl font-bold text-center sm:w-full">{vehiculo.modelo}</h1>
                     </div>
 
-                    <div className={`rounded-lg shadow-md p-4 sm:p-6 mb-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                    <div className={`rounded-lg shadow-md p-4 sm:p-6 mb-6 ${darkMode ? 'bg-gray-500' : 'bg-white'}`}>
                         {!isEditing ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-4">
                                 <p><strong>Marca:</strong> {vehiculo.marca_id?.nombre_marca || 'Sin marca'}</p>
@@ -184,35 +279,60 @@ function DetalleVehiculo() {
                                 <p><strong>Color:</strong> {vehiculo.color}</p>
                                 <p><strong>Motor:</strong> {vehiculo.motor}</p>
                                 <p><strong>Kilometraje:</strong> {vehiculo.kilometraje}</p>
-                                <div className="col-span-full flex justify-start">
-                                    <Button onClick={handleEditClick} className="bg-gray-800" variant="outline" size="md">Modificar</Button>
+                                <div className="col-span-full flex justify-between items-center">
+                                    <div className="flex space-x-2">
+                                        <Button
+                                            onClick={handleEditClick}
+                                            className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-800'}`}
+                                            variant="default"
+                                            size="md"
+                                        >
+                                            Modificar
+                                        </Button>
+                                        <Button
+                                            onClick={handleTransferVehicle}
+                                            className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-800'}`}
+                                            variant="default"
+                                            size="md"
+                                        >
+                                            Transferir Vehículo
+                                        </Button>
+                                    </div>
+                                    <Button
+                                        onClick={handleDisableVehicle}
+                                        className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-800'}`}
+                                        variant="default"
+                                        size="md"
+                                    >
+                                        Deshabilitar Vehículo
+                                    </Button>
                                 </div>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm mb-4">
                                 <div>
                                     <label><strong>Kilometraje:</strong></label>
-                                    <p className="w-full p-2 border rounded bg-gray-100">{editData.kilometraje}</p>
+                                    <p className={`w-full p-2 border rounded bg-gray-100 ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100'}`}>{editData.kilometraje}</p>
                                 </div>
                                 <div>
                                     <label><strong>Marca:</strong></label>
-                                    <p className="w-full p-2 border rounded bg-gray-100">{editData.marca_id?.nombre_marca || 'Sin marca'}</p>
+                                    <p className={`w-full p-2 border rounded bg-gray-100 ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100'}`}>{editData.marca_id?.nombre_marca || 'Sin marca'}</p>
                                 </div>
                                 <div>
                                     <label><strong>Patente:</strong></label>
-                                    <p className="w-full p-2 border rounded bg-gray-100">{editData.patente}</p>
+                                    <p className={`w-full p-2 border rounded bg-gray-100 ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100'}`}>{editData.patente}</p>
                                 </div>
                                 <div>
                                     <label><strong>Modelo:</strong></label>
-                                    <p className="w-full p-2 border rounded bg-gray-100">{editData.modelo}</p>
+                                    <p className={`w-full p-2 border rounded bg-gray-100 ${darkMode ? 'bg-gray-700 text-white' : 'bg-gray-100'}`}>{editData.modelo}</p>
                                 </div>
                                 <div>
                                     <label><strong>Color:</strong></label>
-                                    <input type="text" name="color" value={editData.color} onChange={handleInputChange} className="w-full p-2 border rounded" />
+                                    <input type="text" name="color" value={editData.color} onChange={handleInputChange} className={`w-full p-2 border rounded ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100'}`} />
                                 </div>
                                 <div>
                                     <label><strong>Motor:</strong></label>
-                                    <input type="text" name="motor" value={editData.motor} onChange={handleInputChange} className="w-full p-2 border rounded" />
+                                    <input type="text" name="motor" value={editData.motor} onChange={handleInputChange} className={`w-full p-2 border rounded ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100'}`} />
                                 </div>
                                 <div className="col-span-full flex justify-start">
                                     <Button onClick={handleSave} variant="default" size="md">Guardar</Button>
@@ -224,7 +344,7 @@ function DetalleVehiculo() {
                     <div className={`rounded-lg shadow-md p-4 sm:p-6 overflow-x-auto ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                         <h3 className="text-lg sm:text-xl font-semibold mb-4">Historial de Mantenimiento</h3>
                         <Table className="min-w-full">
-                        {ots.length === 0 ? (
+                            {ots.length === 0 ? (
                                 <div className="text-center text-gray-500 mt-4">
                                     <h4 className="text-xl">No hay historial sobre este vehiculo.</h4>
                                 </div>
@@ -236,6 +356,44 @@ function DetalleVehiculo() {
                         </Table>
                     </div>
                 </div>
+
+                {isTransferModalOpen && (
+                    <Modal isOpen={isTransferModalOpen} onClose={() => setIsTransferModalOpen(false)}>
+                        <div className="p-4">
+                            <h2 className="text-xl font-semibold mb-4">Transferir Vehículo</h2>
+                            <div className="mb-4">
+                                <label className="block mb-2">Busca al usuario al que quieres tranferir el vehiculo:</label>
+                                <input
+                                    type="text"
+                                    value={searchRun}
+                                    onChange={(e) => setSearchRun(e.target.value)}
+                                    className={`w-full p-2 border rounded ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100'}`}
+                                />
+                                <Button onClick={handleSearchUser} variant="default" size="md" className={`mt-2 p-2 rounded ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-600'}`}>Buscar</Button>
+                            </div>
+                            {searchResult && (
+                                <div className="mb-4">
+                                    <p><strong>Nombre:</strong> {searchResult.username}</p>
+                                    <p><strong>Email:</strong> {searchResult.email}</p>
+                                    <Button onClick={handleConfirmTransferClick} variant="default" size="md" className={`mt-2 p-2 rounded ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-600'}`}>Transferir Vehículo</Button>
+                                </div>
+                            )}
+                        </div>
+                    </Modal>
+                )}
+
+                {isConfirmModalOpen && (
+                    <Modal isOpen={isConfirmModalOpen} onClose={() => setIsConfirmModalOpen(false)}>
+                        <div className="p-4">
+                            <h2 className="text-xl font-semibold mb-4">Confirmar Transferencia</h2>
+                            <p>¿Estás seguro de que deseas transferir el vehículo a {searchResult.username}?</p>
+                            <div className="flex space-x-4 mt-4">
+                                <Button onClick={confirmTransfer} variant="default" size="md" className={`p-2 rounded ${darkMode ? 'bg-green-600 text-white' : 'bg-green-500'}`}>Sí</Button>
+                                <Button onClick={() => setIsConfirmModalOpen(false)} variant="default" size="md" className={`p-2 rounded ${darkMode ? 'bg-red-600 text-white' : 'bg-red-500'}`}>No</Button>
+                            </div>
+                        </div>
+                    </Modal>
+                )}
             </div>
         </div>
     );
