@@ -153,7 +153,7 @@ function Servicios() {
     };
 
     return (
-        <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+        <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
             <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} darkMode={darkMode} />
             <div className="flex-1 flex flex-col">
                 <DashboardHeader toggleSidebar={toggleSidebar} darkMode={darkMode} />
@@ -161,8 +161,8 @@ function Servicios() {
                     <h1 className={`text-2xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>Servicios Disponibles</h1>
                     <div className={`rounded-lg border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-card text-card-foreground border-gray-200'} shadow-sm p-6 w-full`}>
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-2xl font-semibold leading-none tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>Lista de Servicios</h3>
-                            <Button onClick={() => setIsModalOpen(true)}>
+                            <h3 className={`text-2xl font-semibold leading-none tracking-tight ${darkMode ? 'text-white ' : 'text-gray-900'}`}>Lista de Servicios</h3>
+                            <Button onClick={() => setIsModalOpen(true)} className={`${darkMode ? 'bg-blue-700 text-white hover:bg-gray-600' : 'bg-gray-800 text-white hover:bg-gray-700'} transition duration-300`}>
                                 Agregar Servicio
                             </Button>
                         </div>

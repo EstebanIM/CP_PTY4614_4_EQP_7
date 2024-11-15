@@ -138,7 +138,7 @@ function AsignarMecanico() {
     };
 
     return (
-        <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+        <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
             <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} darkMode={darkMode} />
             <div className="flex-1 flex flex-col">
                 <DashboardHeader toggleSidebar={toggleSidebar} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
@@ -161,7 +161,9 @@ function AsignarMecanico() {
                         />
                         <Button
                             onClick={handleSearchUser}
-                            className={`w-1/8 mt-4 py-2 px-4 rounded-lg transition ${loading ? 'cursor-not-allowed bg-gray-500' : 'bg-gray-700 hover:bg-gray-700'} text-white font-semibold`}
+                            className={`w-1/8 mt-4 py-2 px-4 rounded-lg transition ${loading ? 'cursor-not-allowed bg-gray-500' : 'bg-gray-700 hover:bg-gray-700'} ${darkMode
+                                ? 'bg-blue-700 text-white hover:bg-gray-800'
+                                : 'bg-gray-800 text-white hover:bg-gray-700'} text-white font-semibold`}
                             disabled={loading}
                         >
                             {loading ? 'Buscando...' : 'Buscar Usuario'}

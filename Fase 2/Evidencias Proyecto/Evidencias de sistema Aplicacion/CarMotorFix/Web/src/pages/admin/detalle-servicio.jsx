@@ -122,16 +122,16 @@ function DetalleServicio() {
     if (!servicio) return <LoadingComponent />;
 
     return (
-        <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+        <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
             <ToastContainer />
             <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} darkMode={darkMode} />
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col ">
                 <DashboardHeader toggleSidebar={toggleSidebar} darkMode={darkMode} />
-                <div className={`p-8 flex flex-col items-start ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'} mt-4`}>
+                <div className={`p-8 mx-6 my-6 flex flex-col items-start ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'} mt-4`}>
                     <Button
                         onClick={() => navigate(-1)}
                         className={`mb-4 px-4 py-2 font-semibold rounded-lg shadow ${darkMode
-                            ? 'bg-gray-700 text-white hover:bg-gray-600'
+                            ? 'bg-blue-700 text-white hover:bg-gray-600'
                             : 'bg-gray-800 text-white hover:bg-gray-700'
                             } transition duration-300`}
                     >
