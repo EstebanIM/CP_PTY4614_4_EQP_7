@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
 import { toast } from 'react-toastify';
@@ -15,13 +15,34 @@ function AsignarMecanico() {
     const [assigning, setAssigning] = useState(false);
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [userRole, setUserRole] = useState("Admin");
+    const [userRole, setUserRole] = useState(null);
 
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
+
+    const fetchUserRole = async () => {
+        const jwt = getTokenFromLocalCookie();
+        if (jwt) {
+            try {
+                const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                });
+                setUserRole(response.role.name);
+            } catch (error) {
+                console.error("Error fetching user role:", error);
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchUserRole();
+    },);
 
     const handleSearchUser = async () => {
         const jwt = getTokenFromLocalCookie();
