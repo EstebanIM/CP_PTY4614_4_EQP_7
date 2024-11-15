@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import { DarkModeContext } from '../../context/DarkModeContext';
 
 const Spinner = ({ size = "medium" }) => {
+  const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
   const sizeClasses = {
     small: "w-4 h-4",
     medium: "w-6 h-6",

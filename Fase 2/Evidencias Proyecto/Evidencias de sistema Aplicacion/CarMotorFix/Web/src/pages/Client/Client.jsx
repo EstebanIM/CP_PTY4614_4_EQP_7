@@ -80,8 +80,8 @@ function Client() {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${jwt}`,
             },
+            
           });
-
           const vehiculoIds = response.vehiculo_ids || [];
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
           const OT = response.ots || [];
@@ -552,8 +552,8 @@ function Client() {
                   <option value="">Selecciona un vehículo</option>
                   {vehiculos.map((vehiculo) => (
                     <option key={vehiculo.id} value={vehiculo.id}>
-                      {vehiculo.marca_id.nombre_marca} {vehiculo.modelo} - {formatPatente(vehiculo.patente)}
-                    </option>
+                      {vehiculo.marca_id ? vehiculo.marca_id.nombre_marca : 'Marca desconocida'} {vehiculo.modelo} - {formatPatente(vehiculo.patente)}
+                      </option>
                   ))}
                 </select>
               </div>

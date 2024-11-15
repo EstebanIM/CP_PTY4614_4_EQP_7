@@ -73,24 +73,19 @@ export default function MisVehiculos() {
     return (
         <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
             {/* Sidebar */}
-            <div className="fixed inset-y-0 left-0 w-64 z-20">
-                <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
-            </div>
+            <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
 
             {/* Main content area */}
-            <div className="flex-1 flex flex-col ml-64">
+            <div className="flex-1 flex flex-col">
                 {/* Header */}
-                <div className="fixed top-0 left-64 right-0 z-10 bg-white dark:bg-gray-900">
-                    <DashboardHeader toggleSidebar={toggleSidebar} />
-                </div>
+                <DashboardHeader toggleSidebar={toggleSidebar} />
 
                 {/* Main content */}
-                <div className="flex-1 overflow-y-auto mt-16 p-4">
+                <div className="container mx-auto p-4">
                     {/* Contenido del cliente modular */}
                     {renderComponentByRole(userRole)}
                 </div>
             </div>
         </div>
     );
-
 }

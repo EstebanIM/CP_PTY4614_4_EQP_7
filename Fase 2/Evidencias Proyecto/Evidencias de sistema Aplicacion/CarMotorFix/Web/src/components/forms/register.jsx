@@ -1,9 +1,7 @@
 import PropTypes from 'prop-types';
-import { InputField } from './InputField';
 import { Button } from '../ui/button';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import { DarkModeContext } from '../../context/DarkModeContext';
 
 export const RegisterForm = ({
   email,
@@ -20,7 +18,6 @@ export const RegisterForm = ({
   handleRutChange,
   passwordStrength,
 }) => {
-  const { darkMode } = useContext(DarkModeContext);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -34,95 +31,132 @@ export const RegisterForm = ({
 
   return (
     <>
-      <InputField
-        id="name"
-        label="Nombre"
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
-      <InputField
-        id="surname"
-        label="Apellido"
-        type="text"
-        value={surname}
-        onChange={(e) => setSurname(e.target.value)}
-        required
-      />
-      <InputField
-        id="rut"
-        label="RUT"
-        type="text"
-        value={rut}
-        onChange={handleRutChange}
-        placeholder="12345678-9"
-        required
-      />
-      <InputField
-        id="email"
-        label="Correo Electrónico"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <div className="relative">
-        <InputField
-          id="password"
-          label="Contraseña"
-          type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+      {/* Nombre */}
+      <div className="mb-4">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+          Nombre
+        </label>
+        <input
+          id="name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           required
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
-        <button
-          type="button"
-          onClick={togglePasswordVisibility}
-          className={`absolute inset-y-0 right-0 flex items-center pr-3 ${
-            darkMode ? 'text-white' : 'text-gray-500'
-          } focus:outline-none`}
-          aria-label="Toggle password visibility"
-        >
-          {showPassword ? <EyeOff /> : <Eye />}
-        </button>
       </div>
 
-      <div className="mt-4">
-        <div className={`h-2 rounded ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
+      {/* Apellido */}
+      <div className="mb-4">
+        <label htmlFor="surname" className="block text-sm font-medium text-gray-700">
+          Apellido
+        </label>
+        <input
+          id="surname"
+          type="text"
+          value={surname}
+          onChange={(e) => setSurname(e.target.value)}
+          required
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      {/* RUT */}
+      <div className="mb-4">
+        <label htmlFor="rut" className="block text-sm font-medium text-gray-700">
+          RUT
+        </label>
+        <input
+          id="rut"
+          type="text"
+          value={rut}
+          onChange={handleRutChange}
+          placeholder="12345678-9"
+          required
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      {/* Correo Electrónico */}
+      <div className="mb-4">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          Correo Electrónico
+        </label>
+        <input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      {/* Contraseña */}
+      <div className="mb-4">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          Contraseña
+        </label>
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="mt-1 block w-full p-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
+            aria-label="Toggle password visibility"
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Barra de Fortalecimiento de Contraseña */}
+      <div className="mt-2 mb-4">
+        <div className="h-2 rounded bg-gray-200">
           <div
-            className={`h-full rounded transition-all ${
-              passwordStrength >= 3 ? 'bg-green-500' : 'bg-red-500'
-            }`}
+            className={`h-full rounded transition-all ${passwordStrength >= 3 ? 'bg-green-500' : 'bg-red-500'
+              }`}
             style={{ width: `${(passwordStrength / 5) * 100}%` }}
           ></div>
         </div>
       </div>
 
-      <div className="relative">
-        <InputField
-          id="confirmPassword"
-          label="Repetir Contraseña"
-          type={showConfirmPassword ? 'text' : 'password'}
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          required
-        />
-        <button
-          type="button"
-          onClick={toggleConfirmPasswordVisibility}
-          className={`absolute inset-y-0 right-0 flex items-center pr-3 ${
-            darkMode ? 'text-white' : 'text-gray-500'
-          } focus:outline-none`}
-          aria-label="Toggle confirm password visibility"
-        >
-          {showConfirmPassword ? <EyeOff /> : <Eye />}
-        </button>
+      {/* Repetir Contraseña */}
+      <div className="mb-4">
+        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+          Repetir Contraseña
+        </label>
+        <div className="relative">
+          <input
+            id="confirmPassword"
+            type={showConfirmPassword ? 'text' : 'password'}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            className="mt-1 block w-full p-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+          <button
+            type="button"
+            onClick={toggleConfirmPasswordVisibility}
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 focus:outline-none"
+            aria-label="Toggle confirm password visibility"
+          >
+            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
       </div>
 
+      {/* Botón de Registro */}
       <Button
         type="submit"
-        className={`w-full mt-4 ${darkMode ? 'bg-gray-700 text-white' : 'bg-indigo-600 text-white'} hover:bg-indigo-700`}
+        className="w-full mt-4 bg-indigo-600 text-white hover:bg-indigo-700"
       >
         Registrarse
       </Button>
