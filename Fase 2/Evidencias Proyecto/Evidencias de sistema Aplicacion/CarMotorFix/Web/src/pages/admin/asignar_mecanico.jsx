@@ -151,7 +151,7 @@ if (userRole !== 'Admin') {
         </div>
     );
     
-}else{
+} else {
     return (
         <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
             <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} darkMode={darkMode} />

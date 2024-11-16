@@ -24,13 +24,27 @@ export default function WorkOrderDetails() {
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
   const [showAddEstado, setshowAddEstado] = useState(false);
+  const [showNota, setshowNota] = useState(false);
   const [newEstado, setNewEstado] = useState([]);
+  const [notas, setNotas] = useState([]);
+  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
+  const [showAddValorizar, setshowAddValorizar] = useState(false);
+  const [showupdateValorizar, setshowupdateValorizar] = useState(false);
 
   const [formData, setFormData] = useState({
     descripcion: '',
     fecharecepcion: '',
     fechaentrega: '',
     catalogo_servicios: []
+  });
+
+  const [formNota, setFormNota] = useState({
+    descripcion: ''
+  });
+
+  const [formValorizar, setFormValorizar] = useState({
+    descripcion: '',
+    puntuacion: ''
   });
 
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
@@ -48,7 +62,18 @@ export default function WorkOrderDetails() {
         });
 
         setOrden(response.data);
-        console.log(response.data);
+        // console.log(response.data);
+
+        const ViewNotas = response.data.notas.map((nota) => {
+          return {
+            id: nota.id,
+            descripcion: nota.descripcion,
+            mecanico: nota.mecanico.prim_nom + ' ' + nota.mecanico.prim_apell,
+            fecha: new Date(nota.createdAt).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+          };
+        });
+
+        setNotas(ViewNotas);
 
         setVehiculoID(response.data.vehiculo.documentId);
       } catch (error) {
@@ -89,9 +114,6 @@ export default function WorkOrderDetails() {
 
           setVehiculo(response.data);
 
-          // console.log(response.data);
-
-
         } catch (error) {
           console.error('Error fetching vehicle:', error);
         }
@@ -111,6 +133,7 @@ export default function WorkOrderDetails() {
         });
 
         setNewEstado(response.data || []);
+
 
       } catch (error) {
         console.error('Error fetching order states:', error);
@@ -236,7 +259,7 @@ export default function WorkOrderDetails() {
       }
 
       const data = await response.json();
-      console.log('Orden actualizada exitosamente:', data);
+      // console.log('Orden actualizada exitosamente:', data);
 
       const clienteEmail = Orden.user.email;
       const mecanicoEmail = Orden.mecanico_id.correo;
@@ -294,18 +317,160 @@ export default function WorkOrderDetails() {
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e, formType = 'formData') => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (formType === 'formData') {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    } else if (formType === 'formNota') {
+      setFormNota(prev => ({ ...prev, [name]: value }));
+    } else if (formType === 'formValorizar') {
+      setFormValorizar(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleSubmitNota = async (e) => {
+    e.preventDefault();
+
+    const jwt = getTokenFromLocalCookie();
+    if (jwt) {
+      try {
+
+        setLoading(true);
+        const updateNota = {
+          data: {
+            descripcion: formNota.descripcion,
+            mecanico: Orden.mecanico_id.id,
+            ot: Orden.id
+          },
+        };
+
+        const response = await fetch(`${STRAPI_URL}/api/notas`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(updateNota),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error al agregar nota: ${response.statusText}`);
+        }
+
+        setFormNota({
+          descripcion: ''
+        });
+
+        setshowNota(false);
+      } catch (error) {
+        console.error('Error al agregar nota:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleValorizar = async (e) => {
+    e.preventDefault();
+
+    const jwt = getTokenFromLocalCookie();
+    if (jwt) {
+      try {
+
+        setLoading(true);
+        const updateValorizar = {
+          data: {
+            descripcion: formValorizar.descripcion,
+            puntuacion: formValorizar.puntuacion,
+            ot: Orden.id
+          },
+        };
+
+        const response = await fetch(`${STRAPI_URL}/api/clasificacion-ots`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(updateValorizar),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error al agregar Valorizacion: ${response.statusText}`);
+        }
+
+        setFormValorizar({
+          descripcion: '',
+          puntuacion: ''
+        });
+
+        setshowAddValorizar(false);
+      } catch (error) {
+        console.error('Error al agregar Valorizacion:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+  };
+
+  const handleModificarValorizar = async (e) => {
+    e.preventDefault();
+    const jwt = getTokenFromLocalCookie();
+    if (jwt) {
+      try {
+
+        setLoading(true);
+        const updateValorizar = {
+          data: {
+            descripcion: formValorizar.descripcion,
+            puntuacion: formValorizar.puntuacion
+          },
+        };
+
+        const response = await fetch(`${STRAPI_URL}/api/clasificacion-ots/${Orden.clasificacion_ot.documentId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(updateValorizar),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error al Actualizar Valorizacion: ${response.statusText}`);
+        }
+
+        setFormValorizar({
+          descripcion: '',
+          puntuacion: ''
+        });
+
+        setshowupdateValorizar(false);
+      } catch (error) {
+        console.error('Error al Actualizar Valorizacion:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+  };
+
+  const handleBoleta = async () => {
+
   };
 
   return (
-    <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
-      <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
+    <div id="element-to-print" className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+      <div className="print:hidden">
+        <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
+      </div>
       <div className="flex-1 flex flex-col">
-        <DashboardHeader toggleSidebar={toggleSidebar} />
+        <div className="print:hidden">
+          <DashboardHeader toggleSidebar={toggleSidebar} />
+        </div>
         <div className="p-4 sm:p-6 flex flex-col">
-          <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
+          <div className="print:hidden flex flex-col sm:flex-row justify-between items-center mb-4">
             <Button onClick={handleBack} variant="outline" size="md" className="mb-2 sm:mb-0">Volver</Button>
             <h1 className={`text-2xl sm:text-4xl font-bold text-center sm:w-full ${darkMode ? 'text-white' : 'text-black'}`}>Detalle de Orden de Trabajo</h1>
           </div>
@@ -313,23 +478,25 @@ export default function WorkOrderDetails() {
           <Card className={`p-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Orden #{Orden.id}</h2>
-              {Orden.descripcion &&
-                userRole === 'Authenticated' &&
-                Orden.estado_ot_id?.nom_estado !== 'Aceptado' &&
-                Orden.estado_ot_id?.nom_estado !== 'Rechazado' && (
-                  <div className="space-x-4">
-                    <button className="px-4 py-2 bg-green-700 text-white rounded"
-                      onClick={() => actualizarEstadoOrden(Orden.documentId, 2)} // 2 para "Aceptado"
-                    >
-                      Aceptar
-                    </button>
-                    <button className="px-4 py-2 bg-red-700 text-white rounded"
-                      onClick={() => actualizarEstadoOrden(Orden.documentId, 4)} // 4 para "Rechazado"
-                    >
-                      Rechazar
-                    </button>
-                  </div>
-                )}
+              <div className="print:hidden">
+                {Orden.descripcion &&
+                  userRole === 'Authenticated' &&
+                  Orden.estado_ot_id?.nom_estado === 'Cotizando' &&
+                  Orden.estado_ot_id?.nom_estado === 'Nueva Cotización' && (
+                    <div className="space-x-4">
+                      <button className="px-4 py-2 bg-green-700 text-white rounded"
+                        onClick={() => actualizarEstadoOrden(Orden.documentId, 2)} // 2 para "Aceptado"
+                      >
+                        Aceptar
+                      </button>
+                      <button className="px-4 py-2 bg-red-700 text-white rounded"
+                        onClick={() => actualizarEstadoOrden(Orden.documentId, 4)} // 4 para "Rechazado"
+                      >
+                        Rechazar
+                      </button>
+                    </div>
+                  )}
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div>
@@ -382,6 +549,14 @@ export default function WorkOrderDetails() {
                   </div>
                 </div>
               )}
+              {Orden.clasificacion_ot !== null && (
+                <div>
+                  <div className="text-sm text-muted-foreground">Valorización</div>
+                  <div className="font-medium">
+                    {Orden.clasificacion_ot?.puntuacion} - {Orden.clasificacion_ot?.descripcion}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="space-y-4">
@@ -397,22 +572,116 @@ export default function WorkOrderDetails() {
               </ul>
             </div>
 
-            {['Admin', 'Mechanic'].includes(userRole) && (
-              <div className="mt-6 flex justify-end">
+            {Orden.estado_ot_id?.nom_estado !== 'Finalizado' &&
+              ['Admin', 'Mechanic'].includes(userRole) && (
+                <div className="print:hidden mt-6 flex justify-end">
+                  <button
+                    className={`px-4 py-2 ${darkMode
+                      ? 'bg-gray-700 text-white hover:bg-gray-600'
+                      : 'bg-black text-white hover:bg-gray-700'
+                      } rounded`}
+                    onClick={() => setshowAddEstado(true)}
+                  >
+                    Actualizar Orden
+                  </button>
+                  <button
+                    className={`ml-2 px-4 py-2 ${darkMode
+                      ? 'bg-gray-700 text-white hover:bg-gray-600'
+                      : 'bg-black text-white hover:bg-gray-700'
+                      } rounded`}
+                    onClick={() => setshowNota(true)}
+                  >
+                    Agregar Nota
+                  </button>
+                </div>
+              )}
+            {Orden.estado_ot_id?.nom_estado === 'Finalizado' && (
+              <div className="print:hidden mt-6 flex justify-end">
+                {Orden.clasificacion_ot.length > 0 && (
+                  <button
+                    className={`px-4 py-2 ${darkMode
+                      ? 'bg-gray-700 text-white hover:bg-gray-600'
+                      : 'bg-black text-white hover:bg-gray-700'
+                      } rounded`}
+                    onClick={() => setshowAddValorizar(true)}
+                  >
+                    Valorizar
+                  </button>
+                )}
                 <button
-                  className={`px-4 py-2 ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-black text-white hover:bg-gray-700'} rounded`}
-                  onClick={() => setshowAddEstado(true)}
+                  className={`px-4 py-2 ${darkMode
+                    ? 'bg-gray-700 text-white hover:bg-gray-600'
+                    : 'bg-black text-white hover:bg-gray-700'
+                    } rounded`}
+                  onClick={() => setshowupdateValorizar(true)}
                 >
-                  Actualizar Orden
+                  Modificar Valorizar
                 </button>
+
                 <button
-                  className={`ml-2 px-4 py-2 ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-black text-white hover:bg-gray-700'} rounded`}
+                  className={`ml-2 px-4 py-2 ${darkMode
+                    ? 'bg-gray-700 text-white hover:bg-gray-600'
+                    : 'bg-black text-white hover:bg-gray-700'
+                    } rounded`}
+                  onClick={handleBoleta}
                 >
-                  Agregar Nota
+                  Descargar Boleta
                 </button>
               </div>
             )}
+
           </Card>
+
+          <div className={`rounded-lg shadow-md p-4 mt-6 sm:p-6 overflow-x-auto ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+            <h3 className="text-lg sm:text-xl font-semibold mb-4">Notas de Mantenimiento</h3>
+            <div className="min-w-full">
+              {notas.length === 0 ? (
+                <div className="text-center text-gray-500 mt-4">
+                  <h4 className="text-xl">No hay Notas sobre esta Orden de trabajo.</h4>
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Descripción
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Mecánico
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Fecha
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {notas.map((nota) => (
+                      <tr key={nota.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {nota.descripcion}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {nota.mecanico}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {nota.fecha}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
 
           <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
             <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
@@ -427,7 +696,7 @@ export default function WorkOrderDetails() {
                   id="estado"
                   name="estado"
                   value={formData.estado}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange(e, 'formData')}
                   required
                   className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                 >
@@ -441,7 +710,15 @@ export default function WorkOrderDetails() {
                     ))}
                 </select>
 
-                {(formData.estado === 3) && (
+                <button
+                  type="button"
+                  onClick={() => setShowAdditionalFields(!showAdditionalFields)}
+                  className="mt-2 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
+                >
+                  {showAdditionalFields ? 'Ocultar Información Adicional' : 'Agregar Información Adicional'}
+                </button>
+
+                {showAdditionalFields && (
                   <>
                     <label htmlFor="descripcion" className="text-sm font-medium">Descripción</label>
                     <textarea
@@ -449,7 +726,7 @@ export default function WorkOrderDetails() {
                       name="descripcion"
                       placeholder="Ingrese descripción"
                       value={formData.descripcion}
-                      onChange={handleChange}
+                      onChange={(e) => handleChange(e, 'formData')}
                       className="p-2 border rounded"
                     />
 
@@ -459,7 +736,7 @@ export default function WorkOrderDetails() {
                       id="fecharecepcion"
                       name="fecharecepcion"
                       value={formData.fecharecepcion}
-                      onChange={handleChange}
+                      onChange={(e) => handleChange(e, 'formData')}
                       className="p-2 border rounded"
                     />
 
@@ -469,7 +746,7 @@ export default function WorkOrderDetails() {
                       id="fechaentrega"
                       name="fechaentrega"
                       value={formData.fechaentrega}
-                      onChange={handleChange}
+                      onChange={(e) => handleChange(e, 'formData')}
                       className="p-2 border rounded"
                     />
                   </>
@@ -477,6 +754,91 @@ export default function WorkOrderDetails() {
               </div>
               <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
                 Actualizar
+              </button>
+            </form>
+          </Modal>
+
+          <Modal isOpen={showNota} onClose={() => setshowNota(false)}>
+            <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+              Agregar Nota
+            </h4>
+            <form onSubmit={handleSubmitNota}>
+              <div className="grid gap-4">
+                <label htmlFor="descripcion" className="text-sm font-medium">Descripción</label>
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  placeholder="Ingrese descripción"
+                  value={formNota.descripcion}
+                  onChange={(e) => handleChange(e, 'formNota')}
+                  className="p-2 border rounded"
+                />
+              </div>
+              <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                Agregar
+              </button>
+            </form>
+          </Modal>
+
+          <Modal isOpen={showAddValorizar} onClose={() => setshowAddValorizar(false)}>
+            <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+              Agregar Valorizador
+            </h4>
+            <form onSubmit={handleValorizar}>
+              <div className="grid gap-4">
+                <label htmlFor="puntuacion" className="text-sm font-medium">Puntuación</label>
+                <input
+                  id="puntuacion"
+                  name="puntuacion"
+                  type="number"
+                  placeholder="Ingrese puntuación"
+                  value={formValorizar.puntuacion}
+                  onChange={(e) => handleChange(e, 'formValorizar')}
+                  className="p-2 border rounded"
+                />
+                <label htmlFor="descripcion" className="text-sm font-medium">Descripción</label>
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  placeholder="Ingrese descripción"
+                  value={formValorizar.descripcion}
+                  onChange={(e) => handleChange(e, 'formValorizar')}
+                  className="p-2 border rounded"
+                />
+              </div>
+              <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                Agregar
+              </button>
+            </form>
+          </Modal>
+
+          <Modal isOpen={showupdateValorizar} onClose={() => setshowupdateValorizar(false)}>
+            <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+              Agregar Valorizador
+            </h4>
+            <form onSubmit={handleModificarValorizar}>
+              <div className="grid gap-4">
+                <label htmlFor="puntuacion" className="text-sm font-medium">Puntuación</label>
+                <input
+                  id="puntuacion"
+                  name="puntuacion"
+                  type="number"
+                  placeholder={Orden.clasificacion_ot?.puntuacion || 'Ingrese puntuación'}
+                  value={formValorizar.puntuacion}
+                  onChange={(e) => handleChange(e, 'formValorizar')}
+                  className="p-2 border rounded"
+                />
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  placeholder={Orden.clasificacion_ot?.descripcion || 'Ingrese descripción'}
+                  value={formValorizar.descripcion}
+                  onChange={(e) => handleChange(e, 'formValorizar')}
+                  className="p-2 border rounded"
+                />
+              </div>
+              <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                Modificar
               </button>
             </form>
           </Modal>
