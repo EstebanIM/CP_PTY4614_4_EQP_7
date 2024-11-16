@@ -30,11 +30,15 @@ export default function WorkOrderDetails() {
   const [showAdditionalFields, setShowAdditionalFields] = useState(false);
   const [showAddValorizar, setshowAddValorizar] = useState(false);
   const [showupdateValorizar, setshowupdateValorizar] = useState(false);
+  const [showAddServicio, setshowAddServicio] = useState(false);
+  const [catalogoServicios, setCatalogoServicios] = useState([]);
 
   const [formData, setFormData] = useState({
     descripcion: '',
     fecharecepcion: '',
     fechaentrega: '',
+    fecha_fin: '',
+    costo_variable: '',
     catalogo_servicios: []
   });
 
@@ -141,11 +145,33 @@ export default function WorkOrderDetails() {
     }
   };
 
+  const fetchCatalogoServicios = async () => {
+    const jwt = getTokenFromLocalCookie();
+    if (jwt) {
+      try {
+        const response = await fetcher(`${STRAPI_URL}/api/catalogo-servicios`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+
+        setCatalogoServicios(response.data || []);
+        console.log('Catalogo Servicios:', response.data);
+
+
+      } catch (error) {
+        console.error('Error fetching catalogo servicios:', error);
+      }
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
     fetchOrden();
     fetchUserRole();
     fetchEstados();
+    fetchCatalogoServicios();
   }, [id]);
 
   useEffect(() => {
@@ -456,6 +482,84 @@ export default function WorkOrderDetails() {
 
   };
 
+  const handleSubmitServicio = async (e) => {
+    e.preventDefault();
+    const jwt = getTokenFromLocalCookie();
+    if (jwt) {
+      try {
+
+        setLoading(true);
+        const EstadoData = {
+          data: Object.fromEntries(
+            Object.entries({
+              estado_ot_id: formData.estado,
+              descripcion: formData.descripcion,
+              fecharecepcion: formData.fecharecepcion,
+              fechaentrega: formData.fechaentrega,
+              catalogo_servicios_id: formData.catalogo_servicios,
+              costo_variable: formData.costo_variable,
+              fecha_fin: formData.fecha_fin,
+              orden_trabajos_id: Orden.id,
+              fecha_inicio: new Date().toISOString()
+            }).filter(
+              ([, value]) => value !== "" && value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+            )
+          )
+        };
+        
+        const NuevoTotal = Number(Orden.costo) + Number(formData.costo_variable);
+
+        const TotalData = {
+          data: {
+            costo: NuevoTotal
+          }
+        };
+
+        const response = await fetch(`${STRAPI_URL}/api/orden-trabajos/${Orden.documentId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(TotalData),
+        });
+
+        const response2 = await fetch(`${STRAPI_URL}/api/ordentrabajo-catalogoservicios`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify(EstadoData),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error al actualizar el costo: ${response.statusText}`);
+        }
+
+        if (!response2.ok) {
+          throw new Error(`Error al agregar servicio: ${response2.statusText}`);
+
+        }
+
+        setFormData({
+          descripcion: '',
+          fecharecepcion: '',
+          fechaentrega: '',
+          costo_variable: '',
+          fecha_fin: '',
+          catalogo_servicios: []
+        });
+
+        setshowAddServicio(false);
+      } catch (error) {
+        console.error('Error adding Estado:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const handleBoleta = async () => {
 
   };
@@ -580,6 +684,15 @@ export default function WorkOrderDetails() {
                       ? 'bg-gray-700 text-white hover:bg-gray-600'
                       : 'bg-black text-white hover:bg-gray-700'
                       } rounded`}
+                    onClick={() => setshowAddServicio(true)}
+                  >
+                    Agregar Servicios
+                  </button>
+                  <button
+                    className={`ml-2 px-4 py-2 ${darkMode
+                      ? 'bg-gray-700 text-white hover:bg-gray-600'
+                      : 'bg-black text-white hover:bg-gray-700'
+                      } rounded`}
                     onClick={() => setshowAddEstado(true)}
                   >
                     Actualizar Orden
@@ -682,6 +795,63 @@ export default function WorkOrderDetails() {
               )}
             </div>
           </div>
+
+          <Modal isOpen={showAddServicio} onClose={() => setshowAddServicio(false)}>
+            <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+              Actualizar Orden
+            </h4>
+            <form onSubmit={handleSubmitServicio}>
+              <div className="grid gap-4">
+                <label htmlFor="catalogo_servicios" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>
+                  Catalogo Servicios
+                </label>
+                <select
+                  id="catalogo_servicios"
+                  name="catalogo_servicios"
+                  value={formData.catalogo_servicios}
+                  onChange={(e) => handleChange(e, 'formData')}
+                  required
+                  className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                >
+                  <option value="">Seleccione Servicio</option>
+                  {catalogoServicios.map(tipo => (
+                    <option key={tipo.id} value={tipo.id}>{tipo.tp_servicio}</option>
+                  ))}
+                </select>
+
+                <label htmlFor="fecha_fin" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>
+                  Fecha fin
+                </label>
+                <input
+                  id="fecha_fin"
+                  name="fecha_fin"
+                  type="date"
+                  value={formData.fecha_fin || ""}
+                  onChange={(e) => handleChange(e, 'formData')}
+                  required
+                  className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                />
+
+                <label htmlFor="costo_variable" className={`text-sm font-medium ${darkMode ? 'text-white' : 'text-gray-700'}`}>
+                  Costo variable
+                </label>
+                <input
+                  id="costo_variable"
+                  name="costo_variable"
+                  type="number"
+                  value={formData.costo_variable || ""}
+                  onChange={(e) => handleChange(e, 'formData')}
+                  required
+                  className={`p-2 border rounded ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                />
+              </div>
+
+              <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                Actualizar
+              </button>
+            </form>
+          </Modal>
+
 
           <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
             <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
