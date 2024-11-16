@@ -766,10 +766,6 @@ export interface ApiMecanicoMecanico extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 60;
       }>;
-    orden_trabajos_id: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::orden-trabajo.orden-trabajo'
-    >;
     taller_id: Schema.Attribute.Relation<'manyToOne', 'api::taller.taller'>;
     vehiculos: Schema.Attribute.Relation<
       'manyToMany',
@@ -780,6 +776,10 @@ export interface ApiMecanicoMecanico extends Struct.CollectionTypeSchema {
       'plugin::users-permissions.user'
     >;
     notas: Schema.Attribute.Relation<'oneToMany', 'api::nota.nota'>;
+    orden_trabajos_id: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::orden-trabajo.orden-trabajo'
+    >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -854,7 +854,7 @@ export interface ApiOrdenTrabajoOrdenTrabajo
       'api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio'
     >;
     mecanico_id: Schema.Attribute.Relation<
-      'manyToOne',
+      'manyToMany',
       'api::mecanico.mecanico'
     >;
     catalogo_servicios: Schema.Attribute.Relation<

@@ -130,7 +130,7 @@ const DashboardAutos = () => {
         }));
 
         const Cotizacion = OT.filter(cotizacion => cotizacion.estado_ot_id === 'Cotizando');
-        const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'Cotizando');
+        const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'Cotizando' && Ordenes.estado_ot_id !== 'Finalizado');
 
         setOrdenes(Ordenes);
 

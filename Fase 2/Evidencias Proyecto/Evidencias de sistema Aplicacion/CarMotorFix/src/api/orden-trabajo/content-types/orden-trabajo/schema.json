@@ -46,7 +46,7 @@
     },
     "mecanico_id": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::mecanico.mecanico",
       "inversedBy": "orden_trabajos_id"
     },
