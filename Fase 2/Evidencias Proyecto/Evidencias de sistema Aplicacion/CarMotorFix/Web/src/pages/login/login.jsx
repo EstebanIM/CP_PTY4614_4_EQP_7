@@ -95,8 +95,7 @@ export default function ResponsiveAuthForm({ className = "" }) {
     setPasswordStrength(passedRules);
   };
 
-  const handlePasswordChange = (e) => {
-    const newPassword = e.target.value;
+  const handlePasswordChange = (newPassword) => {
     setPassword(newPassword);
     validatePassword(newPassword);
   };

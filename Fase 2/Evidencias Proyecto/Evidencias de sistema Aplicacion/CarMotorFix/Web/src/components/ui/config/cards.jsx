@@ -1,11 +1,14 @@
 import * as React from "react";
 import PropTypes from "prop-types";
+import { useContext } from 'react';
+import { DarkModeContext } from '../../../context/DarkModeContext';
 
 const Card = React.forwardRef(function Card({ className = "", ...props }, ref) {
+  const { darkMode } = useContext(DarkModeContext);
   return (
     <div
       ref={ref}
-      className={`rounded-lg border bg-card text-card-foreground shadow-sm ${className}`}
+      className={`rounded-lg ${darkMode ? 'bg-gray-800 text-white border-gray-700' : 'bg-card text-card-foreground border'} shadow-sm ${className}`}
       {...props}
     />
   );

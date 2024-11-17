@@ -31,12 +31,6 @@
       "required": true,
       "maxLength": 60
     },
-    "orden_trabajos_id": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::orden-trabajo.orden-trabajo",
-      "mappedBy": "mecanico_id"
-    },
     "taller_id": {
       "type": "relation",
       "relation": "manyToOne",
@@ -54,6 +48,18 @@
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "mecanico"
+    },
+    "notas": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::nota.nota",
+      "mappedBy": "mecanico"
+    },
+    "orden_trabajos_id": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::orden-trabajo.orden-trabajo",
+      "mappedBy": "mecanico_id"
     }
   }
 }

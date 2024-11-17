@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getDarkModeFromLocalCookie } from '../../lib/cookies';
-import Spinner from '../../components/animation/spinner'; // Import Spinner component
+import { useContext } from 'react';
+import { DarkModeContext } from '../../context/DarkModeContext';
+import Spinner from '../../components/animation/spinner'; 
 
 const Modal = ({ isOpen, onClose, children, loading = false }) => {
-    const darkMode = getDarkModeFromLocalCookie();
+    const { darkMode } = useContext(DarkModeContext);
 
     const handleOutsideClick = (e) => {
         if (e.target === e.currentTarget) onClose();
@@ -15,7 +16,7 @@ const Modal = ({ isOpen, onClose, children, loading = false }) => {
         <AnimatePresence>
             {isOpen && (
                 <motion.div 
-                    className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ${darkMode ? 'bg-gray-900' : 'bg-black'}`}
+                    className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 ${darkMode ? 'bg-gray-900 bg-opacity-75' : 'bg-black bg-opacity-50'}`}
                     onClick={handleOutsideClick}
                     aria-labelledby="modal-title"
                     role="dialog"
@@ -34,10 +35,12 @@ const Modal = ({ isOpen, onClose, children, loading = false }) => {
                     >
                         <button 
                             onClick={onClose} 
-                            className="absolute top-3 right-3 p-1 bg-gray-200 rounded-full hover:bg-gray-300 focus:outline-none"
+                            className={`absolute top-3 right-3 p-1 rounded-full focus:outline-none ${
+                                darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
+                            }`}
                             aria-label="Close modal"
                         >
-                            <X className="h-6 w-6 text-gray-600 hover:text-gray-800" />
+                            <X className={`h-6 w-6 ${darkMode ? 'text-white' : 'text-gray-600 hover:text-gray-800'}`} />
                         </button>
                         {loading ? (
                             <div className="flex justify-center items-center h-full">

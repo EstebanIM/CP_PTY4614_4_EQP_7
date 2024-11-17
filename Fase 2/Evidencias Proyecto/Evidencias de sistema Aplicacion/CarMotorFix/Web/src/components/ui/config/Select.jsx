@@ -2,14 +2,17 @@ import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown } from "lucide-react";
 import PropTypes from "prop-types";
+import { useContext } from 'react';
+import { DarkModeContext } from '../../../context/DarkModeContext';
 
 const Select = SelectPrimitive.Root;
 
 const SelectTrigger = React.forwardRef(function SelectTrigger({ className = "", children, ...props }, ref) {
+  const { darkMode } = useContext(DarkModeContext);
   return (
     <SelectPrimitive.Trigger
       ref={ref}
-      className={`flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`flex h-10 w-full items-center justify-between rounded-md border ${darkMode ? 'border-gray-600 bg-gray-700 text-white' : 'border-input bg-background text-muted-foreground'} px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       {...props}
     >
       {children}
@@ -35,11 +38,12 @@ SelectValue.propTypes = {
 };
 
 const SelectContent = React.forwardRef(function SelectContent({ className = "", children, position = "popper", ...props }, ref) {
+  const { darkMode } = useContext(DarkModeContext);
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         ref={ref}
-        className={`relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ${className}`}
+        className={`relative z-50 min-w-[8rem] overflow-hidden rounded-md border ${darkMode ? 'border-gray-600 bg-gray-800 text-white' : 'border-border bg-popover text-popover-foreground'} shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ${className}`}
         position={position}
         {...props}
       >
@@ -58,10 +62,11 @@ SelectContent.propTypes = {
 };
 
 const SelectItem = React.forwardRef(function SelectItem({ className = "", children, ...props }, ref) {
+  const { darkMode } = useContext(DarkModeContext);
   return (
     <SelectPrimitive.Item
       ref={ref}
-      className={`relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ${className}`}
+      className={`relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none ${darkMode ? 'hover:bg-gray-700 data-[state=active]:bg-gray-600' : 'hover:bg-accent data-[state=active]:bg-accent-foreground'} focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 ${className}`}
       {...props}
     >
       <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">

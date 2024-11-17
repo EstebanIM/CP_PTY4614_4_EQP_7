@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/config/tabs';
@@ -11,13 +11,14 @@ import { User, IdCard, Mail, Lock, Bell, Palette, Eye, EyeOff } from 'lucide-rea
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import { fetcher } from '../../lib/strApi';
-import { getTokenFromLocalCookie, getIdFromLocalCookie, getDarkModeFromLocalCookie, setDarkMode as saveDarkModePreference } from '../../lib/cookies';
+import { getTokenFromLocalCookie, getIdFromLocalCookie } from '../../lib/cookies';
 import { supabase } from '../../lib/supabaseClient';
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function Config() {
-  const [darkMode, setDarkMode] = useState(getDarkModeFromLocalCookie()); // Initial dark mode state from cookie
+  const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
   const [userRole, setUserRole] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -146,7 +147,7 @@ export default function Config() {
 
   const handleSave = async () => {
     const userjwt = getTokenFromLocalCookie();
-    const userId = await getIdFromLocalCookie();
+    const userId = getIdFromLocalCookie();
 
     try {
       const accountResponse = await fetch(`${STRAPI_URL}/api/users/${userId}`, {
@@ -179,11 +180,7 @@ export default function Config() {
   };
 
   const handleDarkModeToggle = (enabled) => {
-    setDarkMode(enabled);
-    saveDarkModePreference(enabled); // Save preference to cookie
-
-    // Reload the page to apply dark mode changes immediately
-    window.location.reload();
+    toggleDarkMode(enabled);
   };
 
   return (
@@ -226,6 +223,11 @@ export default function Config() {
                                 value={value}
                                 onChange={handleChange}
                                 type={key === 'email' ? 'email' : 'text'}
+                                className={`${
+                                  darkMode
+                                    ? 'bg-gray-700 border-gray-600 text-white'
+                                    : 'bg-white border-gray-300 text-gray-900'
+                                }`}
                               />
                             ) : (
                               <div className="p-2 border rounded-md">
@@ -244,12 +246,18 @@ export default function Config() {
                         ) : (
                           <Button onClick={handleEdit}>Editar Información</Button>
                         )}
+                        {/* <button
+                          className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                          onClick=""
+                          >
+                          Desactivar Cuenta
+                        </button> */}
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Card for Password Change (always visible) */}
+                {/* Card para Cambio de Contraseña (siempre visible) */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Cambiar Contraseña</CardTitle>
@@ -269,6 +277,11 @@ export default function Config() {
                             type={showPasswords[field] ? 'text' : 'password'}
                             value={passwords[field]}
                             onChange={handlePasswordInputChange}
+                            className={`${
+                              darkMode
+                                ? 'bg-gray-700 border-gray-600 text-white'
+                                : 'bg-white border-gray-300 text-gray-900'
+                            }`}
                           />
                           <Button
                             type="button"
@@ -328,7 +341,7 @@ export default function Config() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="dark-mode">Modo Oscuro (beta)</Label>
+                      <Label htmlFor="dark-mode">Modo Oscuro</Label>
                       <Switch id="dark-mode" checked={darkMode} onCheckedChange={handleDarkModeToggle} />
                     </div>
                   </CardContent>

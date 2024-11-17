@@ -4,7 +4,8 @@
   "info": {
     "singularName": "clasificacion-ot",
     "pluralName": "clasificacion-ots",
-    "displayName": "Clasificacion_ot"
+    "displayName": "Clasificacion_ot",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -23,10 +24,11 @@
       "required": true,
       "maxLength": 200
     },
-    "orden_trabajo_id": {
+    "ot": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "api::orden-trabajo.orden-trabajo"
+      "target": "api::orden-trabajo.orden-trabajo",
+      "inversedBy": "clasificacion_ot"
     }
   }
 }

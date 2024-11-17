@@ -1,15 +1,16 @@
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button"; 
 import { Menu, Bell, User, Settings, LogOut } from "lucide-react";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { unsetToken, getTokenFromLocalCookie, getDarkModeFromLocalCookie } from '../../lib/cookies';
+import { unsetToken, getTokenFromLocalCookie } from '../../lib/cookies';
 import { fetcher } from '../../lib/strApi';
+import { DarkModeContext } from '../../context/DarkModeContext'; // Importar el contexto
 
 export default function DashboardHeader({ toggleSidebar }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userName, setUserName] = useState('');
-  const [darkMode, setDarkMode] = useState(getDarkModeFromLocalCookie()); // Set initial state based on cookie
+  const { darkMode } = useContext(DarkModeContext); // Usar el contexto
   const navigate = useNavigate();
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -38,11 +39,6 @@ export default function DashboardHeader({ toggleSidebar }) {
     fetchUser();
   }, [STRAPI_URL]);
 
-  useEffect(() => {
-    const darkModeEnabled = getDarkModeFromLocalCookie();
-    setDarkMode(darkModeEnabled);
-  }, []);
-
   const logout = async () => {
     try {
       unsetToken();
@@ -57,7 +53,7 @@ export default function DashboardHeader({ toggleSidebar }) {
 
   return (
     <header className={`${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'} shadow-sm z-10`}>
-      <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+      <div className="max-w-7x2 mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         <div className="flex items-center">
           <Button variant="ghost" size="sm" className="mr-2 md:hidden" onClick={toggleSidebar}>
             <Menu className={`h-6 w-6 ${darkMode ? 'text-white' : 'text-gray-900'}`} />

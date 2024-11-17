@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/tables/cards";
@@ -8,6 +8,7 @@ import { fetcher } from "../../lib/strApi";
 import { getTokenFromLocalCookie } from "../../lib/cookies";
 import Tablas from "../../components/Tablas";
 import { useNavigate } from "react-router-dom";
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -33,18 +34,19 @@ const useCountUp = (targetValue, duration) => {
 
 // Component to display stats with counting animation
 const CountUpCard = ({ title, value }) => {
+  const { darkMode } = useContext(DarkModeContext);
   const count = useCountUp(value, 1000);
   return (
-    <Card className="bg-white">
+    <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <CardTitle className={`${darkMode ? 'text-white' : 'text-gray-900'} text-sm font-medium`}>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex justify-center items-center">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="text-4xl font-bold text-center"
+          className={`text-4xl font-bold text-center ${darkMode ? 'text-gray-300' : 'text-black'}`}
         >
           {count}
         </motion.div>
@@ -59,6 +61,7 @@ CountUpCard.propTypes = {
 };
 
 const DashboardAdmin = () => {
+  const { darkMode } = useContext(DarkModeContext);
   const [activeTab, setActiveTab] = useState("autos");
   const [vehiculos, setVehiculos] = useState([]);
   const [Cotizaciones, setCotizaciones] = useState([]);
@@ -80,17 +83,20 @@ const DashboardAdmin = () => {
     const fetchVehiculos = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/vehiculos?populate[user_id][fields]=username&populate[marca_id][fields]=nombre_marca`, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${jwt}`,
-            },
-          });
+          const response = await fetcher(
+            `${STRAPI_URL}/api/vehiculos?filters[estado][$eq]=true&populate[user_id][fields]=username&populate[marca_id][fields]=nombre_marca`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${jwt}`,
+              },
+            }
+          );
 
           const vehiculoIds = response.data || [];
-          const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
+          const validVehiculoIds = vehiculoIds.filter(v => v && v.id && v.estado === true); // Asegurarse de que estado sea true
 
-          setTotalVehiculos(response.data.length);
+          setTotalVehiculos(validVehiculoIds.length); // Actualizar con la cantidad filtrada
           setVehiculos(validVehiculoIds);
         } catch (error) {
           console.error('Error fetching vehicles:', error);
@@ -113,7 +119,7 @@ const DashboardAdmin = () => {
           setCotizaciones(validOtIds);
           setTotalCotizaciones(response.data.length);
         } catch (error) {
-          console.error('Error fetching vehicles:', error);
+          console.error('Error fetching cotizaciones:', error);
         }
       }
     };
@@ -135,7 +141,7 @@ const DashboardAdmin = () => {
           setTotalOrdenes(response.data.length);
 
         } catch (error) {
-          console.error('Error fetching vehicles:', error);
+          console.error('Error fetching órdenes:', error);
         }
       }
     };
@@ -275,11 +281,19 @@ const DashboardAdmin = () => {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     return (
       <div className="flex items-center space-x-2">
-        <button onClick={() => handlePageChange(setCurrentPage, totalPages, currentPage - 1)} disabled={currentPage === 1} className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+        <button
+          onClick={() => handlePageChange(setCurrentPage, totalPages, currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`p-1 hover:text-gray-700 ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <span className="text-xs text-gray-500">Página {currentPage} de {totalPages}</span>
-        <button onClick={() => handlePageChange(setCurrentPage, totalPages, currentPage + 1)} disabled={currentPage === totalPages} className="p-1 text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+        <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Página {currentPage} de {totalPages}</span>
+        <button
+          onClick={() => handlePageChange(setCurrentPage, totalPages, currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`p-1 hover:text-gray-700 ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
+        >
           <ArrowRight className="h-5 w-5" />
         </button>
       </div>
@@ -292,7 +306,7 @@ const DashboardAdmin = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row">
+    <div className={`flex flex-col md:flex-row ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
       <div className="flex-1">
         <div className="container mx-auto p-4">
 
@@ -309,19 +323,28 @@ const DashboardAdmin = () => {
             <div className="flex flex-wrap space-x-4 mb-4 overflow-auto">
               <button
                 onClick={() => setActiveTab("autos")}
-                className={`px-4 py-2 font-medium ${activeTab === "autos" ? "text-black border-b-2 border-black" : "text-gray-500"}`}
+                className={`px-4 py-2 font-medium ${activeTab === "autos"
+                  ? `${darkMode ? 'text-white border-b-2 border-white' : 'text-black border-b-2 border-black'}`
+                  : `${darkMode ? 'text-gray-400' : 'text-gray-500'}`
+                  }`}
               >
                 Autos
               </button>
               <button
                 onClick={() => setActiveTab("cotizaciones")}
-                className={`px-4 py-2 font-medium ${activeTab === "cotizaciones" ? "text-black border-b-2 border-black" : "text-gray-500"}`}
+                className={`px-4 py-2 font-medium ${activeTab === "cotizaciones"
+                  ? `${darkMode ? 'text-white border-b-2 border-white' : 'text-black border-b-2 border-black'}`
+                  : `${darkMode ? 'text-gray-400' : 'text-gray-500'}`
+                  }`}
               >
                 Cotizaciones
               </button>
               <button
                 onClick={() => setActiveTab("ordenes")}
-                className={`px-4 py-2 font-medium ${activeTab === "ordenes" ? "text-black border-b-2 border-black" : "text-gray-500"}`}
+                className={`px-4 py-2 font-medium ${activeTab === "ordenes"
+                  ? `${darkMode ? 'text-white border-b-2 border-white' : 'text-black border-b-2 border-black'}`
+                  : `${darkMode ? 'text-gray-400' : 'text-gray-500'}`
+                  }`}
               >
                 Órdenes
               </button>
@@ -330,10 +353,10 @@ const DashboardAdmin = () => {
             {/* Sección de Autos */}
             {activeTab === "autos" && (
               <motion.div initial="hidden" animate="visible" exit="hidden" variants={variants}>
-                <Card>
+                <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                   <CardHeader className="flex justify-between items-center w-full px-4">
                     <div className="flex w-full items-center">
-                      <CardTitle className="flex-grow">Autos registrados en el Taller</CardTitle>
+                      <CardTitle className={`${darkMode ? 'text-white' : 'text-gray-900'} flex-grow`}>Autos registrados en el Taller</CardTitle>
                       <div className="flex items-center space-x-2">
                         {renderPaginationControls(currentPageAutos, setCurrentPageAutos, vehiculos.length)}
                       </div>
@@ -341,13 +364,12 @@ const DashboardAdmin = () => {
                   </CardHeader>
 
                   <CardContent className="overflow-x-auto">
-                    <Table className="min-w-full divide-y divide-gray-200 table-fixed">
+                    <Table className={`min-w-full divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'} table-fixed`}>
                       {currentAutos.length === 0 ? (
-                        <div className="p-4 text-center text-gray-500">No hay autos registrados</div>
+                        <div className={`p-4 text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No hay autos registrados</div>
                       ) : (
                         <Tablas servicio={currentAutos} handleViewTabla={handleViewVehiculo} columns={columns} />
-                      )
-                      }
+                      )}
                     </Table>
                   </CardContent>
                 </Card>
@@ -357,20 +379,20 @@ const DashboardAdmin = () => {
             {/* Sección de Cotizaciones */}
             {activeTab === "cotizaciones" && (
               <motion.div initial="hidden" animate="visible" exit="hidden" variants={variants}>
-                <Card>
+                <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                   <CardHeader className="flex justify-between items-center w-full px-4">
                     <div className="flex w-full items-center">
-                      <CardTitle className="flex-grow">Historial de Cotizaciones</CardTitle>
+                      <CardTitle className={`${darkMode ? 'text-white' : 'text-gray-900'} flex-grow`}>Historial de Cotizaciones</CardTitle>
                       <div className="flex items-center space-x-2">
                         {renderPaginationControls(currentPageCotizaciones, setCurrentPageCotizaciones, Cotizaciones.length)}
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
-                    <Table className="min-w-full divide-y divide-gray-200 table-fixed">
+                    <Table className={`min-w-full divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'} table-fixed`}>
                       {
                         currentCotizaciones.length === 0 ? (
-                          <div className="p-4 text-center text-gray-500">No hay cotizaciones registradas</div>
+                          <div className={`p-4 text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No hay cotizaciones registradas</div>
                         ) : (
                           <Tablas servicio={currentCotizaciones} handleViewTabla={handleViewCotizacion} columns={columns2} />
                         )
@@ -384,24 +406,23 @@ const DashboardAdmin = () => {
             {/* Sección de Órdenes */}
             {activeTab === "ordenes" && (
               <motion.div initial="hidden" animate="visible" exit="hidden" variants={variants}>
-                <Card>
+                <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
                   <CardHeader className="flex justify-between items-center w-full px-4">
                     <div className="flex w-full items-center">
-                      <CardTitle className="flex-grow">Historial de Órdenes</CardTitle>
+                      <CardTitle className={`${darkMode ? 'text-white' : 'text-gray-900'} flex-grow`}>Historial de Órdenes</CardTitle>
                       <div className="flex items-center space-x-2">
                         {renderPaginationControls(currentPageOrdenes, setCurrentPageOrdenes, Ordenes.length)}
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="overflow-x-auto">
-                    <Table className="min-w-full divide-y divide-gray-200 table-fixed">
+                    <Table className={`min-w-full divide-y ${darkMode ? 'divide-gray-700' : 'divide-gray-200'} table-fixed`}>
                       {/* No se ve no hay cotizaciones */}
-                      {currentOrdenes.length === 0  ? (
-                        <div className="p-4 text-center text-gray-500">No hay órdenes registradas</div>
+                      {currentOrdenes.length === 0 ? (
+                        <div className={`p-4 text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>No hay órdenes registradas</div>
                       ) : (
                         <Tablas servicio={currentOrdenes} handleViewTabla={handleViewCotizacion} columns={columns3} />
-                      )
-                      }
+                      )}
                     </Table>
                   </CardContent>
                 </Card>
@@ -412,6 +433,9 @@ const DashboardAdmin = () => {
       </div>
     </div>
   );
+};
+
+DashboardAdmin.propTypes = {
 };
 
 export default DashboardAdmin;

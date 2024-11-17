@@ -1,17 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import { FaTools, FaUsers, FaFileInvoiceDollar } from "react-icons/fa";
 import { fetcher } from '../../lib/strApi';
-import { getTokenFromLocalCookie, getDarkModeFromLocalCookie } from '../../lib/cookies';
+import { getTokenFromLocalCookie } from '../../lib/cookies';
 import ConsejoAutoDelDia from '../../components/mensaje/mensajedia';
+import { DarkModeContext } from '../../context/DarkModeContext'; // Asegúrate de la ruta correcta
+import Cookies from 'js-cookie';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function Inicio() {
+  console.log(Cookies.get('rol'));
+  
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userRole, setUserRole] = useState(null);
-  const [darkMode] = useState(getDarkModeFromLocalCookie()); 
+  const { darkMode } = useContext(DarkModeContext); 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -38,7 +42,7 @@ export default function Inicio() {
   }, []);
 
   return (
-    <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+    <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       {/* Sidebar */}
       <DashboardSidebar
         sidebarOpen={sidebarOpen}

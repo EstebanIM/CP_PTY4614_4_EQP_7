@@ -637,6 +637,7 @@ export interface ApiClasificacionOtClasificacionOt
     singularName: 'clasificacion-ot';
     pluralName: 'clasificacion-ots';
     displayName: 'Clasificacion_ot';
+    description: '';
   };
   options: {
     draftAndPublish: false;
@@ -655,7 +656,7 @@ export interface ApiClasificacionOtClasificacionOt
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 200;
       }>;
-    orden_trabajo_id: Schema.Attribute.Relation<
+    ot: Schema.Attribute.Relation<
       'oneToOne',
       'api::orden-trabajo.orden-trabajo'
     >;
@@ -713,14 +714,15 @@ export interface ApiMarcaMarca extends Struct.CollectionTypeSchema {
     singularName: 'marca';
     pluralName: 'marcas';
     displayName: 'Marca';
+    description: '';
   };
   options: {
     draftAndPublish: false;
   };
   attributes: {
     nombre_marca: Schema.Attribute.String & Schema.Attribute.Required;
-    vehiculo_id: Schema.Attribute.Relation<
-      'oneToOne',
+    vehiculo_ids: Schema.Attribute.Relation<
+      'oneToMany',
       'api::vehiculo.vehiculo'
     >;
     createdAt: Schema.Attribute.DateTime;
@@ -764,10 +766,6 @@ export interface ApiMecanicoMecanico extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 60;
       }>;
-    orden_trabajos_id: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::orden-trabajo.orden-trabajo'
-    >;
     taller_id: Schema.Attribute.Relation<'manyToOne', 'api::taller.taller'>;
     vehiculos: Schema.Attribute.Relation<
       'manyToMany',
@@ -776,6 +774,11 @@ export interface ApiMecanicoMecanico extends Struct.CollectionTypeSchema {
     user: Schema.Attribute.Relation<
       'oneToOne',
       'plugin::users-permissions.user'
+    >;
+    notas: Schema.Attribute.Relation<'oneToMany', 'api::nota.nota'>;
+    orden_trabajos_id: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::orden-trabajo.orden-trabajo'
     >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
@@ -789,6 +792,37 @@ export interface ApiMecanicoMecanico extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::mecanico.mecanico'
     > &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiNotaNota extends Struct.CollectionTypeSchema {
+  collectionName: 'notas';
+  info: {
+    singularName: 'nota';
+    pluralName: 'notas';
+    displayName: 'nota';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    descripcion: Schema.Attribute.Text;
+    mecanico: Schema.Attribute.Relation<'manyToOne', 'api::mecanico.mecanico'>;
+    ot: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::orden-trabajo.orden-trabajo'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    publishedAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::nota.nota'> &
       Schema.Attribute.Private;
   };
 }
@@ -820,7 +854,7 @@ export interface ApiOrdenTrabajoOrdenTrabajo
       'api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio'
     >;
     mecanico_id: Schema.Attribute.Relation<
-      'manyToOne',
+      'manyToMany',
       'api::mecanico.mecanico'
     >;
     catalogo_servicios: Schema.Attribute.Relation<
@@ -833,6 +867,11 @@ export interface ApiOrdenTrabajoOrdenTrabajo
     >;
     vehiculo: Schema.Attribute.Relation<'manyToOne', 'api::vehiculo.vehiculo'>;
     descripcion: Schema.Attribute.Text;
+    notas: Schema.Attribute.Relation<'oneToMany', 'api::nota.nota'>;
+    clasificacion_ot: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::clasificacion-ot.clasificacion-ot'
+    >;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -983,8 +1022,8 @@ export interface ApiTpVehiculoTpVehiculo extends Struct.CollectionTypeSchema {
   };
   attributes: {
     nom_tp_vehiculo: Schema.Attribute.String & Schema.Attribute.Required;
-    vehiculo_id: Schema.Attribute.Relation<
-      'oneToOne',
+    vehiculo_ids: Schema.Attribute.Relation<
+      'oneToMany',
       'api::vehiculo.vehiculo'
     >;
     createdAt: Schema.Attribute.DateTime;
@@ -1034,11 +1073,6 @@ export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
-    marca_id: Schema.Attribute.Relation<'oneToOne', 'api::marca.marca'>;
-    tp_vehiculo_id: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::tp-vehiculo.tp-vehiculo'
-    >;
     mecanicos: Schema.Attribute.Relation<
       'manyToMany',
       'api::mecanico.mecanico'
@@ -1047,6 +1081,12 @@ export interface ApiVehiculoVehiculo extends Struct.CollectionTypeSchema {
       'oneToMany',
       'api::orden-trabajo.orden-trabajo'
     >;
+    tp_vehiculo_id: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::tp-vehiculo.tp-vehiculo'
+    >;
+    marca_id: Schema.Attribute.Relation<'manyToOne', 'api::marca.marca'>;
+    estado: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     createdAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
@@ -1452,6 +1492,7 @@ declare module '@strapi/strapi' {
       'api::estado-ot.estado-ot': ApiEstadoOtEstadoOt;
       'api::marca.marca': ApiMarcaMarca;
       'api::mecanico.mecanico': ApiMecanicoMecanico;
+      'api::nota.nota': ApiNotaNota;
       'api::orden-trabajo.orden-trabajo': ApiOrdenTrabajoOrdenTrabajo;
       'api::ordentrabajo-catalogoservicio.ordentrabajo-catalogoservicio': ApiOrdentrabajoCatalogoservicioOrdentrabajoCatalogoservicio;
       'api::region.region': ApiRegionRegion;
