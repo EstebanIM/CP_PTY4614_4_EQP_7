@@ -710,7 +710,7 @@ export default function WorkOrderDetails() {
               )}
             {Orden.estado_ot_id?.nom_estado === 'Finalizado' && (
               <div className="print:hidden mt-6 flex justify-end">
-                {Orden.clasificacion_ot.length > 0 && (
+                {Orden.clasificacion_ot === null && (
                   <button
                     className={`px-4 py-2 ${darkMode
                       ? 'bg-gray-700 text-white hover:bg-gray-600'
