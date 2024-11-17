@@ -246,12 +246,12 @@ export default function Config() {
                         ) : (
                           <Button onClick={handleEdit}>Editar Información</Button>
                         )}
-                        <button
+                        {/* <button
                           className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
                           onClick=""
                           >
                           Desactivar Cuenta
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   </CardContent>

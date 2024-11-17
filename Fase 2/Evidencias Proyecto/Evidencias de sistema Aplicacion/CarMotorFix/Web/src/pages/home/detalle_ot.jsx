@@ -10,6 +10,7 @@ import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import Loading from "../../components/animation/loading";
 import { DarkModeContext } from '../../context/DarkModeContext';
+import html2pdf from "html2pdf.js";
 
 export default function WorkOrderDetails() {
   const { darkMode } = useContext(DarkModeContext);
@@ -157,7 +158,7 @@ export default function WorkOrderDetails() {
         });
 
         setCatalogoServicios(response.data || []);
-        console.log('Catalogo Servicios:', response.data);
+        // console.log('Catalogo Servicios:', response.data);
 
 
       } catch (error) {
@@ -506,7 +507,7 @@ export default function WorkOrderDetails() {
             )
           )
         };
-        
+
         const NuevoTotal = Number(Orden.costo) + Number(formData.costo_variable);
 
         const TotalData = {
@@ -560,12 +561,21 @@ export default function WorkOrderDetails() {
     }
   };
 
-  const handleBoleta = async () => {
+  const handleBoleta = () => {
+    const element = document.getElementById('order-and-notes');
+    const options = {
+      margin: 1,
+      filename: 'orden_de_trabajo.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 4 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
 
+    html2pdf().from(element).set(options).save();
   };
 
   return (
-    <div id="element-to-print" className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+    <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
       <div className="print:hidden">
         <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
       </div>
@@ -573,7 +583,7 @@ export default function WorkOrderDetails() {
         <div className="print:hidden">
           <DashboardHeader toggleSidebar={toggleSidebar} />
         </div>
-        <div className="p-4 sm:p-6 flex flex-col">
+        <div id="order-and-notes" className="p-4 sm:p-6 flex flex-col">
           <div className="print:hidden flex flex-col sm:flex-row justify-between items-center mb-4">
             <Button onClick={handleBack} variant="outline" size="md" className="mb-2 sm:mb-0">Volver</Button>
             <h1 className={`text-2xl sm:text-4xl font-bold text-center sm:w-full ${darkMode ? 'text-white' : 'text-black'}`}>Detalle de Orden de Trabajo</h1>
@@ -668,7 +678,9 @@ export default function WorkOrderDetails() {
               <ul className="list-disc pl-5 space-y-2">
                 {Orden.catalogo_servicios && Orden.catalogo_servicios.length > 0 ? (
                   Orden.catalogo_servicios.map((servicio, index) => (
-                    <li key={index}>{servicio.tp_servicio}</li>
+                    <li key={index}>
+                      {servicio.tp_servicio} - {servicio.costserv ? servicio.costserv.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' }) : 'No disponible'}
+                    </li>
                   ))
                 ) : (
                   <li>No hay servicios disponibles</li>
@@ -722,7 +734,7 @@ export default function WorkOrderDetails() {
                   </button>
                 )}
                 <button
-                  className={`px-4 py-2 ${darkMode
+                  className={`print:hidden px-4 py-2 ${darkMode
                     ? 'bg-gray-700 text-white hover:bg-gray-600'
                     : 'bg-black text-white hover:bg-gray-700'
                     } rounded`}
@@ -732,7 +744,7 @@ export default function WorkOrderDetails() {
                 </button>
 
                 <button
-                  className={`ml-2 px-4 py-2 ${darkMode
+                  className={`print:hidden ml-2 px-4 py-2 ${darkMode
                     ? 'bg-gray-700 text-white hover:bg-gray-600'
                     : 'bg-black text-white hover:bg-gray-700'
                     } rounded`}
@@ -742,7 +754,6 @@ export default function WorkOrderDetails() {
                 </button>
               </div>
             )}
-
           </Card>
 
           <div className={`rounded-lg shadow-md p-4 mt-6 sm:p-6 overflow-x-auto ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
@@ -851,7 +862,6 @@ export default function WorkOrderDetails() {
               </button>
             </form>
           </Modal>
-
 
           <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
             <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
