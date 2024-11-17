@@ -21,6 +21,7 @@ import Detalle_Orden from './pages/home/detalle_ot';
 import AsignarMecanico from './pages/admin/asignar_mecanico';
 import { DarkModeProvider } from './context/DarkModeContext';
 import OrdenDeTrabajo from './pages/mecanico/OrdenDeTrabajo';
+import BoletaTailwind from './pages/Client/Boleta';
 
 function App() {
   return (
@@ -29,6 +30,22 @@ function App() {
         <Router>
           <Routes>
             {/* Rutas públicas */}
+            <Route
+              path="/"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/pdf"
+              element={
+                <PublicRoute>
+                  <BoletaTailwind />
+                </PublicRoute>
+              }
+            />
             <Route
               path="/"
               element={

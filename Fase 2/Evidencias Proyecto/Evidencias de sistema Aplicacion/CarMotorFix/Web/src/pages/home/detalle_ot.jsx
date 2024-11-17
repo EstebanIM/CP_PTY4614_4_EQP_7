@@ -506,7 +506,7 @@ export default function WorkOrderDetails() {
             )
           )
         };
-
+        
         const NuevoTotal = Number(Orden.costo) + Number(formData.costo_variable);
 
         const TotalData = {
@@ -708,33 +708,29 @@ export default function WorkOrderDetails() {
                   </button>
                 </div>
               )}
-            {Orden.estado_ot_id?.nom_estado === 'Finalizado' &&
-              ['Authenticated'].includes(userRole) && (
-                <div className="print:hidden mt-6 flex justify-end">
-                  {Orden.clasificacion_ot.length > 0 && (
-                    <button
-                      className={`px-4 py-2 ${darkMode
-                        ? 'bg-gray-700 text-white hover:bg-gray-600'
-                        : 'bg-black text-white hover:bg-gray-700'
-                        } rounded`}
-                      onClick={() => setshowAddValorizar(true)}
-                    >
-                      Valorizar
-                    </button>
-                  )}
+            {Orden.estado_ot_id?.nom_estado === 'Finalizado' && (
+              <div className="print:hidden mt-6 flex justify-end">
+                {Orden.clasificacion_ot.length > 0 && (
                   <button
                     className={`px-4 py-2 ${darkMode
                       ? 'bg-gray-700 text-white hover:bg-gray-600'
                       : 'bg-black text-white hover:bg-gray-700'
                       } rounded`}
-                    onClick={() => setshowupdateValorizar(true)}
+                    onClick={() => setshowAddValorizar(true)}
                   >
-                    Modificar Valorizar
+                    Valorizar
                   </button>
-                </div>
-              )}
-            <div className="print:hidden mt-6 flex justify-end">
-              {Orden.estado_ot_id?.nom_estado === 'Finalizado' && (
+                )}
+                <button
+                  className={`px-4 py-2 ${darkMode
+                    ? 'bg-gray-700 text-white hover:bg-gray-600'
+                    : 'bg-black text-white hover:bg-gray-700'
+                    } rounded`}
+                  onClick={() => setshowupdateValorizar(true)}
+                >
+                  Modificar Valorizar
+                </button>
+
                 <button
                   className={`ml-2 px-4 py-2 ${darkMode
                     ? 'bg-gray-700 text-white hover:bg-gray-600'
@@ -744,8 +740,8 @@ export default function WorkOrderDetails() {
                 >
                   Descargar Boleta
                 </button>
-              )}
-            </div>
+              </div>
+            )}
 
           </Card>
 
@@ -855,6 +851,7 @@ export default function WorkOrderDetails() {
               </button>
             </form>
           </Modal>
+
 
           <Modal isOpen={showAddEstado} onClose={() => setshowAddEstado(false)}>
             <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
