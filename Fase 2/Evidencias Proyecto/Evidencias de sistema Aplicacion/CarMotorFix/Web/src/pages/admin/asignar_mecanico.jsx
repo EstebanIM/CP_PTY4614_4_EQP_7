@@ -6,6 +6,7 @@ import DashboardSidebar from '../../components/menu/DashboardSidebar';
 import DashboardHeader from '../../components/menu/DashboardHeader';
 import { Button } from '../../components/ui/button';
 import { DarkModeContext } from '../../context/DarkModeContext';
+import LoadingComponent from '../../components/animation/loading';
 
 function AsignarMecanico() {
     const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
@@ -16,6 +17,7 @@ function AsignarMecanico() {
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userRole, setUserRole] = useState(null);
+    const [loadingUserRole, setLoadingUserRole] = useState(true); // Nuevo estado de carga
 
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -38,7 +40,11 @@ function AsignarMecanico() {
                     setUserRole(response.role.name);
                 } catch (error) {
                     console.error('Error fetching user role:', error);
+                } finally {
+                    setLoadingUserRole(false); // Actualizamos el estado de carga
                 }
+            } else {
+                setLoadingUserRole(false); // Si no hay JWT, también actualizamos el estado
             }
         };
 
@@ -137,21 +143,25 @@ function AsignarMecanico() {
         }
     };
 
-if (userRole !== 'Admin') {
-    return (
-        <div className="flex flex-col justify-center items-center h-screen bg-gray-100">
-            <h1 className="text-5xl font-bold text-red-500 mb-4">404</h1>
-            <p className="text-xl text-gray-700 mb-8">Oops! La página que buscas no existe.</p>
-            <button
-                onClick={() => window.location.href = '/inicio'}
-                className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-all"
-            >
-                Volver al inicio
-            </button>
-        </div>
-    );
-    
-} else {
+    if (loadingUserRole) {
+        return <LoadingComponent />;
+    }
+
+    if (userRole !== 'Admin') {
+        return (
+            <div className="flex flex-col justify-center items-center h-screen bg-gray-100">
+                <h1 className="text-5xl font-bold text-red-500 mb-4">404</h1>
+                <p className="text-xl text-gray-700 mb-8">Oops! La página que buscas no existe.</p>
+                <button
+                    onClick={() => window.location.href = '/inicio'}
+                    className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-all"
+                >
+                    Volver al inicio
+                </button>
+            </div>
+        );
+    }
+
     return (
         <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
             <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} darkMode={darkMode} />
@@ -234,7 +244,6 @@ if (userRole !== 'Admin') {
             )}
         </div>
     )
-}
 }
 
 export default AsignarMecanico;
