@@ -594,22 +594,25 @@ export default function WorkOrderDetails() {
               <h2 className="text-2xl font-bold">Orden #{Orden.id}</h2>
               <div className="print:hidden">
                 {Orden.descripcion &&
-                  userRole === 'Authenticated' &&
-                  Orden.estado_ot_id?.nom_estado === 'Cotizando' &&
-                  Orden.estado_ot_id?.nom_estado === 'Nueva Cotización' && (
+                  ['Authenticated'].includes(userRole) &&
+                  (Orden.estado_ot_id?.nom_estado === 'Cotizando' || Orden.estado_ot_id?.nom_estado === 'Nueva Cotización') &&
+                  Orden.fechaentrega && (
                     <div className="space-x-4">
-                      <button className="px-4 py-2 bg-green-700 text-white rounded"
+                      <button
+                        className="px-4 py-2 bg-green-700 text-white rounded"
                         onClick={() => actualizarEstadoOrden(Orden.documentId, 2)} // 2 para "Aceptado"
                       >
                         Aceptar
                       </button>
-                      <button className="px-4 py-2 bg-red-700 text-white rounded"
+                      <button
+                        className="px-4 py-2 bg-red-700 text-white rounded"
                         onClick={() => actualizarEstadoOrden(Orden.documentId, 4)} // 4 para "Rechazado"
                       >
                         Rechazar
                       </button>
                     </div>
                   )}
+
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-6">
@@ -720,28 +723,34 @@ export default function WorkOrderDetails() {
                   </button>
                 </div>
               )}
+
             {Orden.estado_ot_id?.nom_estado === 'Finalizado' && (
               <div className="print:hidden mt-6 flex justify-end">
-                {Orden.clasificacion_ot === null && (
-                  <button
-                    className={`px-4 py-2 ${darkMode
-                      ? 'bg-gray-700 text-white hover:bg-gray-600'
-                      : 'bg-black text-white hover:bg-gray-700'
-                      } rounded`}
-                    onClick={() => setshowAddValorizar(true)}
-                  >
-                    Valorizar
-                  </button>
+                {['Authenticated'].includes(userRole) && (
+                  <>
+                    {Orden.clasificacion_ot === null ? (
+                      <button
+                        className={`px-4 py-2 ${darkMode
+                          ? 'bg-gray-700 text-white hover:bg-gray-600'
+                          : 'bg-black text-white hover:bg-gray-700'
+                          } rounded`}
+                        onClick={() => setshowAddValorizar(true)}
+                      >
+                        Valorizar
+                      </button>
+                    ) : (
+                      <button
+                        className={`px-4 py-2 ${darkMode
+                          ? 'bg-gray-700 text-white hover:bg-gray-600'
+                          : 'bg-black text-white hover:bg-gray-700'
+                          } rounded`}
+                        onClick={() => setshowupdateValorizar(true)}
+                      >
+                        Modificar Valoriación
+                      </button>
+                    )}
+                  </>
                 )}
-                <button
-                  className={`print:hidden px-4 py-2 ${darkMode
-                    ? 'bg-gray-700 text-white hover:bg-gray-600'
-                    : 'bg-black text-white hover:bg-gray-700'
-                    } rounded`}
-                  onClick={() => setshowupdateValorizar(true)}
-                >
-                  Modificar Valorizar
-                </button>
 
                 <button
                   className={`print:hidden ml-2 px-4 py-2 ${darkMode
@@ -754,6 +763,8 @@ export default function WorkOrderDetails() {
                 </button>
               </div>
             )}
+
+
           </Card>
 
           <div className={`rounded-lg shadow-md p-4 mt-6 sm:p-6 overflow-x-auto ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
@@ -1024,7 +1035,7 @@ export default function WorkOrderDetails() {
           </Modal>
 
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }

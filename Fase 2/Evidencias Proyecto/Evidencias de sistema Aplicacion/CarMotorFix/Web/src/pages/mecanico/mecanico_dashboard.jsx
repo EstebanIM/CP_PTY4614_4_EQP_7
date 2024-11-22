@@ -8,15 +8,16 @@ import { getTokenFromLocalCookie } from "../../lib/cookies";
 import { fetcher } from "../../lib/strApi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { DarkModeContext } from '../../context/DarkModeContext'; // Importar el contexto
+import { DarkModeContext } from '../../context/DarkModeContext';
 import { Button } from "../../components/ui/config/button";
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 const DashboardAutos = () => {
-  const { darkMode } = useContext(DarkModeContext); // Obtener el estado de darkMode
+  const { darkMode } = useContext(DarkModeContext);
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
   const [totalServicios, setTotalServicios] = useState(0);
   const [vehiculos, setVehiculos] = useState([]);
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
@@ -56,6 +57,7 @@ const DashboardAutos = () => {
     const jwt = getTokenFromLocalCookie();
 
     const fetchIDMecanico = async () => {
+      setLoading(true);
       try {
         const response = await fetcher(
           `${STRAPI_URL}/api/users/me?populate[mecanico][populate][vehiculos][filters][estado][$eq]=true&populate[mecanico][populate][vehiculos][fields]=id,anio,documentId,modelo,motor,patente,estado&populate[mecanico][populate][vehiculos][populate][user_id][fields]=id&populate[mecanico][populate][vehiculos][populate][marca_id][fields]=nombre_marca`,
@@ -66,7 +68,7 @@ const DashboardAutos = () => {
             },
           }
         );
-
+        
         setIdMecanico(response.mecanico.documentId);
 
         const Vehiculos = response.mecanico.vehiculos.map((vehiculo) => ({
@@ -86,12 +88,16 @@ const DashboardAutos = () => {
         const vehiculosUnicos = new Set(vehiculosHabilitados.map(vehiculo => vehiculo.id));
         setTotalVehiculos(vehiculosUnicos.size);
         setVehiculos(vehiculosHabilitados);
+        console.log('Vehiculos:', vehiculosHabilitados);
+        
 
 
       } catch (error) {
         console.error('Error fetching IDMecanico:', error);
       }
     };
+
+    setLoading(false);
 
     fetchIDMecanico();
   }, []);
@@ -100,7 +106,7 @@ const DashboardAutos = () => {
     if (!idMecanico) return;
 
     const jwt = getTokenFromLocalCookie();
-
+    setLoading(true);
     const fetchOT = async () => {
       try {
         const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&populate[estado_ot_id][fields]=nom_estado&populate[vehiculo][fields]=id,anio,modelo,motor,patente&populate[vehiculo][populate][marca_id][fields]=nombre_marca&populate[vehiculo][populate][user_id][fields]=id&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
@@ -214,6 +220,8 @@ const DashboardAutos = () => {
       }
     };
 
+    setLoading(false);
+    
     fetchUsers();
     fetchMarcas();
     fetchTiposVehiculo();
@@ -551,7 +559,7 @@ const DashboardAutos = () => {
           <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <CardContent className="overflow-x-auto">
               <Table className="min-w-full">
-                <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
+                <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} loading={loading} />
               </Table>
             </CardContent>
           </Card>
@@ -569,7 +577,7 @@ const DashboardAutos = () => {
                       <h4 className="text-xl">No hay ordenes activas.</h4>
                     </div>
                   ) : (
-                    <Tablas servicio={ordenes} handleViewTabla={handleViewOT} columns={columns2} />
+                    <Tablas servicio={ordenes} handleViewTabla={handleViewOT} columns={columns2} loading={loading} />
                   )}
                 </Table>
               </CardContent>
@@ -590,7 +598,7 @@ const DashboardAutos = () => {
             <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <CardContent className="overflow-x-auto">
                 <Table className="min-w-full">
-                  <Tablas servicio={Cotizaciones} handleViewTabla={handleViewOT} columns={columns3} />
+                  <Tablas servicio={Cotizaciones} handleViewTabla={handleViewOT} columns={columns3} loading={loading} />
                 </Table>
               </CardContent>
             </Card>
@@ -749,7 +757,7 @@ const DashboardAutos = () => {
             >
               <option value="">Selecciona un vehículo</option>
               {vehiculos.map((vehiculo) => (
-                vehiculo && vehiculo.id && vehiculo.marca_id && vehiculo.marca_id.nombre_marca ? (
+                vehiculo && vehiculo.id ? (
                   <option key={vehiculo.id} value={vehiculo.id}>
                     {vehiculo.marca_id} {vehiculo.modelo} - {vehiculo.patente}
                   </option>
