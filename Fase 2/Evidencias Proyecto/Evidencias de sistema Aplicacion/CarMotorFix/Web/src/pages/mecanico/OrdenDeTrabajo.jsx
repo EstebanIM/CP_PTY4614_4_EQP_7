@@ -31,12 +31,12 @@ function OrdenDeTrabajo() {
                         Authorization: `Bearer ${jwt}`,
                     },
                 });
-    
+
                 setUserRole(response.role.name);
                 if (response.mecanico) {
                     setMecanicoID(response.mecanico.documentId);
                 } else {
-                setOrdenTrabajo(response.ots);
+                    setOrdenTrabajo(response.ots);
                 }
 
             } catch (error) {
@@ -44,7 +44,7 @@ function OrdenDeTrabajo() {
             }
         }
     };
-    
+
     const fetchOrdenesTrabajo = async () => {
         const jwt = getTokenFromLocalCookie();
         if (jwt && mecanicoID) {
@@ -55,29 +55,30 @@ function OrdenDeTrabajo() {
                         Authorization: `Bearer ${jwt}`,
                     },
                 });
-    
+
                 setOrdenTrabajo(response.data.orden_trabajos_id);
-                
+                console.log(response.data.orden_trabajos_id);
+
             } catch (error) {
                 console.error("Error fetching ordenes de trabajo:", error);
             }
         }
     };
-    
+
     useEffect(() => {
         const fetchData = async () => {
             await fetchUser();
         };
-    
+
         fetchData();
     }, []);
-    
+
     useEffect(() => {
         if (mecanicoID) {
             fetchOrdenesTrabajo();
         }
     }, [mecanicoID]);
-    
+
 
     const handleViewOT = (ordenTrabajo) => {
         navigate(`/detalle_ot/${ordenTrabajo.documentId}`);
@@ -85,13 +86,23 @@ function OrdenDeTrabajo() {
 
     const columns = [
         {
+            header: "N° Orden",
+            key: "nro_orden",
+            render: (ordenTrabajo) => ordenTrabajo.id || 'N° Orden no disponible',
+        },
+        {
+            header: "Cliente",
+            key: "cliente",
+
+            render: (ordenTrabajo) => ordenTrabajo.user?.nombre + ' ' + ordenTrabajo.user?.apellido || 'Cliente no disponible',
+        },
+        {
             header: "Servicio",
             key: "servicio",
             render: (ordenTrabajo) => {
                 if (ordenTrabajo.catalogo_servicios && ordenTrabajo.catalogo_servicios.length > 0) {
-                    const firstService = ordenTrabajo.catalogo_servicios[0].tp_servicio;
-                    const moreServices = ordenTrabajo.catalogo_servicios.length > 1;
-                    return moreServices ? `${firstService} (+${ordenTrabajo.catalogo_servicios.length - 1} más)` : firstService;
+                    const allServices = ordenTrabajo.catalogo_servicios.map(servicio => servicio.tp_servicio).join(', ');
+                    return allServices;
                 }
                 return 'Servicio no disponible';
             },
