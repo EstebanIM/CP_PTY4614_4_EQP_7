@@ -253,7 +253,7 @@ function Servicios() {
                                             value={selectedCategory}
                                             onChange={handleCategoryChange}
                                             required
-                                            className={`p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                                            className={`p-2 border rounded w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                                         >
                                             <option value="" className="text-gray-500">Seleccione una categoría</option>
                                             {opcionesServicios.map((categoria) => (
@@ -268,7 +268,7 @@ function Servicios() {
                                                 value={newServicio.tp_servicio}
                                                 onChange={handleOptionChange}
                                                 required
-                                                className={`p-2 border rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : ''}`}
+                                                className={`p-2 border rounded w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                                             >
                                                 <option value="" className="text-gray-500">Seleccione un tipo de servicio</option>
                                                 {opcionesServicios.find(cat => cat.categoria === selectedCategory)?.opciones.map((opcion) => (

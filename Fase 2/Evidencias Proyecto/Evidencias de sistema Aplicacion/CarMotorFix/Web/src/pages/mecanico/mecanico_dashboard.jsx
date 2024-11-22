@@ -86,6 +86,8 @@ const DashboardAutos = () => {
         const vehiculosUnicos = new Set(vehiculosHabilitados.map(vehiculo => vehiculo.id));
         setTotalVehiculos(vehiculosUnicos.size);
         setVehiculos(vehiculosHabilitados);
+        console.log('Vehiculos:', vehiculosHabilitados);
+        
 
 
       } catch (error) {
@@ -749,7 +751,7 @@ const DashboardAutos = () => {
             >
               <option value="">Selecciona un vehículo</option>
               {vehiculos.map((vehiculo) => (
-                vehiculo && vehiculo.id && vehiculo.marca_id && vehiculo.marca_id.nombre_marca ? (
+                vehiculo && vehiculo.id ? (
                   <option key={vehiculo.id} value={vehiculo.id}>
                     {vehiculo.marca_id} {vehiculo.modelo} - {vehiculo.patente}
                   </option>
