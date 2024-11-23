@@ -68,7 +68,7 @@ const DashboardAutos = () => {
             },
           }
         );
-        
+
         setIdMecanico(response.mecanico.documentId);
 
         const Vehiculos = response.mecanico.vehiculos.map((vehiculo) => ({
@@ -89,7 +89,7 @@ const DashboardAutos = () => {
         setTotalVehiculos(vehiculosUnicos.size);
         setVehiculos(vehiculosHabilitados);
         console.log('Vehiculos:', vehiculosHabilitados);
-        
+
 
 
       } catch (error) {
@@ -221,7 +221,7 @@ const DashboardAutos = () => {
     };
 
     setLoading(false);
-    
+
     fetchUsers();
     fetchMarcas();
     fetchTiposVehiculo();
@@ -522,6 +522,8 @@ const DashboardAutos = () => {
     setNewVehiculo({ ...newVehiculo, [e.target.name]: e.target.value });
   };
 
+  const today = new Date().toISOString().split('T')[0];
+
   return (
     <div className={`flex ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <div className="container mx-auto p-4">
@@ -779,6 +781,7 @@ const DashboardAutos = () => {
               onChange={handleChangeCotizacion}
               className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white border-gray-600' : 'focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 border-gray-300'} rounded-md`}
               required
+              min={today}
             />
           </div>
 
@@ -795,6 +798,7 @@ const DashboardAutos = () => {
               onChange={handleChangeCotizacion}
               className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white border-gray-600' : 'focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 border-gray-300'} rounded-md`}
               required
+              min={formData.fecharecepcion || new Date().toISOString().split('T')[0]}
             />
           </div>
 
