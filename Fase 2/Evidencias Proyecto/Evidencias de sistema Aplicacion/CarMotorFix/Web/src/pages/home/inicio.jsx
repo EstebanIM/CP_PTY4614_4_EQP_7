@@ -6,12 +6,10 @@ import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
 import ConsejoAutoDelDia from '../../components/mensaje/mensajedia';
 import { DarkModeContext } from '../../context/DarkModeContext'; // Asegúrate de la ruta correcta
-import Cookies from 'js-cookie';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function Inicio() {
-  console.log(Cookies.get('rol'));
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userRole, setUserRole] = useState(null);

@@ -260,7 +260,7 @@ function DetalleVehiculo() {
     };
 
     const handleViewOT = (id) => {
-        console.log("Ver OT:", id);
+        navigate(`/detalle_ot/${id.documentId}`);
     };
 
     if (!vehiculo) return <LoadingComponent />;
