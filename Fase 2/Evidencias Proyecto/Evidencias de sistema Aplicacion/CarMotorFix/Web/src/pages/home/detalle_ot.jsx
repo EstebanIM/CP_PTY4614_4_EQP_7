@@ -188,7 +188,11 @@ export default function WorkOrderDetails() {
   }, [Orden, vehiculo]);
 
   const handleBack = () => {
-    navigate('/dashboard');
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   const formatPatente = (patente) => {

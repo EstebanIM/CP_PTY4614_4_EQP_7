@@ -2,9 +2,9 @@ import { ArrowRight } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { useContext } from 'react';
 import { DarkModeContext } from '../context/DarkModeContext';
-import Spinner from './animation/spinner'; 
+import Spinner from './animation/spinner';
 
-const Tablas = ({ servicio, handleViewTabla, columns, loading }) => {
+const Tablas = ({ servicio = [], handleViewTabla, columns = [], loading = false }) => {
     const { darkMode } = useContext(DarkModeContext);
 
     if (loading) {
@@ -87,22 +87,11 @@ const Tablas = ({ servicio, handleViewTabla, columns, loading }) => {
         </div>
     );
 };
-
 Tablas.propTypes = {
-    servicio: PropTypes.arrayOf(PropTypes.object).isRequired,
-    handleViewTabla: PropTypes.func.isRequired,
-    columns: PropTypes.arrayOf(
-        PropTypes.shape({
-            header: PropTypes.string.isRequired,
-            key: PropTypes.string.isRequired,
-            render: PropTypes.func
-        })
-    ).isRequired,
-    loading: PropTypes.bool
-};
-
-Tablas.defaultProps = {
-    loading: false
+    servicio: PropTypes.array,
+    handleViewTabla: PropTypes.func,
+    columns: PropTypes.array,
+    loading: PropTypes.bool,
 };
 
 export default Tablas;
