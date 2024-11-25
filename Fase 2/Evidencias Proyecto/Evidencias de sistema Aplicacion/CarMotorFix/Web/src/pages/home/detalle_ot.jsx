@@ -566,17 +566,29 @@ export default function WorkOrderDetails() {
   };
 
   const handleBoleta = () => {
-    const element = document.getElementById('order-and-notes');
+    const element = document.getElementById("order-and-notes");
+    const body = document.body;
+
+    body.classList.add("pdf-hide-buttons", "pdf-light-mode");
+
     const options = {
       margin: 1,
-      filename: 'orden_de_trabajo.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
+      filename: "orden_de_trabajo.pdf",
+      image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 4 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
     };
 
-    html2pdf().from(element).set(options).save();
+    html2pdf()
+      .from(element)
+      .set(options)
+      .save()
+      .finally(() => {
+        body.classList.remove("pdf-hide-buttons", "pdf-light-mode");
+      });
   };
+
+
 
   return (
     <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
@@ -763,7 +775,7 @@ export default function WorkOrderDetails() {
                     } rounded`}
                   onClick={handleBoleta}
                 >
-                  Descargar Boleta
+                  Generar detalle
                 </button>
               </div>
             )}
