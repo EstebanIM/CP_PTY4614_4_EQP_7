@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button"; 
-import { Menu, Bell, User, Settings, LogOut } from "lucide-react";
+import { Menu, User, Settings, LogOut } from "lucide-react";
 import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { unsetToken, getTokenFromLocalCookie } from '../../lib/cookies';
@@ -62,9 +62,6 @@ export default function DashboardHeader({ toggleSidebar }) {
         </div>
 
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" className="mr-2">
-            <Bell className={`h-5 w-5 ${darkMode ? 'text-white' : 'text-gray-900'}`} />
-          </Button>
           <div className="relative dropdown">
             <Button variant="ghost" size="icon" onClick={toggleDropdown}>
               <User className={`h-5 w-5 ${darkMode ? 'text-white' : 'text-gray-900'}`} />

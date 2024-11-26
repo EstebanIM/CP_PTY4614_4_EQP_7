@@ -7,7 +7,7 @@ import { Button } from '../../components/ui/config/button';
 import { Label } from '../../components/ui/config/label';
 import { Switch } from '../../components/ui/config/Switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/config/cards';
-import { User, IdCard, Mail, Lock, Bell, Palette, Eye, EyeOff } from 'lucide-react';
+import { User, IdCard, Mail, Lock, Palette, Eye, EyeOff } from 'lucide-react';
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import { fetcher } from '../../lib/strApi';
@@ -196,7 +196,6 @@ export default function Config() {
             <Tabs defaultValue="perfil" className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="perfil">Perfil</TabsTrigger>
-                <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
                 <TabsTrigger value="apariencia">Apariencia</TabsTrigger>
               </TabsList>
 
@@ -304,29 +303,6 @@ export default function Config() {
                   </CardContent>
                 </Card>
 
-              </TabsContent>
-
-              {/* Notificaciones */}
-              <TabsContent value="notificaciones">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Bell className="h-5 w-5" />
-                      Preferencias de Notificaciones
-                    </CardTitle>
-                    <CardDescription>Gestiona cómo y cuándo recibes notificaciones</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="email-notif">Notificaciones por Email</Label>
-                      <Switch id="email-notif" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="sms-notif">Notificaciones por SMS</Label>
-                      <Switch id="sms-notif" />
-                    </div>
-                  </CardContent>
-                </Card>
               </TabsContent>
 
               {/* Apariencia */}

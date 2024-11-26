@@ -1,22 +1,19 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Cambiado a useNavigate de react-router-dom
+import { useNavigate } from 'react-router-dom'; // Cambiado a useNavigate
 import { useAuth } from './context/AuthContext';
-import Cookies from 'js-cookie';
 import PropTypes from 'prop-types';
 
 const PublicRoute = ({ children }) => {
   const { user } = useAuth();
-  const navigate = useNavigate(); // Cambiado a useNavigate
+  const navigate = useNavigate(); // Usamos el hook de navegación
 
   useEffect(() => {
-    const jwt = Cookies.get('jwt');
-
-    if (user || jwt) {
-      navigate('/Inicio', { replace: true }); // Redirigir a /Inicio si el usuario está autenticado
+    if (user) {
+      navigate('/Inicio'); // Si está autenticado, lo redirige a '/' (por ejemplo, la página principal)
     }
   }, [user, navigate]);
 
-  return !user ? children : null; // Retorna los children solo si el usuario no está autenticado
+  return !user ? children : null; // Si no está autenticado, muestra los hijos (página pública)
 };
 
 PublicRoute.propTypes = {
