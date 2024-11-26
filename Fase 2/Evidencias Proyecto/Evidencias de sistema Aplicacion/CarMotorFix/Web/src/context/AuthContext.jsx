@@ -1,32 +1,29 @@
-import  { createContext, useContext, useState, useEffect } from 'react';
-import PropTypes from 'prop-types'; // Para validaciones de prop-types
-import { getUserFromLocalCookie, getTokenFromLocalCookie } from '../lib/cookies'; // Para obtener los datos del usuario desde las cookies
-import { login as loginService } from '../services/authService'; // Importa el servicio de login
+import { createContext, useContext, useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { getUserFromLocalCookie, getTokenFromLocalCookie } from '../lib/cookies';
+import { login as loginService } from '../services/authService';
 
-// Crear contexto de autenticación
 const AuthContext = createContext();
 
-// Proveedor del contexto
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // Estado del usuario
-  const [loading, setLoading] = useState(true); // Estado de carga
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Comprobación inicial del usuario desde las cookies
   useEffect(() => {
     const checkUser = async () => {
-      const token = getTokenFromLocalCookie(); // Obtén el token desde las cookies
+      const token = getTokenFromLocalCookie();
       if (!token) {
+        setUser(null);
         setLoading(false);
-        setUser(null); // No hay token, no hay usuario autenticado
         return;
       }
 
       try {
-        const currentUser = await getUserFromLocalCookie(); // Obtén el usuario desde el backend usando el token
-        setUser(currentUser); // Establece el usuario en el estado
+        const currentUser = await getUserFromLocalCookie();
+        setUser(currentUser);
       } catch (error) {
         console.error('Error al verificar el usuario:', error);
-        setUser(null); // Error, no hay usuario válido
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -35,33 +32,26 @@ export const AuthProvider = ({ children }) => {
     checkUser();
   }, []);
 
-  // Función para el login
   const login = async (email, password) => {
     try {
-      const loggedInUser = await loginService(email, password); // Usa el servicio de login
-      setUser(loggedInUser); // Establece el usuario
+      const loggedInUser = await loginService(email, password);
+      setUser(loggedInUser); // Actualiza el estado del usuario
+      return loggedInUser; // Devuelve el usuario si es necesario
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
+      throw error;
     }
   };
 
-  // Función para el logout
-  const logout = () => {
-    localStorage.removeItem('jwt');
-    setUser(null);
-  };
-
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// PropTypes para asegurar que el AuthProvider reciba los hijos correctamente
 AuthProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-// Hook para acceder al contexto de autenticación
 export const useAuth = () => useContext(AuthContext);

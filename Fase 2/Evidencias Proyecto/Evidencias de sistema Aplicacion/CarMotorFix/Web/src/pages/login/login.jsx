@@ -6,14 +6,16 @@ import { LoginForm } from '../../components/forms/logins';
 import { RegisterForm } from '../../components/forms/register';
 import { ResetPasswordForm } from '../../components/forms/reset';
 import AnimatedBackground from '../../components/animation/animated-background';
-import { login, register, resetPassword } from '../../services/authService';
+import { register, resetPassword } from '../../services/authService';
 import { handleRutChange } from '../../utils/rutHandler';
 import { validateRut, validateEmail } from '../../utils/validation_rut';
 import { Button } from '../../components/ui/button';
 import PropTypes from 'prop-types';
 import LoadingComponent from '../../components/animation/loading';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ResponsiveAuthForm({ className = "" }) {
+  const { user, login, loading: authLoading } = useAuth(); // Obtén el estado y la función `login` del contexto
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,12 +35,18 @@ export default function ResponsiveAuthForm({ className = "" }) {
 
   const navigate = useNavigate();
 
+  // Redirige automáticamente si el usuario ya está autenticado
+  if (user) {
+    navigate("/Inicio");
+    return null;
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       if (mode === "login") {
-        await login(email, password);
+        await login(email, password); // Llama a `login` del contexto
         toast.success("Inicio de sesión exitoso");
         navigate("/Inicio");
       } else if (mode === "register" && validateForm()) {
@@ -46,7 +54,7 @@ export default function ResponsiveAuthForm({ className = "" }) {
         toast.success("Registro exitoso, revisa tu correo para confirmar tu cuenta");
         navigate("/verify-email");
       } else if (mode === "reset") {
-        await resetPassword(email); // Llama a resetPassword para iniciar el proceso de recuperación
+        await resetPassword(email);
         toast.success("Correo de recuperación enviado");
       }
     } catch (error) {
@@ -103,10 +111,10 @@ export default function ResponsiveAuthForm({ className = "" }) {
   const formVariants = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -50 }
+    exit: { opacity: 0, y: -50 },
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return <LoadingComponent />;
   }
 
