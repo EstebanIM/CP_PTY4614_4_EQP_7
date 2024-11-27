@@ -65,7 +65,6 @@ const DashboardAdmin = () => {
   const [activeTab, setActiveTab] = useState("autos");
   const [vehiculos, setVehiculos] = useState([]);
   const [Cotizaciones, setCotizaciones] = useState([]);
-  const [TotalVehiculos, setTotalVehiculos] = useState(0);
   const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
   const [Ordenes, setOrdenes] = useState(0);
   const [TotalOrdenes, setTotalOrdenes] = useState(0);
@@ -96,7 +95,6 @@ const DashboardAdmin = () => {
           const vehiculoIds = response.data || [];
           const validVehiculoIds = vehiculoIds.filter(v => v && v.id && v.estado === true); // Asegurarse de que estado sea true
 
-          setTotalVehiculos(validVehiculoIds.length); // Actualizar con la cantidad filtrada
           setVehiculos(validVehiculoIds);
         } catch (error) {
           console.error('Error fetching vehicles:', error);
@@ -138,6 +136,7 @@ const DashboardAdmin = () => {
           const validOtIds = otIds.filter(v => v && v.id);
 
           setOrdenes(validOtIds);
+          console.log(validOtIds);
           setTotalOrdenes(response.data.length);
 
         } catch (error) {
@@ -312,7 +311,6 @@ const DashboardAdmin = () => {
 
           {/* Tarjetas de estadísticas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <CountUpCard title="Total de Autos" value={TotalVehiculos} />
             <CountUpCard title="Cotizaciones Pendientes" value={TotalCotizaciones} />
             <CountUpCard title="Órdenes Activas" value={TotalOrdenes} />
             <CountUpCard title="Órdenes Pendientes" value={12} />

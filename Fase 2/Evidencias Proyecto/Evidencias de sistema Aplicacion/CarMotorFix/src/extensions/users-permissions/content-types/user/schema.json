@@ -78,7 +78,8 @@
       "mappedBy": "user"
     },
     "nombre": {
-      "type": "string"
+      "type": "string",
+      "required": false
     },
     "apellido": {
       "type": "string"

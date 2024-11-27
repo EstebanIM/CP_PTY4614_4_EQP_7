@@ -25,12 +25,15 @@ export const register = async (email, password, name, surname, rut) => {
   const cleanedRut = rut.replace(/[^0-9]/g, ''); // Limpia el RUT, manteniendo solo números
 
   // Registro en Strapi
-  const strapiResponse = await fetcher(`${STRAPI_URL}/api/auth/local/register`, {
+  const strapiResponse = await fetch(`${STRAPI_URL}/api/auth/local/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, username: generatedUsername, password }),
   });
 
+  console.log(strapiResponse);
+  
+  
   if (strapiResponse.error) {
     throw new Error(strapiResponse.error.message);
   }
@@ -39,7 +42,7 @@ export const register = async (email, password, name, surname, rut) => {
   const userId = strapiResponse.user.id;
   const userjwt = strapiResponse.jwt;
 
-  const accountResponse = await fetcher(`${STRAPI_URL}/api/users/${userId}`, {
+  const accountResponse = await fetch(`${STRAPI_URL}/api/users/${userId}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -47,7 +50,10 @@ export const register = async (email, password, name, surname, rut) => {
     },
     body: JSON.stringify({ nombre: name, apellido: surname, run: cleanedRut }),
   });
-
+  
+  console.log(accountResponse);
+  console.log(accountResponse.error);
+  
   if (accountResponse.error) {
     throw new Error(accountResponse.error.message);
   }
