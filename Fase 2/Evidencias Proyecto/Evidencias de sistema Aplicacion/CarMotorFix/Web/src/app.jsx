@@ -18,7 +18,7 @@ import Dashboard from './pages/home/dashboard';
 import Catalogo_servicio from './pages/admin/Catalogo_servicio';
 import Detalle_servicio from './pages/admin/detalle-servicio';
 import Detalle_Orden from './pages/home/detalle_ot';
-import AsignarMecanico from './pages/admin/asignar_mecanico';
+import VerUsuario from './pages/admin/ver-usuarios';
 import { DarkModeProvider } from './context/DarkModeContext';
 import OrdenDeTrabajo from './pages/mecanico/OrdenDeTrabajo';
 import BoletaTailwind from './pages/Client/Boleta';
@@ -121,10 +121,10 @@ function App() {
               }
             />
             <Route
-              path="/asignar_mecanico"
+              path="/ver-usuario"
               element={
                 <PrivateRoute>
-                  <AsignarMecanico />
+                  <VerUsuario />
                 </PrivateRoute>
               }
             />
