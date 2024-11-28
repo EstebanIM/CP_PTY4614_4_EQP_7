@@ -22,6 +22,7 @@ import AsignarMecanico from './pages/admin/asignar_mecanico';
 import { DarkModeProvider } from './context/DarkModeContext';
 import OrdenDeTrabajo from './pages/mecanico/OrdenDeTrabajo';
 import BoletaTailwind from './pages/Client/Boleta';
+import Client from './pages/Client/Client';
 
 function App() {
   return (
@@ -77,6 +78,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/mis-vehiculos"
+              element={
+                <PrivateRoute>
+                  <Client />
                 </PrivateRoute>
               }
             />

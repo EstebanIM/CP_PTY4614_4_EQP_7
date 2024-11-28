@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button";
-import { Users, CarFront, File, X, List, Home } from "lucide-react";
+import { Users, CarFront, File, X, List, Home, LayoutDashboard } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { DarkModeContext } from '../../context/DarkModeContext';
@@ -57,13 +57,25 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
         </div>
 
         <div>
-          <Link to="/dashboard" className="w-full block">
+          <Link to="/mis-vehiculos" className="w-full block">
             <Button variant="ghost" className="justify-start flex items-center">
               <CarFront className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} />
-              {userRole === "Admin" || userRole === "Mechanic" ? "Dashboard" : "Mis Vehículos"}
+              Mis Vehículos
             </Button>
           </Link>
         </div>
+
+        {/* Dashboard */}
+        {userRole === "Admin" || userRole === "Mechanic" ?(
+          <div>
+          <Link to="/dashboard" className="w-full block">
+            <Button variant="ghost" className="justify-start flex items-center">
+              <LayoutDashboard className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} />
+              Dashboard
+            </Button>
+          </Link>
+        </div>
+          ) : null}
 
         {/* Mecanico */}
         {userRole === "Admin" ? (

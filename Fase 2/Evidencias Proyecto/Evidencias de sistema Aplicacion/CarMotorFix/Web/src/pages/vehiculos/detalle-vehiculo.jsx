@@ -47,7 +47,7 @@ function DetalleVehiculo() {
                     setEditData(response.data);
                     setOts(response.data.ots || []);
                     console.log("Ots", response.data.ots);
-                    
+
 
                 } catch (error) {
                     console.error('Error fetching vehicle details:', error);
@@ -82,7 +82,15 @@ function DetalleVehiculo() {
     }, []);
 
     const handleBack = () => {
-        navigate('/dashboard');
+        if (window.history.length > 1) {
+            navigate(-1);
+        } else {
+            if (userRole === 'Authenticated') {
+                navigate('/mis-vehiculos');
+            } else {
+                navigate('/dashboard');
+            }
+        }
     };
 
     const handleEditClick = () => {

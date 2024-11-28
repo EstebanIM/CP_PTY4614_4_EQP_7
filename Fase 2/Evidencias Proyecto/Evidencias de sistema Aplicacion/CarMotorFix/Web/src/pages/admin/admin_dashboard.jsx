@@ -12,7 +12,6 @@ import { DarkModeContext } from '../../context/DarkModeContext';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
-// Helper function for counting animation
 const useCountUp = (targetValue, duration) => {
   const [count, setCount] = useState(0);
 
@@ -32,7 +31,6 @@ const useCountUp = (targetValue, duration) => {
   return count;
 };
 
-// Component to display stats with counting animation
 const CountUpCard = ({ title, value }) => {
   const { darkMode } = useContext(DarkModeContext);
   const count = useCountUp(value, 1000);
@@ -66,12 +64,10 @@ const DashboardAdmin = () => {
   const [vehiculos, setVehiculos] = useState([]);
   const [Cotizaciones, setCotizaciones] = useState([]);
   const [TotalCotizaciones, setTotalCotizaciones] = useState(0);
+  const navigate = useNavigate();
   const [Ordenes, setOrdenes] = useState(0);
   const [TotalOrdenes, setTotalOrdenes] = useState(0);
-
-  const navigate = useNavigate();
-
-  // Estados de paginación para cada tabla
+  const [Pendientes, setPendientes] = useState(0);
   const [currentPageAutos, setCurrentPageAutos] = useState(1);
   const [currentPageCotizaciones, setCurrentPageCotizaciones] = useState(1);
   const [currentPageOrdenes, setCurrentPageOrdenes] = useState(1);
@@ -136,7 +132,10 @@ const DashboardAdmin = () => {
           const validOtIds = otIds.filter(v => v && v.id);
 
           setOrdenes(validOtIds);
-          console.log(validOtIds);
+          const pendientes = validOtIds.filter(item => item.estado_ot_id.nom_estado === 'Pendiente de aprobación');
+
+          console.log(pendientes);
+          setPendientes(pendientes.length);
           setTotalOrdenes(response.data.length);
 
         } catch (error) {
@@ -158,14 +157,12 @@ const DashboardAdmin = () => {
     navigate(`/detalle_ot/${cotizacion.documentId}`);
   };
 
-  // Funciones de cambio de página para cada tabla
   const handlePageChange = (setCurrentPage, totalPages, newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
   };
 
-  // Cálculos de paginación para cada tabla
   const paginate = (data, currentPage) => {
     if (!Array.isArray(data)) {
       return [];
@@ -313,7 +310,7 @@ const DashboardAdmin = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <CountUpCard title="Cotizaciones Pendientes" value={TotalCotizaciones} />
             <CountUpCard title="Órdenes Activas" value={TotalOrdenes} />
-            <CountUpCard title="Órdenes Pendientes" value={12} />
+            <CountUpCard title="Órdenes Pendientes" value={Pendientes} />
           </div>
 
           <div className="mb-6">

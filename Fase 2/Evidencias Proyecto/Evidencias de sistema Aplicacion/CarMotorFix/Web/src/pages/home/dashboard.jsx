@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 
-import Client from "../Client/Client";
+// import Client from "../Client/Client";
 import Mecanico_dashboard from "../mecanico/mecanico_dashboard";
 import Admin_dashboard from "../admin/admin_dashboard";
 
@@ -13,15 +13,15 @@ import { DarkModeContext } from '../../context/DarkModeContext';
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function MisVehiculos() {
-    const { darkMode } = useContext(DarkModeContext); // Usar DarkModeContext
+    const { darkMode } = useContext(DarkModeContext);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [userRole, setUserRole] = useState(null); // Para guardar el rol del usuario
+    const [userRole, setUserRole] = useState(null);
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
     const fetchUserRole = async () => {
-        const jwt = getTokenFromLocalCookie(); // Obtener el JWT
+        const jwt = getTokenFromLocalCookie();
         if (jwt) {
             try {
                 const response = await fetcher(`${STRAPI_URL}/api/users/me?populate=*`, {
@@ -31,7 +31,7 @@ export default function MisVehiculos() {
                     },
                 });
 
-                setUserRole(response.role.name); // Guarda el nombre del rol en el estado
+                setUserRole(response.role.name);
             } catch (error) {
                 console.error("Error fetching user role:", error);
             }
@@ -39,18 +39,18 @@ export default function MisVehiculos() {
     };
 
     useEffect(() => {
-        fetchUserRole(); // Llama a la función para obtener el rol cuando el componente se monte
+        fetchUserRole();
     }, []);
 
     const renderComponentByRole = (role) => {
         switch (role) {
-            case "Authenticated":
-                return (
-                    <>
-                        <h1 className="text-2xl font-bold mb-6">Mis Vehículos</h1>
-                        <Client />
-                    </>
-                );
+            // case "Authenticated":
+            //     return (
+            //         <>
+            //             <h1 className="text-2xl font-bold mb-6">Mis Vehículos</h1>
+            //             <Client />
+            //         </>
+            //     );
             case "Mechanic":
                 return (
                     <>

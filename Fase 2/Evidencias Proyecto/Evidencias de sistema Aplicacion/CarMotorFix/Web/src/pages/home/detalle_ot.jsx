@@ -191,7 +191,11 @@ export default function WorkOrderDetails() {
     if (window.history.length > 1) {
       navigate(-1);
     } else {
-      navigate('/dashboard');
+      if (userRole === 'Authenticated') {
+        navigate('/mis-vehiculos');
+      } else {
+        navigate('/dashboard');
+      }
     }
   };
 
