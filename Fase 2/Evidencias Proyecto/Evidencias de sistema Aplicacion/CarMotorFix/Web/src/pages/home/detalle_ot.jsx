@@ -69,7 +69,7 @@ export default function WorkOrderDetails() {
         setOrden(response.data);
         // console.log(response.data);
 
-        const ViewNotas = response.data.notas.map((nota) => {
+        const ViewNotas = response.data.notas?.map((nota) => {
           return {
             id: nota.id,
             descripcion: nota.descripcion,
@@ -595,7 +595,7 @@ export default function WorkOrderDetails() {
 
 
   return (
-    <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+    <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
       <div className="print:hidden">
         <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
       </div>
@@ -790,7 +790,7 @@ export default function WorkOrderDetails() {
           <div className={`rounded-lg shadow-md p-4 mt-6 sm:p-6 overflow-x-auto ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <h3 className="text-lg sm:text-xl font-semibold mb-4">Notas de Mantenimiento</h3>
             <div className="min-w-full">
-              {notas.length === 0 ? (
+              {notas?.length === 0 ? (
                 <div className="text-center text-gray-500 mt-4">
                   <h4 className="text-xl">No hay Notas sobre esta Orden de trabajo.</h4>
                 </div>
@@ -819,7 +819,7 @@ export default function WorkOrderDetails() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {notas.map((nota) => (
+                    {notas?.map((nota) => (
                       <tr key={nota.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {nota.descripcion}

@@ -47,10 +47,18 @@ function OrdenDeTrabajo() {
                         },
                     }
                 );
-
+                console.log("Orden ",ordenesResponse);
+                
                 setOrdenTrabajo(ordenesResponse.data.orden_trabajos_id || []);
             } else {
-                setOrdenTrabajo(userResponse.ots || []);
+                const ordenesResponse = await fetcher(`${STRAPI_URL}/api/orden-trabajos?pLevel`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                });
+                console.log("Orden ",ordenesResponse);
+                setOrdenTrabajo(ordenesResponse.data || []);
             }
         } catch (error) {
             console.error('Error fetching data:', error);

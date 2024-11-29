@@ -9,7 +9,7 @@ import { getTokenFromLocalCookie } from "../../lib/cookies";
 import Tablas from "../../components/Tablas";
 import { useNavigate } from "react-router-dom";
 import { DarkModeContext } from '../../context/DarkModeContext';
-
+import DashboardStats from "../../components/ui/StatCard";
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 const useCountUp = (targetValue, duration) => {
@@ -101,22 +101,47 @@ const DashboardAdmin = () => {
     const fetchOTCotizaciones = async () => {
       if (jwt) {
         try {
-          const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[user][fields]=username&populate=estado_ot_id&filters[estado_ot_id][nom_estado][$eq]=Cotizando`, {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${jwt}`,
-            },
-          });
+          const response = await fetcher(
+            `${STRAPI_URL}/api/orden-trabajos?populate[user][fields]=username&populate=estado_ot_id&filters[estado_ot_id][nom_estado][$eq]=Cotizando`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${jwt}`,
+              },
+            }
+          );
+
           const otIds = response.data || [];
           const validOtIds = otIds.filter(v => v && v.id);
 
+          const now = new Date();
+          const currentMonth = now.getMonth();
+          const currentYear = now.getFullYear();
+
+          const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+          const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+          const cotizacionesMesActual = validOtIds.filter(ot => {
+            const createdAt = new Date(ot.createdAt);
+            return createdAt.getMonth() === currentMonth && createdAt.getFullYear() === currentYear;
+          });
+
+          const cotizacionesMesPasado = validOtIds.filter(ot => {
+            const createdAt = new Date(ot.createdAt);
+            return createdAt.getMonth() === lastMonth && createdAt.getFullYear() === lastMonthYear;
+          });
+
           setCotizaciones(validOtIds);
-          setTotalCotizaciones(response.data.length);
+          setTotalCotizaciones({
+            actual: cotizacionesMesActual.length,
+            pasado: cotizacionesMesPasado.length,
+          });
         } catch (error) {
           console.error('Error fetching cotizaciones:', error);
         }
       }
     };
+
 
     const fetchOEnproceso = async () => {
       if (jwt) {
@@ -132,11 +157,31 @@ const DashboardAdmin = () => {
           const validOtIds = otIds.filter(v => v && v.id);
 
           setOrdenes(validOtIds);
-          const pendientes = validOtIds.filter(item => item.estado_ot_id.nom_estado === 'Pendiente de aprobación');
+          const now = new Date();
+          const currentMonth = now.getMonth();
+          const currentYear = now.getFullYear();
 
-          console.log(pendientes);
+          const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+          const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+          const pendientes = validOtIds.filter(item => item.estado_ot_id.nom_estado === 'Pendiente de aprobación');
           setPendientes(pendientes.length);
-          setTotalOrdenes(response.data.length);
+
+          const ordenesMesActual = validOtIds.filter(ot => {
+            const createdAt = new Date(ot.createdAt);
+            return createdAt.getMonth() === currentMonth && createdAt.getFullYear() === currentYear;
+          });
+
+          const ordenesMesPasado = validOtIds.filter(ot => {
+            const createdAt = new Date(ot.createdAt);
+            return createdAt.getMonth() === lastMonth && createdAt.getFullYear() === lastMonthYear;
+          });
+
+          setTotalOrdenes({
+            actual: ordenesMesActual.length,
+            pasado: ordenesMesPasado.length,
+          });
+
 
         } catch (error) {
           console.error('Error fetching órdenes:', error);
@@ -306,12 +351,12 @@ const DashboardAdmin = () => {
       <div className="flex-1">
         <div className="container mx-auto p-4">
 
-          {/* Tarjetas de estadísticas */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <CountUpCard title="Cotizaciones Pendientes" value={TotalCotizaciones} />
-            <CountUpCard title="Órdenes Activas" value={TotalOrdenes} />
-            <CountUpCard title="Órdenes Pendientes" value={Pendientes} />
-          </div>
+          <DashboardStats
+            TotalCotizaciones={TotalCotizaciones}
+            TotalOrdenes={TotalOrdenes}
+            Pendientes={Pendientes}
+          />
+
 
           <div className="mb-6">
             {/* Botones de navegación por pestañas */}
