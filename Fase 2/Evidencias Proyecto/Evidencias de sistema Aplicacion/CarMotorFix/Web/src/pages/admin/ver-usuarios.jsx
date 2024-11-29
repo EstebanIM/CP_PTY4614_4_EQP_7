@@ -7,6 +7,7 @@ import DashboardHeader from '../../components/menu/DashboardHeader';
 import { Button } from '../../components/ui/button';
 import { DarkModeContext } from '../../context/DarkModeContext';
 import LoadingComponent from '../../components/animation/loading';
+import Tablas from '../../components/Tablas';
 
 function AsignarMecanico() {
     const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
@@ -17,7 +18,14 @@ function AsignarMecanico() {
     const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userRole, setUserRole] = useState(null);
-    const [loadingUserRole, setLoadingUserRole] = useState(true); // Nuevo estado de carga
+    const [loadingUserRole, setLoadingUserRole] = useState(true);
+    // Crear estado para almacenar todos los usuarios
+    const [usuarios, setUsuarios] = useState([]);
+    const [loadingUsuarios, setLoadingUsuarios] = useState(true);
+
+    // Estados para el Modal
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -41,14 +49,39 @@ function AsignarMecanico() {
                 } catch (error) {
                     console.error('Error fetching user role:', error);
                 } finally {
-                    setLoadingUserRole(false); // Actualizamos el estado de carga
+                    setLoadingUserRole(false);
                 }
             } else {
-                setLoadingUserRole(false); // Si no hay JWT, también actualizamos el estado
+                setLoadingUserRole(false);
             }
         };
 
         fetchUserRole();
+    }, [STRAPI_URL]);
+
+    // Fetch de todos los usuarios
+    useEffect(() => {
+        const obtenerUsuarios = async () => {
+            const jwt = getTokenFromLocalCookie();
+            if (jwt) {
+                try {
+                    const response = await fetcher(`${STRAPI_URL}/api/users?populate=role`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${jwt}`,
+                        },
+                    });
+                    setUsuarios(response);
+                } catch (error) {
+                    console.error("Error obteniendo usuarios:", error);
+                    toast.error("Ocurrió un error al obtener los usuarios.");
+                } finally {
+                    setLoadingUsuarios(false);
+                }
+            }
+        };
+
+        obtenerUsuarios();
     }, [STRAPI_URL]);
 
     const handleSearchUser = async () => {
@@ -104,7 +137,6 @@ function AsignarMecanico() {
                     console.error("Error al asignar rol:", errorData);
                     toast.error(errorData.message || "Error al asignar el rol de mecánico.");
                 } else {
-                    // const updatedUser = await response.json();
                     toast.success("Rol de mecánico asignado exitosamente.");
                     setUser({ ...user, role: { id: '3', name: 'Mecánico' } });
 
@@ -143,7 +175,109 @@ function AsignarMecanico() {
         }
     };
 
-    if (loadingUserRole) {
+    // Función para asignar o quitar roles desde el modal
+    const handleToggleRole = async () => {
+        const jwt = getTokenFromLocalCookie();
+        if (!jwt || !selectedUser) return;
+
+        try {
+            if (selectedUser.role === 'Mechanic') {
+                // Quitar Rol de Mecánico y asignar Rol Authenticated
+                await fetch(`${STRAPI_URL}/api/users/${selectedUser.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                    body: JSON.stringify({
+                        role: '1',
+                    }),
+                });
+                toast.success("Rol de Cliente asignado exitosamente.");
+            } else {
+                // Asignar Rol de Mecánico
+                await fetch(`${STRAPI_URL}/api/users/${selectedUser.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                    body: JSON.stringify({
+                        role: '3', // ID para 'Mechanic'
+                    }),
+                });
+                toast.success("Rol de Mecánico asignado exitosamente.");
+            }
+
+            // Actualizar el estado del usuario seleccionado
+            setSelectedUser(prev => ({
+                ...prev,
+                role: selectedUser.role === 'Mechanic' ? 'Authenticated' : 'Mechanic',
+            }));
+
+            // Actualizar la lista de usuarios
+            setUsuarios(prevUsuarios => prevUsuarios.map(usuario =>
+                usuario.id === selectedUser.id
+                    ? { ...usuario, role: selectedUser.role === 'Mechanic' ? 'Authenticated' : 'Mechanic' }
+                    : usuario
+            ));
+        } catch (error) {
+            console.error("Error al actualizar el rol:", error);
+            toast.error("Ocurrió un error al actualizar el rol.");
+        }
+    };
+
+    // Función para formatear el RUN
+    const formatearRun = (run) => {
+        if (!run) return '';
+        const runStr = String(run);
+        const runSinGuion = runStr.replace('-', '');
+        const dv = runStr.slice(-1);
+        const cuerpo = runSinGuion.slice(0, -1);
+        let formato = '';
+        if (cuerpo.length === 7) { // Formato "1.111.111-1"
+            formato = cuerpo.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.') + '-' + dv;
+        } else if (cuerpo.length === 8) { // Formato "11.111.111-1"
+            formato = cuerpo.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.') + '-' + dv;
+        } else {
+            formato = runStr; // Retorna el RUN original si no coincide con los formatos esperados
+        }
+
+        return formato;
+    };
+
+    const columns = [
+        {
+            header: 'Nombre Completo',
+            key: 'nombreCompleto',
+            render: (item) => `${item.nombre} ${item.apellido}`,
+        },
+        {
+            header: 'Email',
+            key: 'email',
+        },
+        {
+            header: 'Rol',
+            key: 'role',
+            render: (item) => {
+                if (item.role === 'Mechanic') return 'Mecánico';
+                if (item.role === 'Authenticated') return 'Cliente';
+                return item.role;
+            },
+        },
+        {
+            header: 'RUN',
+            key: 'run',
+            render: (item) => formatearRun(item.run),
+        },
+    ];
+
+    const handleViewTabla = (item) => {
+        setSelectedUser(item);
+        setIsModalOpen(true);
+    };
+
+    if (loadingUserRole || loadingUsuarios) {
         return <LoadingComponent />;
     }
 
@@ -168,82 +302,55 @@ function AsignarMecanico() {
             <div className="flex-1 flex flex-col">
                 <DashboardHeader toggleSidebar={toggleSidebar} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
                 <div className={`p-8 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg mx-6 my-6`}>
-                    <h1 className={`text-3xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Asignar Rol de Mecánico</h1>
+                    <h1 className={`text-3xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Gestión de Usuarios</h1>
 
-                    {/* Sección de Buscar Usuario */}
-                    <div className={`p-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg shadow-md mb-6`}>
-                        <h2 className={`text-2xl font-semibold mb-4 ${darkMode ? 'text-blue-300' : 'text-blue-700'}`}>Buscar Usuario</h2>
-                        <label htmlFor="run" className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                            Ingrese el RUN del Usuario
-                        </label>
-                        <input
-                            type="text"
-                            id="run"
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
-                            placeholder="123456789 - Sin punto ni guión"
-                            value={run}
-                            onChange={(e) => setRun(e.target.value)}
-                        />
-                        <Button
-                            onClick={handleSearchUser}
-                            className={`w-1/8 mt-4 py-2 px-4 rounded-lg transition ${loading ? 'cursor-not-allowed bg-gray-500' : 'bg-gray-700 hover:bg-gray-700'} ${darkMode
-                                ? 'bg-blue-700 text-white hover:bg-gray-800'
-                                : 'bg-gray-800 text-white hover:bg-gray-700'} text-white font-semibold`}
-                            disabled={loading}
-                        >
-                            {loading ? 'Buscando...' : 'Buscar Usuario'}
-                        </Button>
-                    </div>
+                    {/* Tabla de Usuarios */}
+                    <Tablas
+                        servicio={usuarios.map(usuario => ({
+                            ...usuario,
+                            nombreCompleto: `${usuario.nombre} ${usuario.apellido}`,
+                            role: usuario.role.name,
+                        }))}
+                        columns={columns}
+                        handleViewTabla={handleViewTabla}
+                        loading={loadingUsuarios}
+                    />
 
-                    {/* Sección de Asignar Rol */}
-                    {user && (
-                        <div className={`p-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg shadow-md`}>
-                            <h2 className={`text-2xl font-semibold mb-4 ${darkMode ? 'text-green-300' : 'text-green-700'}`}>Información del Usuario</h2>
-                            <div className={`space-y-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                <p><strong>Nombre:</strong> {user.nombre} {user.apellido}</p>
-                                <p><strong>Email:</strong> {user.email}</p>
-                                <p><strong>RUN:</strong> {user.run}</p>
-                                <p><strong>Rol Actual:</strong> {user.role ? user.role.name : 'Sin rol asignado'}</p>
+                    {/* Modal de Información del Usuario */}
+                    {isModalOpen && selectedUser && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div className={`p-6 rounded-lg shadow-lg max-w-md w-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
+                                <h3 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-700'}`}>
+                                    Información del Usuario
+                                </h3>
+                                <div className="space-y-2">
+                                    <p><strong>Nombre:</strong> {selectedUser.nombre} {selectedUser.apellido}</p>
+                                    <p><strong>Email:</strong> {selectedUser.email}</p>
+                                    <p><strong>RUN:</strong> {formatearRun(selectedUser.run)}</p>
+                                    <p><strong>Rol Actual:</strong> {selectedUser.role === 'Mechanic' ? 'Mecánico' : selectedUser.role === 'Authenticated' ? 'Cliente' : selectedUser.role}</p>
+                                </div>
+                                <div className="flex justify-end space-x-4 mt-6">
+                                    <Button
+                                        onClick={handleToggleRole}
+                                        className={`px-4 py-2 rounded-lg ${selectedUser.role === 'Mechanic' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white`}
+                                    >
+                                        {selectedUser.role === 'Mechanic' ? 'Quitar Rol de Mecánico' : 'Asignar Rol de Mecánico'}
+                                    </Button>
+                                    <Button
+                                        onClick={() => setIsModalOpen(false)}
+                                        className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'}`}
+                                    >
+                                        Cerrar
+                                    </Button>
+                                </div>
                             </div>
-
-                            <Button
-                                onClick={() => setConfirmModalOpen(true)}
-                                className={`w-1/8 mt-6 py-2 px-4 rounded-lg transition ${assigning ? 'cursor-not-allowed bg-gray-500' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold`}
-                                disabled={assigning}
-                            >
-                                {assigning ? 'Asignando...' : 'Asignar Rol de Mecánico'}
-                            </Button>
                         </div>
                     )}
                 </div>
             </div>
-
-            {/* Modal de Confirmación */}
-            {confirmModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className={`p-6 rounded-lg shadow-lg max-w-sm w-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
-                        <h3 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-white' : 'text-gray-700'}`}>¿Confirmar Asignación de Rol?</h3>
-                        <p className="mb-6">¿Estás seguro de que deseas asignar el rol de mecánico a este usuario?</p>
-                        <div className="flex justify-end space-x-4">
-                            <Button
-                                onClick={handleAssignRole}
-                                className={`px-4 py-2 rounded-lg ${assigning ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'} text-white`}
-                                disabled={assigning}
-                            >
-                                Confirmar
-                            </Button>
-                            <Button
-                                onClick={() => setConfirmModalOpen(false)}
-                                className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'}`}
-                            >
-                                Cancelar
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     )
+
 }
 
 export default AsignarMecanico;
