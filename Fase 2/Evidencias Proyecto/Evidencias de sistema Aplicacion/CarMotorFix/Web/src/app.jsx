@@ -18,7 +18,7 @@ import Dashboard from './pages/home/dashboard';
 import Catalogo_servicio from './pages/admin/Catalogo_servicio';
 import Detalle_servicio from './pages/admin/detalle-servicio';
 import Detalle_Orden from './pages/home/detalle_ot';
-import VerUsuario from './pages/admin/ver-usuarios';
+import GestionUsuario from './pages/admin/gestion-usuarios';
 import { DarkModeProvider } from './context/DarkModeContext';
 import OrdenDeTrabajo from './pages/mecanico/OrdenDeTrabajo';
 import BoletaTailwind from './pages/Client/Boleta';
@@ -98,7 +98,7 @@ function App() {
               }
             />
             <Route
-              path="/admin/detalle-servicio/:id"
+              path="/detalle-servicio/:id"
               element={
                 <PrivateRoute>
                   <Detalle_servicio />
@@ -114,7 +114,7 @@ function App() {
               }
             />
             <Route
-              path="/vehiculos/detalle-vehiculo/:id"
+              path="/detalle-vehiculo/:id"
               element={
                 <PrivateRoute>
                   <DetalleVehiculo />
@@ -130,10 +130,10 @@ function App() {
               }
             />
             <Route
-              path="/ver-usuario"
+              path="/gestion-usuarios"
               element={
                 <PrivateRoute>
-                  <VerUsuario />
+                  <GestionUsuario />
                 </PrivateRoute>
               }
             />

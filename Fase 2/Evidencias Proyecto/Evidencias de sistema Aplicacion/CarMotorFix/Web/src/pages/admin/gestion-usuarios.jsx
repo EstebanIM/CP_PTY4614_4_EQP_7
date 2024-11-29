@@ -11,19 +11,17 @@ import Tablas from '../../components/Tablas';
 
 function AsignarMecanico() {
     const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
-    const [run, setRun] = useState('');
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [assigning, setAssigning] = useState(false);
-    const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+    // const [run, setRun] = useState('');
+    // const [user, setUser] = useState(null);
+    // const [loading, setLoading] = useState(false);
+    // const [assigning, setAssigning] = useState(false);
+    // const [confirmModalOpen, setConfirmModalOpen] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [userRole, setUserRole] = useState(null);
     const [loadingUserRole, setLoadingUserRole] = useState(true);
-    // Crear estado para almacenar todos los usuarios
     const [usuarios, setUsuarios] = useState([]);
     const [loadingUsuarios, setLoadingUsuarios] = useState(true);
 
-    // Estados para el Modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
@@ -59,7 +57,6 @@ function AsignarMecanico() {
         fetchUserRole();
     }, [STRAPI_URL]);
 
-    // Fetch de todos los usuarios
     useEffect(() => {
         const obtenerUsuarios = async () => {
             const jwt = getTokenFromLocalCookie();
@@ -84,105 +81,103 @@ function AsignarMecanico() {
         obtenerUsuarios();
     }, [STRAPI_URL]);
 
-    const handleSearchUser = async () => {
-        const jwt = getTokenFromLocalCookie();
-        if (!run) {
-            toast.warn("Por favor, ingrese un RUN.");
-            return;
-        }
-        if (jwt) {
-            setLoading(true);
-            setUser(null);
-            try {
-                const response = await fetcher(`${STRAPI_URL}/api/users?filters[run][$eq]=${run}&populate=role`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${jwt}`,
-                    },
-                });
+    // const handleSearchUser = async () => {
+    //     const jwt = getTokenFromLocalCookie();
+    //     if (!run) {
+    //         toast.warn("Por favor, ingrese un RUN.");
+    //         return;
+    //     }
+    //     if (jwt) {
+    //         setLoading(true);
+    //         setUser(null);
+    //         try {
+    //             const response = await fetcher(`${STRAPI_URL}/api/users?filters[run][$eq]=${run}&populate=role`, {
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     Authorization: `Bearer ${jwt}`,
+    //                 },
+    //             });
 
-                if (response.error || response.length === 0) {
-                    toast.error("Usuario no encontrado.");
-                } else {
-                    setUser(response[0]);
-                    toast.success("Usuario encontrado.");
-                }
-            } catch (error) {
-                console.error("Error buscando usuario:", error);
-                toast.error("Ocurrió un error inesperado.");
-            } finally {
-                setLoading(false);
-            }
-        }
-    };
+    //             if (response.error || response.length === 0) {
+    //                 toast.error("Usuario no encontrado.");
+    //             } else {
+    //                 setUser(response[0]);
+    //                 toast.success("Usuario encontrado.");
+    //             }
+    //         } catch (error) {
+    //             console.error("Error buscando usuario:", error);
+    //             toast.error("Ocurrió un error inesperado.");
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     }
+    // };
 
-    const handleAssignRole = async () => {
-        const jwt = getTokenFromLocalCookie();
-        if (jwt && user) {
-            setAssigning(true);
-            try {
-                const response = await fetch(`${STRAPI_URL}/api/users/${user.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${jwt}`,
-                    },
-                    body: JSON.stringify({
-                        role: '3',
-                    }),
-                });
+    // const handleAssignRole = async () => {
+    //     const jwt = getTokenFromLocalCookie();
+    //     if (jwt && user) {
+    //         setAssigning(true);
+    //         try {
+    //             const response = await fetch(`${STRAPI_URL}/api/users/${user.id}`, {
+    //                 method: 'PUT',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     Authorization: `Bearer ${jwt}`,
+    //                 },
+    //                 body: JSON.stringify({
+    //                     role: '3',
+    //                 }),
+    //             });
 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ message: "Error desconocido" }));
-                    console.error("Error al asignar rol:", errorData);
-                    toast.error(errorData.message || "Error al asignar el rol de mecánico.");
-                } else {
-                    toast.success("Rol de mecánico asignado exitosamente.");
-                    setUser({ ...user, role: { id: '3', name: 'Mecánico' } });
+    //             if (!response.ok) {
+    //                 const errorData = await response.json().catch(() => ({ message: "Error desconocido" }));
+    //                 console.error("Error al asignar rol:", errorData);
+    //                 toast.error(errorData.message || "Error al asignar el rol de mecánico.");
+    //             } else {
+    //                 toast.success("Rol de mecánico asignado exitosamente.");
+    //                 setUser({ ...user, role: { id: '3', name: 'Mecánico' } });
 
-                    // Insertar datos en la tabla Mecanico
-                    const mecanicoResponse = await fetch(`${STRAPI_URL}/api/mecanicos`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${jwt}`,
-                        },
-                        body: JSON.stringify({
-                            data: {
-                                run: user.run,
-                                prim_nom: user.nombre,
-                                prim_apell: user.apellido,
-                                correo: user.email,
-                            }
-                        }),
-                    });
+    //                 // Insertar datos en la tabla Mecanico
+    //                 const mecanicoResponse = await fetch(`${STRAPI_URL}/api/mecanicos`, {
+    //                     method: 'POST',
+    //                     headers: {
+    //                         'Content-Type': 'application/json',
+    //                         Authorization: `Bearer ${jwt}`,
+    //                     },
+    //                     body: JSON.stringify({
+    //                         data: {
+    //                             run: user.run,
+    //                             prim_nom: user.nombre,
+    //                             prim_apell: user.apellido,
+    //                             correo: user.email,
+    //                         }
+    //                     }),
+    //                 });
 
-                    if (!mecanicoResponse.ok) {
-                        const errorData = await mecanicoResponse.json().catch(() => ({ message: "Error desconocido" }));
-                        console.error("Error al insertar en la tabla Mecanico:", errorData);
-                        toast.error(errorData.message || "Error al insertar en la tabla Mecanico.");
-                    } else {
-                        toast.success("Datos insertados en la tabla Mecanico exitosamente.");
-                    }
-                }
-            } catch (error) {
-                console.error("Error al asignar rol:", error);
-                toast.error("Ocurrió un error inesperado.");
-            } finally {
-                setAssigning(false);
-                setConfirmModalOpen(false);
-            }
-        }
-    };
+    //                 if (!mecanicoResponse.ok) {
+    //                     const errorData = await mecanicoResponse.json().catch(() => ({ message: "Error desconocido" }));
+    //                     console.error("Error al insertar en la tabla Mecanico:", errorData);
+    //                     toast.error(errorData.message || "Error al insertar en la tabla Mecanico.");
+    //                 } else {
+    //                     toast.success("Datos insertados en la tabla Mecanico exitosamente.");
+    //                 }
+    //             }
+    //         } catch (error) {
+    //             console.error("Error al asignar rol:", error);
+    //             toast.error("Ocurrió un error inesperado.");
+    //         } finally {
+    //             setAssigning(false);
+    //             setConfirmModalOpen(false);
+    //         }
+    //     }
+    // };
 
-    // Función para asignar o quitar roles desde el modal
     const handleToggleRole = async () => {
         const jwt = getTokenFromLocalCookie();
         if (!jwt || !selectedUser) return;
 
         try {
             if (selectedUser.role === 'Mechanic') {
-                // Quitar Rol de Mecánico y asignar Rol Authenticated
                 await fetch(`${STRAPI_URL}/api/users/${selectedUser.id}`, {
                     method: 'PUT',
                     headers: {
@@ -194,8 +189,8 @@ function AsignarMecanico() {
                     }),
                 });
                 toast.success("Rol de Cliente asignado exitosamente.");
+                setIsModalOpen(false)
             } else {
-                // Asignar Rol de Mecánico
                 await fetch(`${STRAPI_URL}/api/users/${selectedUser.id}`, {
                     method: 'PUT',
                     headers: {
@@ -203,10 +198,11 @@ function AsignarMecanico() {
                         Authorization: `Bearer ${jwt}`,
                     },
                     body: JSON.stringify({
-                        role: '3', // ID para 'Mechanic'
+                        role: '3',
                     }),
                 });
                 toast.success("Rol de Mecánico asignado exitosamente.");
+                setIsModalOpen(false)
             }
 
             // Actualizar el estado del usuario seleccionado
@@ -227,7 +223,55 @@ function AsignarMecanico() {
         }
     };
 
-    // Función para formatear el RUN
+    const handleToggleBlocked = async () => {
+        const jwt = getTokenFromLocalCookie();
+        if (!jwt || !selectedUser) return;
+
+        try {
+            if (selectedUser.blocked === false) {
+                await fetch(`${STRAPI_URL}/api/users/${selectedUser.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                    body: JSON.stringify({
+                        blocked: true,
+                    }),
+                });
+                toast.success("Usuario desactivado exitosamente.");
+                setIsModalOpen(false)
+            } else {
+                await fetch(`${STRAPI_URL}/api/users/${selectedUser.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${jwt}`,
+                    },
+                    body: JSON.stringify({
+                        blocked: false,
+                    }),
+                });
+                toast.success("Usuario activado exitosamente.");
+                setIsModalOpen(false)
+            }
+
+            setSelectedUser(prev => ({
+                ...prev,
+                blocked: selectedUser.blocked === true ? false : true,
+            }));
+
+            setUsuarios(prevUsuarios => prevUsuarios.map(usuario =>
+                usuario.id === selectedUser.id
+                    ? { ...usuario, blocked: selectedUser.blocked === true ? false : true }
+                    : usuario
+            ));
+        } catch (error) {
+            console.error("Error al actualizar el Estado:", error);
+            toast.error("Ocurrió un error al actualizar el Estado.");
+        }
+    };
+
     const formatearRun = (run) => {
         if (!run) return '';
         const runStr = String(run);
@@ -270,6 +314,11 @@ function AsignarMecanico() {
             key: 'run',
             render: (item) => formatearRun(item.run),
         },
+        {
+            header: 'Estado',
+            key: 'blocked',
+            render: (item) => item.blocked ? 'Desactivado' : 'Activo',
+        },
     ];
 
     const handleViewTabla = (item) => {
@@ -304,19 +353,19 @@ function AsignarMecanico() {
                 <div className={`p-8 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg mx-6 my-6`}>
                     <h1 className={`text-3xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-700'}`}>Gestión de Usuarios</h1>
 
-                    {/* Tabla de Usuarios */}
                     <Tablas
-                        servicio={usuarios.map(usuario => ({
-                            ...usuario,
-                            nombreCompleto: `${usuario.nombre} ${usuario.apellido}`,
-                            role: usuario.role.name,
-                        }))}
+                        servicio={usuarios
+                            .filter(usuario => usuario.role.name !== 'Admin')
+                            .map(usuario => ({
+                                ...usuario,
+                                nombreCompleto: `${usuario.nombre} ${usuario.apellido}`,
+                                role: usuario.role.name,
+                            }))}
                         columns={columns}
                         handleViewTabla={handleViewTabla}
                         loading={loadingUsuarios}
                     />
 
-                    {/* Modal de Información del Usuario */}
                     {isModalOpen && selectedUser && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                             <div className={`p-6 rounded-lg shadow-lg max-w-md w-full ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'}`}>
@@ -328,8 +377,15 @@ function AsignarMecanico() {
                                     <p><strong>Email:</strong> {selectedUser.email}</p>
                                     <p><strong>RUN:</strong> {formatearRun(selectedUser.run)}</p>
                                     <p><strong>Rol Actual:</strong> {selectedUser.role === 'Mechanic' ? 'Mecánico' : selectedUser.role === 'Authenticated' ? 'Cliente' : selectedUser.role}</p>
+                                    <p><strong>Estado:</strong> {selectedUser.blocked ? 'Desactivado' : 'Activo'}</p>
                                 </div>
                                 <div className="flex justify-end space-x-4 mt-6">
+                                <Button
+                                        onClick={handleToggleBlocked}
+                                        className={`px-4 py-2 rounded-lg ${selectedUser.blocked === false ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white`}
+                                    >
+                                        {selectedUser.blocked === true ? 'Activar Usuario' : 'Desactivar Usuario'}
+                                    </Button>
                                     <Button
                                         onClick={handleToggleRole}
                                         className={`px-4 py-2 rounded-lg ${selectedUser.role === 'Mechanic' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white`}
