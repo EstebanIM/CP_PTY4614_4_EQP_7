@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { Button } from '../ui/button';
 
 export const LoginForm = ({ email, setEmail, password, setPassword, handleSubmit }) => {
   return (
@@ -32,13 +31,13 @@ export const LoginForm = ({ email, setEmail, password, setPassword, handleSubmit
         />
       </div>
 
-      <Button
+      <button
         type="submit"
         className="w-full mt-4"
         onClick={handleSubmit}
       >
         Iniciar Sesión
-      </Button>
+      </button>
     </>
   );
 };

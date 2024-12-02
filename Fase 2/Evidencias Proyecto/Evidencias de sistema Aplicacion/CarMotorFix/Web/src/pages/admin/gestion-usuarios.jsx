@@ -205,13 +205,11 @@ function AsignarMecanico() {
                 setIsModalOpen(false)
             }
 
-            // Actualizar el estado del usuario seleccionado
             setSelectedUser(prev => ({
                 ...prev,
                 role: selectedUser.role === 'Mechanic' ? 'Authenticated' : 'Mechanic',
             }));
 
-            // Actualizar la lista de usuarios
             setUsuarios(prevUsuarios => prevUsuarios.map(usuario =>
                 usuario.id === selectedUser.id
                     ? { ...usuario, role: selectedUser.role === 'Mechanic' ? 'Authenticated' : 'Mechanic' }
@@ -406,7 +404,6 @@ function AsignarMecanico() {
             </div>
         </div>
     )
-
 }
 
 export default AsignarMecanico;

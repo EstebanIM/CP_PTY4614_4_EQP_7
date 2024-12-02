@@ -60,7 +60,7 @@ Modal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     children: PropTypes.node.isRequired,
-    loading: PropTypes.bool, // New loading prop
+    loading: PropTypes.bool,
 };
 
 export default Modal;

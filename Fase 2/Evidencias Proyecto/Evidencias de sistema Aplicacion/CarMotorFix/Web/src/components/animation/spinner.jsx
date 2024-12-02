@@ -14,7 +14,9 @@ const Spinner = ({ size = "medium" }) => {
   const colorClass = darkMode ? 'text-white' : 'text-primary';
 
   return (
-    <div className="flex justify-center items-center">
+    <div
+    data-testid="spinner"
+    className="flex justify-center items-center">
       <Loader2 className={`animate-spin ${sizeClasses[size]} ${colorClass}`} />
     </div>
   );
