@@ -47,7 +47,7 @@ function OrdenDeTrabajo() {
                         },
                     }
                 );
-                console.log("Orden ",ordenesResponse);
+                // console.log("Orden ",ordenesResponse);
                 
                 setOrdenTrabajo(ordenesResponse.data.orden_trabajos_id || []);
             } else {
@@ -57,7 +57,7 @@ function OrdenDeTrabajo() {
                         Authorization: `Bearer ${jwt}`,
                     },
                 });
-                console.log("Orden ",ordenesResponse);
+                // console.log("Orden ",ordenesResponse);
                 setOrdenTrabajo(ordenesResponse.data || []);
             }
         } catch (error) {

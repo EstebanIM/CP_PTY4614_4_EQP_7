@@ -56,7 +56,7 @@ export default function Config() {
         });
         setUserRole(response.role.name);
         setUserID(response.id);
-        console.log(response);
+        // console.log(response);
         
       } catch (error) {
         console.error("Error fetching user role:", error);

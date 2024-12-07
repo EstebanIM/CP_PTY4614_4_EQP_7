@@ -84,7 +84,7 @@ export default function DashboardStats({ TotalCotizaciones, TotalOrdenes, TotalP
     const pendingTrend = (actualPending !== undefined && pastPending !== undefined && pastPending !== 0)
         ? ((actualPending - pastPending) / pastPending) * 100
         : undefined;
-    console.log(quotesTrend, ordersTrend, pendingTrend);
+    // console.log(quotesTrend, ordersTrend, pendingTrend);
     
     return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

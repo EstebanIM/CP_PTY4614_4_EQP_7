@@ -88,7 +88,7 @@ const DashboardAutos = () => {
         const vehiculosUnicos = new Set(vehiculosHabilitados.map(vehiculo => vehiculo.id));
         setTotalVehiculos(vehiculosUnicos.size);
         setVehiculos(vehiculosHabilitados);
-        console.log('Vehiculos:', vehiculosHabilitados);
+        // console.log('Vehiculos:', vehiculosHabilitados);
 
 
 
@@ -230,7 +230,7 @@ const DashboardAutos = () => {
   }, [idMecanico]);
 
   const handleViewVehiculo = (vehiculo) => {
-    navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
+    navigate(`/detalle-vehiculo/${vehiculo.documentId}`);
   };
 
   const handleViewOT = (DetalleOT) => {
@@ -406,7 +406,7 @@ const DashboardAutos = () => {
           body: JSON.stringify(CotizacionData),
         });
 
-        console.log('Cotización creada:', CotizacionData);
+        // console.log('Cotización creada:', CotizacionData);
 
         if (response && response.data) {
           setCotizaciones((prevOT) => [...prevOT, response.data]);

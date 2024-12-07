@@ -270,7 +270,7 @@ function Client() {
   };
 
   const handleViewVehiculo = (vehiculo) => {
-    navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
+    navigate(`/detalle-vehiculo/${vehiculo.documentId}`);
   };
 
   const handleViewCotizacion = (cotizacion) => {

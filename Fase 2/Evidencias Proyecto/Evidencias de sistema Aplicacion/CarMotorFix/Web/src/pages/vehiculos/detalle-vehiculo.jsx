@@ -46,7 +46,7 @@ function DetalleVehiculo() {
                     setVehiculo(response.data);
                     setEditData(response.data);
                     setOts(response.data.ots || []);
-                    console.log("Ots", response.data.ots);
+                    // console.log("Ots", response.data.ots);
 
 
                 } catch (error) {
@@ -115,7 +115,7 @@ function DetalleVehiculo() {
         }, {});
 
         if (Object.keys(changes).length === 0) {
-            console.log("No hay cambios para guardar.");
+            // console.log("No hay cambios para guardar.");
             setIsEditing(false);
             return;
         }
