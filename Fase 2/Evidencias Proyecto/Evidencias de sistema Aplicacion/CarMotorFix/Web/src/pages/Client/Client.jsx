@@ -14,6 +14,7 @@ import Spinner from '../../components/animation/spinner';
 import { DarkModeContext } from '../../context/DarkModeContext';
 
 function Client() {
+  
   const { darkMode } = useContext(DarkModeContext);
   const [vehiculos, setVehiculos] = useState([]);
   const [totalServicios, setTotalServicios] = useState(0);

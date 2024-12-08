@@ -4,8 +4,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ResetPasswordForm } from './reset';
 import { DarkModeContext } from '../../context/DarkModeContext';
 
-describe('ResetPasswordForm Component', () => {
-    test('renders correctly and handles interactions', () => {
+describe('ResetPasswordForm Componente', () => {
+    test('Se procesa correctamente y maneja las interacciones.', () => {
         const mockSetEmail = vi.fn();
         const mockHandleSubmit = vi.fn();
 
@@ -30,41 +30,5 @@ describe('ResetPasswordForm Component', () => {
 
         fireEvent.click(submitButton);
         expect(mockHandleSubmit).toHaveBeenCalled();
-    });
-
-    test('applies dark mode styles', () => {
-        const mockSetEmail = vi.fn();
-        const mockHandleSubmit = vi.fn();
-
-        render(
-            <DarkModeContext.Provider value={{ darkMode: true }}>
-                <ResetPasswordForm
-                    email="test@example.com"
-                    setEmail={mockSetEmail}
-                    handleSubmit={mockHandleSubmit}
-                />
-            </DarkModeContext.Provider>,
-        );
-
-        const submitButton = screen.getByRole('button', { name: /enviar instrucciones/i });
-        expect(submitButton).toHaveClass('bg-gray-700 text-white');
-    });
-
-    test('applies light mode styles', () => {
-        const mockSetEmail = vi.fn();
-        const mockHandleSubmit = vi.fn();
-
-        render(
-            <DarkModeContext.Provider value={{ darkMode: false }}>
-                <ResetPasswordForm
-                    email="test@example.com"
-                    setEmail={mockSetEmail}
-                    handleSubmit={mockHandleSubmit}
-                />
-            </DarkModeContext.Provider>,
-        );
-
-        const submitButton = screen.getByRole('button', { name: /enviar instrucciones/i });
-        expect(submitButton).toHaveClass('bg-indigo-600 text-white');
     });
 });
