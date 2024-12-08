@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="E3889874-A448-056A-8BE5-75D9599744C6" containerWithKeyObject="13F9FC61-5888-5EB8-20FD-44094461A7A8" localFKIndex="95096EFE-3700-4C7E-45B8-55BCEC76E948" name="Orden_trabajo_Clasificacion_OT_FK">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:10 UTC</createdTime>
+<generatorID>139C943E-C1EA-F430-B44C-C78F70049F20</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<referredTableLongName>Clasificacion_OT</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>F9FA1833-9736-46F8-E1C7-F52B03CBF0A0</referredTableID>
+<keyObject>2DC41F2B-608C-A596-B609-CB799840C58B</keyObject>
+<referredKeyID>2DC41F2B-608C-A596-B609-CB799840C58B</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>Id_clas</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

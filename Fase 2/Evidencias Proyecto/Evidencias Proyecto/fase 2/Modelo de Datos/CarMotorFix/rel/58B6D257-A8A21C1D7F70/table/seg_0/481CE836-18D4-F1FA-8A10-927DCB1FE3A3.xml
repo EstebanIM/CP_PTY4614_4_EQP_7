@@ -1,0 +1,178 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="481CE836-18D4-F1FA-8A10-927DCB1FE3A3" name="mecanico">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>F40F718D-4609-0AA4-B0F0-BAE4074269AF</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ID_Mecanico" id="DC27FA0F-C8BC-BCE0-E53F-BA58AB538A02">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>D092B664-FA86-13F5-C132-398F6E7A7912</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>30</dataTypePrecision>
+<ownDataTypeParameters>,30,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Rut" id="C71AA2B9-902F-5EEF-86DE-AE37E9480196">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>5DDA4F89-3550-F77E-FA02-FDCB4317514C</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>8</dataTypePrecision>
+<ownDataTypeParameters>,8,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Num_verificador" id="5BF07324-1D74-AE91-6E23-F221FEFD6E46">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>0A93E389-BC0C-FFFE-7E9A-04C41D33DAAB</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Prim_nom" id="CF115834-B823-6370-4C68-5B7D7C274030">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>BBEE92BB-6928-6350-18BE-7E518234E9B5</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>30</dataTypeSize>
+<ownDataTypeParameters>30,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Prim_ap" id="82FE7EFE-8EC7-5FA2-6CF5-BAE86026F6BE">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>EC49938A-BE74-829C-E883-9D4E2910485F</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>40</dataTypeSize>
+<ownDataTypeParameters>40,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="correo" id="25389B65-A6AB-5945-066B-69471A041A68">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<commentInRDBMS><![CDATA[El correo es necesario que tenga como obligacion el @ y el .]]></commentInRDBMS>
+<generatorID>6FFC00D1-52AF-B194-CDE7-9B5461D1399C</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>40</dataTypeSize>
+<ownDataTypeParameters>40,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Clave" id="68F04C51-5047-3C86-CFBE-42A7E842150B">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<commentInRDBMS><![CDATA[La contraseña tiene que cumplir con la encriptacion de esta y que sea segura]]></commentInRDBMS>
+<generatorID>172F31F5-FA95-D7A9-4D3F-4AAE278E6D0C</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>40</dataTypeSize>
+<ownDataTypeParameters>40,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Taller_ID_Taller" id="90627124-2FAB-91AC-2BF6-51CB6D110C52">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>61801BF2-DAFF-2F33-9A27-789D1522A7FE</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="36FB0642-CEDD-B715-452D-D5B444588515" referredColumn="0144F53D-A9B5-EE64-E7B4-A17194F5403F"/>
+</associations>
+</Column>
+<Column name="estado" id="F5792FDE-D5EB-F6F5-9BB8-03C9095C79FD">
+<createdBy>einzu</createdBy>
+<createdTime>2024-11-19 01:40:11 UTC</createdTime>
+<generatorID>C90A5DA3-D156-D30E-5E5D-F731A0BB3B4A</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT006</logicalDatatype>
+<dataTypeSize>1</dataTypeSize>
+<ownDataTypeParameters>1,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Rol_Id_rol" id="A72CAE11-E9BE-5186-EDE5-F3DC8D4963FC">
+<createdBy>einzu</createdBy>
+<createdTime>2024-11-19 01:40:11 UTC</createdTime>
+<generatorID>C73136D8-E0E3-3C94-63CD-387D8789D43E</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>1</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="2AD75348-684A-2C7B-3B97-0BC4D0A2E76C" referredColumn="BCB9283B-F85D-2609-2FF3-395D3C782C5F"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="0138974C-2E1C-0357-7380-66B2FA318F2A" name="mecanico_PK">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>EAB13CE0-0D4C-0399-4D10-753C3DBD4B14</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DC27FA0F-C8BC-BCE0-E53F-BA58AB538A02"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="2480B2B2-27E8-6311-FE18-54A974520DB4" name="mecanico_Taller_FK">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>6D31FF53-4E93-8406-34E3-050403FCFD68</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="90627124-2FAB-91AC-2BF6-51CB6D110C52"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="06B30C71-9EE0-A3E0-BF0F-8B990FDAFD5D" name="mecanico_Rol_FK">
+<createdBy>einzu</createdBy>
+<createdTime>2024-11-19 01:40:11 UTC</createdTime>
+<generatorID>B829C9CB-5791-8F9F-F153-2541C79BE08D</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="A72CAE11-E9BE-5186-EDE5-F3DC8D4963FC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
