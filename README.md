@@ -22,6 +22,9 @@
 </div>
 
 ---
+## 🚀 Descripción del Proyecto
+
+El proyecto busca desarrollar un software de gestión de mantenimiento vehicular dirigido a talleres mecánicos, mejorando la eficiencia en la organización y control de reparaciones y mantenimientos. En la actualidad, muchos talleres, especialmente los pequeños y medianos, carecen de herramientas digitales que les permitan llevar un registro detallado de los servicios realizados, lo cual afecta la calidad del servicio y la satisfacción del cliente.
 
 ## 🛠️ Tecnologías  
 
