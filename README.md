@@ -5,21 +5,33 @@
 </div>
 
 
+
 ## 📚 Tabla de Contenidos  
 
 <div align="center">
-    <a href="#🚀-empezar">
-        Empezar
-    </a>
+    <a href="#🚀-empezar">Empezar</a>
     <span>&nbsp;✦&nbsp;</span>
-    <a href="#🧞-comandos">
-        Comandos
-    </a>
+    <a href="#🔧-requisitos-del-sistema">Requisitos del Sistema</a>
     <span>&nbsp;✦&nbsp;</span>
-    <a href="#🔑-licencia">
-        Licencia
-    </a>
+    <a href="#🚗-descripcion">Descripción</a>
+    <span>&nbsp;✦&nbsp;</span>
+    <a href="#⚙️-tecnologias-principales">Tecnologías Principales</a>
+    <span>&nbsp;✦&nbsp;</span>
+    <a href="#📂-estructura-del-proyecto">Estructura del Proyecto</a>
+    <span>&nbsp;✦&nbsp;</span>
+    <a href="#⚙️-configuracion-inicial">Configuración Inicial</a>
+    <span>&nbsp;✦&nbsp;</span>
+    <a href="#🧩-componentes-principales">Componentes Principales</a>
+    <span>&nbsp;✦&nbsp;</span>
+    <a href="#📦-dependencias-principales">Dependencias Principales</a>
+    <span>&nbsp;✦&nbsp;</span>
+    <a href="#📝-notas-importantes">Notas Importantes</a>
+    <span>&nbsp;✦&nbsp;</span>
+    <a href="#🔑-licencia">Licencia</a>
 </div>
+---
+
+
 
 ---
 # 🌐 Integrantes
