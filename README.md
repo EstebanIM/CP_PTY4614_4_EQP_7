@@ -23,9 +23,7 @@
 
 ---
 # 🌐 Integrantes
-👤 **Nestor Valenzuela**  
-👤 **Yeison Rivera**  
-👤 **Roberto Fuentalba**
+
 
 ---
 
