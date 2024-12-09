@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { DarkModeContext } from '../../context/DarkModeContext';
@@ -9,6 +9,7 @@ import DashboardSidebar from '../../components/menu/DashboardSidebar';
 import DashboardHeader from '../../components/menu/DashboardHeader';
 import { Button } from '../../components/ui/button';
 import Tablas from '../../components/Tablas';
+import { toast } from 'react-toastify';
 
 const Informes = () => {
     const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
@@ -26,53 +27,38 @@ const Informes = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
-    // Obtener el rol del usuario
     useEffect(() => {
-        const fetchUserRole = async () => {
+        const fetchData = async () => {
             const jwt = getTokenFromLocalCookie();
             if (jwt) {
                 try {
-                    const response = await fetcher(`${STRAPI_URL}/api/users/me?populate[role]=*`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${jwt}`,
-                        },
-                    });
-                    setUserRole(response.role.name);
+                    const [userResponse, mecanicosResponse] = await Promise.all([
+                        fetcher(`${STRAPI_URL}/api/users/me?populate[role]=*`, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${jwt}`,
+                            },
+                        }),
+                        fetcher(`${STRAPI_URL}/api/mecanicos?populate=*`, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${jwt}`,
+                            },
+                        }),
+                    ]);
+                    setUserRole(userResponse.role.name);
+                    setMecanicos(mecanicosResponse.data);
                 } catch (error) {
-                    console.error('Error fetching user role:', error);
+                    console.error('Error fetching data:', error);
                 } finally {
                     setLoadingUserRole(false);
-                }
-            } else {
-                setLoadingUserRole(false);
-            }
-        };
-        fetchUserRole();
-    }, [STRAPI_URL]);
-
-    // Obtener la lista de mecánicos
-    useEffect(() => {
-        const fetchMecanicos = async () => {
-            const jwt = getTokenFromLocalCookie();
-            if (jwt) {
-                try {
-                    const response = await fetcher(`${STRAPI_URL}/api/mecanicos?populate[taller_id]=*&populate[vehiculos]=*&populate[user]=*&populate[notas]=*&populate[orden_trabajos_id]=*`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${jwt}`,
-                        },
-                    });
-                    setMecanicos(response.data);
-                } catch (error) {
-                    console.error('Error fetching mecanicos:', error);
-                } finally {
                     setLoadingMecanicos(false);
                 }
             }
         };
-        fetchMecanicos();
+        fetchData();
     }, [STRAPI_URL]);
+    
 
     // Función para generar informe de órdenes por mes
     const generarInformePorMes = (ordenes) => {
@@ -93,12 +79,12 @@ const Informes = () => {
             ordenes.forEach((orden) => {
                 const ordenData = [
                     orden.id,
-                    orden.attributes.descripcion || 'No disponible',
-                    orden.attributes.fechainicio || 'No disponible',
-                    orden.attributes.fecharecepcion || 'No disponible',
-                    orden.attributes.fechaentrega || 'No disponible',
-                    orden.attributes.fechasalida || 'No disponible',
-                    orden.attributes.costo ? `$${orden.attributes.costo}` : 'No disponible',
+                    orden.descripcion || 'No disponible',
+                    orden.fechainicio || 'No disponible',
+                    orden.fecharecepcion || 'No disponible',
+                    orden.fechaentrega || 'No disponible',
+                    orden.fechasalida || 'No disponible',
+                    orden.costo ? `$${orden.costo}` : 'No disponible',
                 ];
                 tableRows.push(ordenData);
             });
@@ -109,13 +95,10 @@ const Informes = () => {
         doc.save(`informe_ordenes_${selectedMes}.pdf`);
     };
 
-    // Función para generar informe por mecánico
     const generarInformePorMecanico = (ordenes) => {
         const doc = new jsPDF();
-        const nombreMecanico = selectedMecanico.prim_nom || 'Desconocido';
-        const apellidoMecanico = selectedMecanico.prim_apell || '';
         doc.setFontSize(18);
-        doc.text(`Informe de Órdenes de ${nombreMecanico} ${apellidoMecanico}`, 14, 22);
+        doc.text(`Informe de Órdenes de ${selectedMecanico.prim_nom} ${selectedMecanico.prim_apell}`, 14, 22);
         doc.setFontSize(12);
         doc.text(`Total de Órdenes Realizadas: ${ordenes.length}`, 14, 32);
         if (ordenes.length === 0) {
@@ -127,12 +110,12 @@ const Informes = () => {
             ordenes.forEach((orden) => {
                 const ordenData = [
                     orden.id,
-                    orden.attributes.descripcion || 'No disponible',
-                    orden.attributes.fechainicio || 'No disponible',
-                    orden.attributes.fecharecepcion || 'No disponible',
-                    orden.attributes.fechaentrega || 'No disponible',
-                    orden.attributes.fechasalida || 'No disponible',
-                    orden.attributes.costo ? `$${orden.attributes.costo}` : 'No disponible',
+                    orden?.descripcion || 'No disponible',
+                    orden?.fechainicio || 'No disponible',
+                    orden?.fecharecepcion || 'No disponible',
+                    orden?.fechaentrega || 'No disponible',
+                    orden?.fechasalida || 'No disponible',
+                    orden?.costo ? `$${orden?.costo}` : 'No disponible',
                 ];
                 tableRows.push(ordenData);
             });
@@ -147,8 +130,12 @@ const Informes = () => {
         const jwt = getTokenFromLocalCookie();
         if (jwt && selectedMes) {
             try {
+                const [year, month] = selectedMes.split('-');
+                const fechaInicio = `${year}-${month}-01`;
+                const fechaFin = new Date(year, month, 0).toISOString().split('T')[0]; // Último día del mes
+    
                 const response = await fetcher(
-                    `${STRAPI_URL}/api/orden-trabajos?filters[fechainicio][$containsi]=${selectedMes}&populate=*`,
+                    `${STRAPI_URL}/api/orden-trabajos?filters[fechainicio][$gte]=${fechaInicio}&filters[fechainicio][$lte]=${fechaFin}&populate=*`,
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -158,23 +145,25 @@ const Informes = () => {
                 );
                 const ordenes = response?.data || [];
                 generarInformePorMes(ordenes);
+                toast.success('Informe generado correctamente.');
             } catch (error) {
                 console.error('Error fetching ordenes por mes:', error);
-                alert('Ocurrió un error al generar el informe.');
             }
         } else {
             alert('Por favor, selecciona un mes.');
         }
     };
+    
 
     // Obtener órdenes por mecánico y generar informe
     const fetchAndGenerateInformePorMecanico = async (mecanico) => {
         setSelectedMecanico(mecanico);
+        
         const jwt = getTokenFromLocalCookie();
         if (jwt && mecanico) {
             try {
                 const response = await fetcher(
-                    `${STRAPI_URL}/api/orden-trabajos?filters[mecanicos_permissions_users][id][$eq]=${mecanico.id}&populate=*`,
+                    `${STRAPI_URL}/api/orden-trabajos?filters[mecanico_id][id][$eq]=${mecanico.id}&populate=*`,
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -182,10 +171,10 @@ const Informes = () => {
                         },
                     });
                 const ordenes = response?.data || [];
+                
                 generarInformePorMecanico(ordenes);
             } catch (error) {
                 console.error('Error fetching ordenes del mecánico:', error);
-                alert('Ocurrió un error al generar el informe.');
             }
         } else {
             alert('Por favor, selecciona un mecánico válido.');
