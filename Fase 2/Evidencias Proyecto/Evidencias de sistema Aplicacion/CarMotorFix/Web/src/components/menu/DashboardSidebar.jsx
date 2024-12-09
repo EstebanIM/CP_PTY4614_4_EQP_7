@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import PropTypes from 'prop-types';
 import { Button } from "../ui/nadvar/button";
-import { Users, CarFront, File, X, List, Home, LayoutDashboard } from "lucide-react";
+import { FileText, Users, CarFront, File, X, List, Home, LayoutDashboard } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { DarkModeContext } from '../../context/DarkModeContext';
@@ -66,16 +66,16 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
         </div>
 
         {/* Dashboard */}
-        {userRole === "Admin" || userRole === "Mechanic" ?(
+        {userRole === "Admin" || userRole === "Mechanic" ? (
           <div>
-          <Link to="/dashboard" className="w-full block">
-            <Button variant="ghost" className="justify-start flex items-center">
-              <LayoutDashboard className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} />
-              Dashboard
-            </Button>
-          </Link>
-        </div>
-          ) : null}
+            <Link to="/dashboard" className="w-full block">
+              <Button variant="ghost" className="justify-start flex items-center">
+                <LayoutDashboard className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} />
+                Dashboard
+              </Button>
+            </Link>
+          </div>
+        ) : null}
 
         {/* Mecanico */}
         {userRole === "Admin" ? (
@@ -92,9 +92,9 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
         {userRole === "Mechanic" || userRole === "Admin" ? (
           <div>
             <Link to="/orden-de-trabajo" className="w-full block">
-            <Button variant="ghost" className="justify-start flex items-center">
-              <File className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Orden de Trabajo
-            </Button>
+              <Button variant="ghost" className="justify-start flex items-center">
+                <File className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Orden de Trabajo
+              </Button>
             </Link>
           </div>
         ) : null}
@@ -105,6 +105,17 @@ const DashboardSidebar = ({ sidebarOpen, toggleSidebar, userRole }) => {
             <Link to="/catalogo_servicio" className="w-full block">
               <Button variant="ghost" className="justify-start flex items-center">
                 <List className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Servicio
+              </Button>
+            </Link>
+          </div>
+        ) : null}
+
+        {/* Informes */}
+        {userRole === "Admin" ? (
+          <div>
+            <Link to="/informes" className="w-full block">
+              <Button variant="ghost" className="justify-start flex items-center">
+                <FileText className={`mr-2 h-4 w-4 ${darkMode ? 'text-white' : 'text-black'}`} /> Informes
               </Button>
             </Link>
           </div>

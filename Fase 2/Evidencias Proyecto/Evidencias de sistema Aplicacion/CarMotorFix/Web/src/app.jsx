@@ -23,6 +23,7 @@ import { DarkModeProvider } from './context/DarkModeContext';
 import OrdenDeTrabajo from './pages/mecanico/OrdenDeTrabajo';
 import BoletaTailwind from './pages/Client/Boleta';
 import Client from './pages/Client/Client';
+import Informes from './pages/admin/informes';
 
 function App() {
   return (
@@ -70,6 +71,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Inicio />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/informes"
+              element={
+                <PrivateRoute>
+                  <Informes />
                 </PrivateRoute>
               }
             />
