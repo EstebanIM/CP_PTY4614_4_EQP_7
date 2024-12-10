@@ -88,30 +88,34 @@ proyecto/
 
 ### 1️⃣ Instalar Bun 🧅 (Gestor de Dependencias, omitir este paso si quiere trabajar con npm):
 
-bash
+```bash
 # MacOS, WSL y Linux:
 curl -fsSL https://bun.sh/install | bash
+```
 
-bash
+```bash
 # Windows powershell:
 powershell -c "irm bun.sh/install.ps1 | iex"
-
+```
 
 ### 2️⃣ Clonar el Repositorio  
 
-bash
+```bash
 git clone https://github.com/EstebanIM/CP_PTY4614_4_EQP_7.git
+```
 
-bash
+Despues
+
+```bash
 cd CP_PTY4614_4_EQP_7
-
+```
 
 
 ### 3️⃣ Variables de Entorno  
 
 #### 📂 Backend (.env)  
 
-env
+```env
 
 # Server
 HOST=0.0.0.0
@@ -135,13 +139,13 @@ RESEND_API_KEY=KEY
 # DATABASE_SSL=false
 # DATABASE_FILENAME=
 # JWT_SECRET=Key==
-
+```
 
 #### 📂 Web (.env)
-env
+```env
 VITE_STRAPI_URL=http://localhost
 VITE_STRAPI_TOKEN_ACCOUNT=TOKEN
-
+```
 
 ### 4️⃣ Instalación
 # 🛠️ Instalación del backend  
