@@ -145,6 +145,81 @@ const Informes = () => {
         doc.save(`informe_mecanico_${mecanico.prim_nom}.pdf`);
     };
 
+    // Función para generar informe de incidencias por mes
+    const generarInformeIncidencias = (ordenes) => {
+        console.log('Datos de órdenes recibidos:', ordenes);
+        
+        const doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text(`Informe de Incidencias - ${selectedMes}`, 14, 22);
+
+        // Filtrar solo las órdenes rechazadas
+        const ordenesRechazadas = ordenes.filter(orden => 
+            orden.estado_ot_id?.nom_estado === "Rechazado"
+        );
+
+        if (ordenesRechazadas.length === 0) {
+            doc.setFontSize(12);
+            doc.text('No hubo órdenes rechazadas en este mes.', 14, 32);
+        } else {
+            doc.setFontSize(12);
+            doc.text(`Total de Incidencias: ${ordenesRechazadas.length}`, 14, 32);
+
+            const tableColumn = ['ID', 'Estado', 'Fecha Inicio', 'Fecha Recepción', 'Fecha Entrega', 'Total Servicios', 'Costo'];
+            const tableRows = [];
+
+            ordenesRechazadas.forEach((orden) => {
+                const estadoOT = orden.estado_ot_id?.nom_estado || 'No disponible';
+                const totalServicios = orden.catalogo_servicios?.length || 0;
+
+                const ordenData = [
+                    orden.id,
+                    estadoOT,
+                    orden.fechainicio || 'No disponible',
+                    orden.fecharecepcion || 'No disponible',
+                    orden.fechaentrega || 'No disponible',
+                    totalServicios,
+                    orden.costo ? `$${orden.costo}` : 'No disponible',
+                ];
+                tableRows.push(ordenData);
+            });
+
+            doc.autoTable({ head: [tableColumn], body: tableRows, startY: 40 });
+        }
+
+        doc.save(`informe_incidencias_${selectedMes}.pdf`);
+    };
+
+    // Función para obtener órdenes y generar informe de incidencias
+    const fetchAndGenerateInformeIncidencias = async () => {
+        const jwt = getTokenFromLocalCookie();
+        if (jwt && selectedMes) {
+            try {
+                const [year, month] = selectedMes.split('-');
+                const fechaInicio = `${year}-${month}-01`;
+                const fechaFin = new Date(year, month, 0).toISOString().split('T')[0];
+
+                const response = await fetcher(
+                    `${STRAPI_URL}/api/orden-trabajos?filters[fechainicio][$gte]=${fechaInicio}&filters[fechainicio][$lte]=${fechaFin}&populate=estado_ot_id&populate=catalogo_servicios`,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${jwt}`,
+                        },
+                    }
+                );
+                const ordenes = response?.data || [];
+                generarInformeIncidencias(ordenes);
+                toast.success('Informe de incidencias generado correctamente.');
+            } catch (error) {
+                console.error('Error fetching ordenes por mes:', error);
+                toast.error('Error al generar el informe de incidencias.');
+            }
+        } else {
+            toast.error('Por favor, selecciona un mes.');
+        }
+    };
+
     // Obtener órdenes por mes y generar informe
     const fetchAndGenerateInformePorMes = async () => {
         const jwt = getTokenFromLocalCookie();
@@ -283,16 +358,27 @@ const Informes = () => {
                             type="month"
                             value={selectedMes}
                             onChange={(e) => setSelectedMes(e.target.value)}
-                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-900'
+                            className={`w-1/4 px-4 py-2 border rounded-lg focus:outline-none ${darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-900'
                                 }`}
                         />
-                        <Button
-                            onClick={fetchAndGenerateInformePorMes}
-                            className={`mt-4 py-2 px-4 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-500 hover:bg-blue-400'
+                        <div className="flex space-x-4 mt-4">
+                            <Button
+                                onClick={fetchAndGenerateInformePorMes}
+                                className={`py-2 px-4 rounded-lg ${
+                                    darkMode ? 'bg-blue-600 hover:bg-gray-900' : 'bg-blue-500 hover:bg-blue-500'
                                 } text-white font-semibold`}
-                        >
-                            Generar Informe
-                        </Button>
+                            >
+                                Generar Informe General
+                            </Button>
+                            <Button
+                                onClick={fetchAndGenerateInformeIncidencias}
+                                className={`py-2 px-4 rounded-lg ${
+                                    darkMode ? 'bg-red-600 hover:bg-red-500' : 'bg-red-500 hover:bg-red-400'
+                                } text-white font-semibold`}
+                            >
+                                Generar Informe de Incidencias
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Informe por Mecánico */}
