@@ -66,7 +66,7 @@ El proyecto busca desarrollar un software de gestión de mantenimiento vehicular
 
 ## 📂 Estructura del Proyecto  
 
-plaintext
+\`\`\`plaintext
 proyecto/  
 proyecto/  
 ├── backend/ # Servidor Strapi (Patrón MVC)  
@@ -83,7 +83,7 @@ proyecto/
     │   │   └── utils/  
     │   ├── App.jsx  
     │   └── main.jsx
-
+\`\`\`
 ## ⚙️ Configuración Inicial  
 
 ### 1️⃣ Instalar Bun 🧅 (Gestor de Dependencias, omitir este paso si quiere trabajar con npm):
