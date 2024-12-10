@@ -18,8 +18,11 @@ const Informes = () => {
     const [loadingUserRole, setLoadingUserRole] = useState(true);
     const [mecanicos, setMecanicos] = useState([]);
     const [loadingMecanicos, setLoadingMecanicos] = useState(true);
-    const [selectedMes, setSelectedMes] = useState('');
     const [selectedMecanico, setSelectedMecanico] = useState(null);
+    const [selectedMes, setSelectedMes] = useState(() => {
+        const today = new Date();
+        return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+    });
 
     const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -58,10 +61,12 @@ const Informes = () => {
         };
         fetchData();
     }, [STRAPI_URL]);
-    
+
 
     // Función para generar informe de órdenes por mes
     const generarInformePorMes = (ordenes) => {
+        console.log('Datos de órdenes recibidos:', ordenes);
+        
         const doc = new jsPDF();
         doc.setFontSize(18);
         doc.text(`Informe de Órdenes de Trabajo - ${selectedMes}`, 14, 22);
@@ -73,17 +78,23 @@ const Informes = () => {
             doc.setFontSize(12);
             doc.text(`Total de Órdenes: ${ordenes.length}`, 14, 32);
 
-            const tableColumn = ['ID', 'Descripción', 'Fecha Inicio', 'Fecha Recepción', 'Fecha Entrega', 'Fecha Salida', 'Costo'];
+            const tableColumn = ['ID', 'Estado', 'Fecha Inicio', 'Fecha Recepción', 'Fecha Entrega', 'Total Servicios', 'Costo'];
             const tableRows = [];
 
             ordenes.forEach((orden) => {
+                // Obtener el estado de la OT
+                const estadoOT = orden.estado_ot_id?.nom_estado || 'No disponible';
+                
+                // Obtener el total de servicios
+                const totalServicios = orden.catalogo_servicios?.length || 0;
+
                 const ordenData = [
                     orden.id,
-                    orden.descripcion || 'No disponible',
+                    estadoOT,
                     orden.fechainicio || 'No disponible',
                     orden.fecharecepcion || 'No disponible',
                     orden.fechaentrega || 'No disponible',
-                    orden.fechasalida || 'No disponible',
+                    totalServicios,
                     orden.costo ? `$${orden.costo}` : 'No disponible',
                 ];
                 tableRows.push(ordenData);
@@ -94,35 +105,44 @@ const Informes = () => {
 
         doc.save(`informe_ordenes_${selectedMes}.pdf`);
     };
+    const generarInformePorMecanico = (ordenes, mecanico) => {
+        if (!mecanico) {
+            console.error('No hay mecánico seleccionado');
+            return;
+        }
 
-    const generarInformePorMecanico = (ordenes) => {
         const doc = new jsPDF();
         doc.setFontSize(18);
-        doc.text(`Informe de Órdenes de ${selectedMecanico.prim_nom} ${selectedMecanico.prim_apell}`, 14, 22);
+        doc.text(`Informe de Órdenes de ${mecanico.prim_nom} ${mecanico.prim_apell}`, 14, 22);
         doc.setFontSize(12);
         doc.text(`Total de Órdenes Realizadas: ${ordenes.length}`, 14, 32);
+
         if (ordenes.length === 0) {
             doc.setFontSize(12);
+            doc.text('No hay órdenes de trabajo para este mecánico.', 14, 42);
         } else {
-            const tableColumn = ['ID', 'Descripción', 'Fecha Inicio', 'Fecha Recepción', 'Fecha Entrega', 'Fecha Salida', 'Costo'];
+            const tableColumn = ['ID', 'Estado', 'Fecha Inicio', 'Fecha Recepción', 'Fecha Entrega', 'Total Servicios', 'Costo'];
             const tableRows = [];
 
             ordenes.forEach((orden) => {
+                const estadoOT = orden.estado_ot_id?.nom_estado || 'No disponible';
+                const totalServicios = orden.catalogo_servicios?.length || 0;
+
                 const ordenData = [
                     orden.id,
-                    orden?.descripcion || 'No disponible',
-                    orden?.fechainicio || 'No disponible',
-                    orden?.fecharecepcion || 'No disponible',
-                    orden?.fechaentrega || 'No disponible',
-                    orden?.fechasalida || 'No disponible',
-                    orden?.costo ? `$${orden?.costo}` : 'No disponible',
+                    estadoOT,
+                    orden.fechainicio || 'No disponible',
+                    orden.fecharecepcion || 'No disponible',
+                    orden.fechaentrega || 'No disponible',
+                    totalServicios,
+                    orden.costo ? `$${orden.costo}` : 'No disponible',
                 ];
                 tableRows.push(ordenData);
             });
 
             doc.autoTable({ head: [tableColumn], body: tableRows, startY: 40 });
         }
-        doc.save(`informe_mecanico_${selectedMecanico.prim_nom}.pdf`);
+        doc.save(`informe_mecanico_${mecanico.prim_nom}.pdf`);
     };
 
     // Obtener órdenes por mes y generar informe
@@ -133,9 +153,9 @@ const Informes = () => {
                 const [year, month] = selectedMes.split('-');
                 const fechaInicio = `${year}-${month}-01`;
                 const fechaFin = new Date(year, month, 0).toISOString().split('T')[0]; // Último día del mes
-    
+
                 const response = await fetcher(
-                    `${STRAPI_URL}/api/orden-trabajos?filters[fechainicio][$gte]=${fechaInicio}&filters[fechainicio][$lte]=${fechaFin}&populate=*`,
+                    `${STRAPI_URL}/api/orden-trabajos?filters[fechainicio][$gte]=${fechaInicio}&filters[fechainicio][$lte]=${fechaFin}&populate=estado_ot_id&populate=catalogo_servicios`,
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -153,17 +173,21 @@ const Informes = () => {
             alert('Por favor, selecciona un mes.');
         }
     };
-    
 
     // Obtener órdenes por mecánico y generar informe
     const fetchAndGenerateInformePorMecanico = async (mecanico) => {
-        setSelectedMecanico(mecanico);
-        
+        if (!mecanico) {
+            toast.error('Por favor, selecciona un mecánico válido.');
+            return;
+        }
+
+        const mecanicoSeleccionado = mecanico;
         const jwt = getTokenFromLocalCookie();
-        if (jwt && mecanico) {
+
+        if (jwt) {
             try {
                 const response = await fetcher(
-                    `${STRAPI_URL}/api/orden-trabajos?filters[mecanico_id][id][$eq]=${mecanico.id}&populate=*`,
+                    `${STRAPI_URL}/api/orden-trabajos?filters[mecanico_id][id][$eq]=${mecanico.id}&populate=estado_ot_id&populate=catalogo_servicios`,
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -171,13 +195,14 @@ const Informes = () => {
                         },
                     });
                 const ordenes = response?.data || [];
-                
-                generarInformePorMecanico(ordenes);
+                generarInformePorMecanico(ordenes, mecanicoSeleccionado);
+                toast.success('Informe generado correctamente.');
             } catch (error) {
                 console.error('Error fetching ordenes del mecánico:', error);
+                toast.error('Error al generar el informe.');
             }
         } else {
-            alert('Por favor, selecciona un mecánico válido.');
+            toast.error('Por favor, selecciona un mecánico válido.');
         }
     };
 
