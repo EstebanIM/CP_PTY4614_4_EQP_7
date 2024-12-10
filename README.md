@@ -150,30 +150,35 @@ VITE_STRAPI_TOKEN_ACCOUNT=TOKEN
 ### 4️⃣ Instalación
 # 🛠️ Instalación del backend  
 
-bash
+```bash
 # Npm
 cd CarMotorFix  
 npm install  
 npm run develop
+```
 
-bash
+```bash
 # bun
 cd CarMotorFix  
 bun install  
 bun run develop
+```
 
 # 🛠️ Instalación del frontend
-bash
+
+```bash
 # npm
 cd /CarMotorFix/Web  
 npm install
 npm run dev
+```
 
-bash
+```bash
 # bun
 cd /CarMotorFix/Web  
 bun install
 bun run dev
+```
 
 # 🛠️ Proyecto Salfa Capacitaciones  
 
@@ -186,23 +191,28 @@ Plataforma web CarMotorFix, diseñada para la gestión integral de talleres auto
 
 ### 5️⃣ Ejecución del Proyecto  
 #### ▶️ Backend(desde /CarMotorFix)  
-bash
+
+```bash
 # npm
 npm run develop
+```
 
-bash
+```bash
 # bun
 bun run develop
+```
 
 #### ▶️ Frontend(desde /CarMotorFix/Web)  
-bash
+
+```bash
 # npm 
 npm run dev
+```
 
-bash
+```bash
 # bun
 bun run dev
-
+```
 
 # 🌐 Puertos y URLs  
 
@@ -239,6 +249,11 @@ bun run dev
 - 📜 **JSX**: ^5.2.2  
 - 👍 **framer-motion**: ^11.11.11
 - ⚠️ **react-toastify**: ^10.0.6
+---
+
+### 🧪 Pruebas  
+
+- ⚡ **ViteTest**: ^2.1.6
 ---
 
 ## 📝 Notas Importantes  
