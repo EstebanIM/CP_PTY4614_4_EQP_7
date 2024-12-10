@@ -1,0 +1,130 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="F40F718D-4609-0AA4-B0F0-BAE4074269AF" name="Mecanico">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 01:06:10 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="ID_Mecanico" id="D092B664-FA86-13F5-C132-398F6E7A7912">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 01:06:10 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>30</dataTypePrecision>
+<ownDataTypeParameters>,30,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="ID_Ususuario" id="FEDB7DAC-30E9-D74E-FED3-93F192DD0063">
+<createdBy>diego</createdBy>
+<createdTime>2024-11-21 01:10:53 UTC</createdTime>
+<generatorID>5A3D5EC4-9E68-9DF7-9132-11C43524877A</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<referedAttribute>6D79A8BE-8EAC-5F35-49F8-92EE3FDCCBF2</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>30</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="Rut" id="5DDA4F89-3550-F77E-FA02-FDCB4317514C">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 01:06:10 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>8</dataTypePrecision>
+<ownDataTypeParameters>,8,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="nombre" id="BBEE92BB-6928-6350-18BE-7E518234E9B5">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 01:06:10 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>30</dataTypeSize>
+<ownDataTypeParameters>30,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="apellido" id="EC49938A-BE74-829C-E883-9D4E2910485F">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 01:06:10 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>40</dataTypeSize>
+<ownDataTypeParameters>40,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="correo" id="6FFC00D1-52AF-B194-CDE7-9B5461D1399C">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 01:06:10 UTC</createdTime>
+<commentInRDBMS><![CDATA[El correo es necesario que tenga como obligacion el @ y el .]]></commentInRDBMS>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>40</dataTypeSize>
+<ownDataTypeParameters>40,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="ID_Taller" id="61801BF2-DAFF-2F33-9A27-789D1522A7FE">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 00:54:37 UTC</createdTime>
+<generatorID>6D31FF53-4E93-8406-34E3-050403FCFD68</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<referedAttribute>684C69E1-949F-DB98-08B5-D68562BA7664</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="EAB13CE0-0D4C-0399-4D10-753C3DBD4B14" name="Nombre PK">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 01:06:10 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<shouldEngineer>false</shouldEngineer>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="false"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>D092B664-FA86-13F5-C132-398F6E7A7912</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

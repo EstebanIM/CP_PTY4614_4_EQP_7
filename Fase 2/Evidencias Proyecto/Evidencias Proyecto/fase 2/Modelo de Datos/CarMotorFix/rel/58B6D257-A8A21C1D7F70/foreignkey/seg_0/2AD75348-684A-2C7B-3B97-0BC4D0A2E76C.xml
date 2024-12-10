@@ -1,0 +1,17 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="2AD75348-684A-2C7B-3B97-0BC4D0A2E76C" containerWithKeyObject="481CE836-18D4-F1FA-8A10-927DCB1FE3A3" localFKIndex="06B30C71-9EE0-A3E0-BF0F-8B990FDAFD5D" name="mecanico_Rol_FK">
+<createdBy>einzu</createdBy>
+<createdTime>2024-11-19 01:40:11 UTC</createdTime>
+<generatorID>B829C9CB-5791-8F9F-F153-2541C79BE08D</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<referredTableLongName>Rol</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>E9487BD4-053D-37AF-E3E0-475718459D23</referredTableID>
+<keyObject>1E3FC2FD-0AB5-3994-E717-A6AE908F2623</keyObject>
+<referredKeyID>1E3FC2FD-0AB5-3994-E717-A6AE908F2623</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>Id_rol</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>
