@@ -222,6 +222,15 @@ function DetalleVehiculo() {
             await fetchVehiculo();
             setIsConfirmDisableModalOpen(false);
             toast.success('Vehículo deshabilitado exitosamente.');
+            if (window.history.length > 1) {
+                navigate(-1);
+            } else {
+                if (userRole === 'Authenticated') {
+                    navigate('/mis-vehiculos');
+                } else {
+                    navigate('/dashboard');
+                }
+            }
         } catch (error) {
             console.error('Error al deshabilitar el vehículo:', error);
             toast.error('Error al deshabilitar el vehículo.');

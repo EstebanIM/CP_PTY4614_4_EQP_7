@@ -49,7 +49,7 @@ function OrdenDeTrabajo() {
                     }
                 );
                 const ordenes = ordenesResponse.data.orden_trabajos_id || [];
-                const ordenesIds = ordenes.filter(OT => OT.estado_ot_id.nom_estado !== 'Cotizando');
+                const ordenesIds = ordenes.filter(OT => OT.estado_ot_id.nom_estado !== 'Cotizando' && OT.estado_ot_id.nom_estado !== 'Rechazado');
                 
                 setOrdenTrabajo(ordenesIds || []);
                 setTotal(ordenesIds.length);
@@ -60,11 +60,11 @@ function OrdenDeTrabajo() {
                         Authorization: `Bearer ${jwt}`,
                     },
                 });
-                const ordenes = ordenesResponse.data || [];
-                const ordenesIds = ordenes.filter(OT => OT.estado_ot_id.nom_estado !== 'Cotizando');
+                const ordenes2 = ordenesResponse.data || [];
+                const ordenesIds2 = ordenes2.filter(OT => OT.estado_ot_id.nom_estado !== 'Cotizando' && OT.estado_ot_id.nom_estado !== 'Rechazado');
                 
-                setOrdenTrabajo(ordenesIds || []);
-                setTotal(ordenesIds.length);
+                setOrdenTrabajo(ordenesIds2 || []);
+                setTotal(ordenesIds2.length);
             }
         } catch (error) {
             console.error('Error fetching data:', error);

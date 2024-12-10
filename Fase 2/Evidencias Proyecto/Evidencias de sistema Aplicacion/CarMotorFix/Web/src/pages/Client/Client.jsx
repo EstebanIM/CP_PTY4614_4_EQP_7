@@ -91,7 +91,7 @@ function Client() {
           });
           const vehiculoIds = response.vehiculo_ids || [];
           setUserRole(response.role.name);
-          const validVehiculoIds = vehiculoIds.filter(v => v && v.id);
+          const validVehiculoIds = vehiculoIds.filter(v => v && v.id && v.estado === true);
           const OT = response.ots || [];
 
           SetOT(OT);
