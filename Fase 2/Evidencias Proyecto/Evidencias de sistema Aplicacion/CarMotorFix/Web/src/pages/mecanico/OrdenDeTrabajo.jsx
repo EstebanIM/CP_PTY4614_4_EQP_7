@@ -14,6 +14,7 @@ function OrdenDeTrabajo() {
     const [userRole, setUserRole] = useState(null);
     const [ordenTrabajo, setOrdenTrabajo] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [total, setTotal] = useState(0);
     const navigate = useNavigate();
 
     const toggleSidebar = () => {
@@ -47,9 +48,11 @@ function OrdenDeTrabajo() {
                         },
                     }
                 );
-                // console.log("Orden ",ordenesResponse);
+                const ordenes = ordenesResponse.data.orden_trabajos_id || [];
+                const ordenesIds = ordenes.filter(OT => OT.estado_ot_id.nom_estado !== 'Cotizando');
                 
-                setOrdenTrabajo(ordenesResponse.data.orden_trabajos_id || []);
+                setOrdenTrabajo(ordenesIds || []);
+                setTotal(ordenesIds.length);
             } else {
                 const ordenesResponse = await fetcher(`${STRAPI_URL}/api/orden-trabajos?pLevel`, {
                     headers: {
@@ -57,8 +60,11 @@ function OrdenDeTrabajo() {
                         Authorization: `Bearer ${jwt}`,
                     },
                 });
-                // console.log("Orden ",ordenesResponse);
-                setOrdenTrabajo(ordenesResponse.data || []);
+                const ordenes = ordenesResponse.data || [];
+                const ordenesIds = ordenes.filter(OT => OT.estado_ot_id.nom_estado !== 'Cotizando');
+                
+                setOrdenTrabajo(ordenesIds || []);
+                setTotal(ordenesIds.length);
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -128,7 +134,10 @@ function OrdenDeTrabajo() {
                 <DashboardHeader toggleSidebar={toggleSidebar} />
 
                 <div className="container mx-auto p-4">
-                    <h1 className="text-2xl font-bold mb-6">Orden de Trabajo</h1>
+                    <div className="mb-4">
+                        <span className="font-semibold">Total de órdenes de trabajo: </span>
+                        <span>{total}</span>
+                    </div>
                     {loading ? (
                         <p>Cargando datos...</p>
                     ) : (
