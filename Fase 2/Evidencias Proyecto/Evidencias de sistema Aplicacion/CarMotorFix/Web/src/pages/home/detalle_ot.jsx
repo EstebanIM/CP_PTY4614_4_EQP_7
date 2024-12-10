@@ -33,6 +33,7 @@ export default function WorkOrderDetails() {
   const [showupdateValorizar, setshowupdateValorizar] = useState(false);
   const [showAddServicio, setshowAddServicio] = useState(false);
   const [catalogoServicios, setCatalogoServicios] = useState([]);
+  const [userID, setUserID] = useState(null);
 
   const [formData, setFormData] = useState({
     descripcion: '',
@@ -54,6 +55,7 @@ export default function WorkOrderDetails() {
 
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
+  
   const fetchOrden = async () => {
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
@@ -69,11 +71,11 @@ export default function WorkOrderDetails() {
         setOrden(response.data);
         // console.log(response.data);
 
-        const ViewNotas = response.data.notas.map((nota) => {
+        const ViewNotas = response.data.notas?.map((nota) => {
           return {
             id: nota.id,
             descripcion: nota.descripcion,
-            mecanico: nota.mecanico.prim_nom + ' ' + nota.mecanico.prim_apell,
+            mecanico: nota.mecanico?.prim_nom + ' ' + nota.mecanico?.prim_apell,
             fecha: new Date(nota.createdAt).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }),
           };
         });
@@ -99,6 +101,7 @@ export default function WorkOrderDetails() {
         });
 
         setUserRole(response.role.name);
+        setUserID(response.mecanico.id);
       } catch (error) {
         console.error('Error fetching user role:', error);
       }
@@ -188,7 +191,15 @@ export default function WorkOrderDetails() {
   }, [Orden, vehiculo]);
 
   const handleBack = () => {
-    navigate('/dashboard');
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      if (userRole === 'Authenticated') {
+        navigate('/mis-vehiculos');
+      } else {
+        navigate('/dashboard');
+      }
+    }
   };
 
   const formatPatente = (patente) => {
@@ -357,20 +368,19 @@ export default function WorkOrderDetails() {
 
   const handleSubmitNota = async (e) => {
     e.preventDefault();
-
+  
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
       try {
-
         setLoading(true);
         const updateNota = {
           data: {
             descripcion: formNota.descripcion,
-            mecanico: Orden.mecanico_id.id,
+            mecanico: userID,
             ot: Orden.id
           },
         };
-
+  
         const response = await fetch(`${STRAPI_URL}/api/notas`, {
           method: 'POST',
           headers: {
@@ -379,16 +389,38 @@ export default function WorkOrderDetails() {
           },
           body: JSON.stringify(updateNota),
         });
-
+  
         if (!response.ok) {
           throw new Error(`Error al agregar nota: ${response.statusText}`);
         }
-
+  
         setFormNota({
           descripcion: ''
         });
-
+  
         setshowNota(false);
+  
+        // Fetch the updated notes
+        const responseOrden = await fetcher(`${STRAPI_URL}/api/orden-trabajos/${id}?pLevel`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+  
+        const updatedOrden = responseOrden.data;
+        const ViewNotas = updatedOrden.notas?.map((nota) => {
+          return {
+            id: nota.id,
+            descripcion: nota.descripcion,
+            mecanico: nota.mecanico?.prim_nom + ' ' + nota.mecanico?.prim_apell,
+            fecha: new Date(nota.createdAt).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+          };
+        });
+  
+        setNotas(ViewNotas);
+  
       } catch (error) {
         console.error('Error al agregar nota:', error);
       } finally {
@@ -396,6 +428,7 @@ export default function WorkOrderDetails() {
       }
     }
   };
+  
 
   const handleValorizar = async (e) => {
     e.preventDefault();
@@ -562,20 +595,32 @@ export default function WorkOrderDetails() {
   };
 
   const handleBoleta = () => {
-    const element = document.getElementById('order-and-notes');
+    const element = document.getElementById("order-and-notes");
+    const body = document.body;
+
+    body.classList.add("pdf-hide-buttons", "pdf-light-mode");
+
     const options = {
       margin: 1,
-      filename: 'orden_de_trabajo.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
+      filename: "orden_de_trabajo.pdf",
+      image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 4 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
     };
 
-    html2pdf().from(element).set(options).save();
+    html2pdf()
+      .from(element)
+      .set(options)
+      .save()
+      .finally(() => {
+        body.classList.remove("pdf-hide-buttons", "pdf-light-mode");
+      });
   };
 
+
+
   return (
-    <div className={`flex h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+    <div className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
       <div className="print:hidden">
         <DashboardSidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} userRole={userRole} />
       </div>
@@ -594,22 +639,25 @@ export default function WorkOrderDetails() {
               <h2 className="text-2xl font-bold">Orden #{Orden.id}</h2>
               <div className="print:hidden">
                 {Orden.descripcion &&
-                  userRole === 'Authenticated' &&
-                  Orden.estado_ot_id?.nom_estado === 'Cotizando' &&
-                  Orden.estado_ot_id?.nom_estado === 'Nueva Cotización' && (
+                  ['Authenticated'].includes(userRole) &&
+                  (Orden.estado_ot_id?.nom_estado === 'Cotizando' || Orden.estado_ot_id?.nom_estado === 'Nueva Cotización') &&
+                  Orden.fechaentrega && (
                     <div className="space-x-4">
-                      <button className="px-4 py-2 bg-green-700 text-white rounded"
+                      <button
+                        className="px-4 py-2 bg-green-700 text-white rounded"
                         onClick={() => actualizarEstadoOrden(Orden.documentId, 2)} // 2 para "Aceptado"
                       >
                         Aceptar
                       </button>
-                      <button className="px-4 py-2 bg-red-700 text-white rounded"
+                      <button
+                        className="px-4 py-2 bg-red-700 text-white rounded"
                         onClick={() => actualizarEstadoOrden(Orden.documentId, 4)} // 4 para "Rechazado"
                       >
                         Rechazar
                       </button>
                     </div>
                   )}
+
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 mb-6">
@@ -720,28 +768,34 @@ export default function WorkOrderDetails() {
                   </button>
                 </div>
               )}
+
             {Orden.estado_ot_id?.nom_estado === 'Finalizado' && (
               <div className="print:hidden mt-6 flex justify-end">
-                {Orden.clasificacion_ot === null && (
-                  <button
-                    className={`px-4 py-2 ${darkMode
-                      ? 'bg-gray-700 text-white hover:bg-gray-600'
-                      : 'bg-black text-white hover:bg-gray-700'
-                      } rounded`}
-                    onClick={() => setshowAddValorizar(true)}
-                  >
-                    Valorizar
-                  </button>
+                {['Authenticated'].includes(userRole) && (
+                  <>
+                    {Orden.clasificacion_ot === null ? (
+                      <button
+                        className={`px-4 py-2 ${darkMode
+                          ? 'bg-gray-700 text-white hover:bg-gray-600'
+                          : 'bg-black text-white hover:bg-gray-700'
+                          } rounded`}
+                        onClick={() => setshowAddValorizar(true)}
+                      >
+                        Valorizar
+                      </button>
+                    ) : (
+                      <button
+                        className={`px-4 py-2 ${darkMode
+                          ? 'bg-gray-700 text-white hover:bg-gray-600'
+                          : 'bg-black text-white hover:bg-gray-700'
+                          } rounded`}
+                        onClick={() => setshowupdateValorizar(true)}
+                      >
+                        Modificar Valoriación
+                      </button>
+                    )}
+                  </>
                 )}
-                <button
-                  className={`print:hidden px-4 py-2 ${darkMode
-                    ? 'bg-gray-700 text-white hover:bg-gray-600'
-                    : 'bg-black text-white hover:bg-gray-700'
-                    } rounded`}
-                  onClick={() => setshowupdateValorizar(true)}
-                >
-                  Modificar Valorizar
-                </button>
 
                 <button
                   className={`print:hidden ml-2 px-4 py-2 ${darkMode
@@ -750,16 +804,18 @@ export default function WorkOrderDetails() {
                     } rounded`}
                   onClick={handleBoleta}
                 >
-                  Descargar Boleta
+                  Generar detalle
                 </button>
               </div>
             )}
+
+
           </Card>
 
           <div className={`rounded-lg shadow-md p-4 mt-6 sm:p-6 overflow-x-auto ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <h3 className="text-lg sm:text-xl font-semibold mb-4">Notas de Mantenimiento</h3>
             <div className="min-w-full">
-              {notas.length === 0 ? (
+              {notas?.length === 0 ? (
                 <div className="text-center text-gray-500 mt-4">
                   <h4 className="text-xl">No hay Notas sobre esta Orden de trabajo.</h4>
                 </div>
@@ -788,7 +844,7 @@ export default function WorkOrderDetails() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {notas.map((nota) => (
+                    {notas?.map((nota) => (
                       <tr key={nota.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {nota.descripcion}
@@ -1024,7 +1080,7 @@ export default function WorkOrderDetails() {
           </Modal>
 
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }

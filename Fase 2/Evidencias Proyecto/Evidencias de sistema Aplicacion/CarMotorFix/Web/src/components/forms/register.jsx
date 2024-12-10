@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { Button } from '../ui/button';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -70,7 +69,7 @@ export const RegisterForm = ({
           id="rut"
           type="text"
           value={rut}
-          onChange={handleRutChange}
+          onChange={(e) => handleRutChange(e.target.value)}
           placeholder="12345678-9"
           required
           className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -119,7 +118,11 @@ export const RegisterForm = ({
 
       {/* Barra de Fortalecimiento de Contraseña */}
       <div className="mt-2 mb-4">
-        <div className="h-2 rounded bg-gray-200">
+        <div
+          className="h-2 rounded bg-gray-200"
+          role="progressbar"
+          aria-label="Password strength bar"
+        >
           <div
             className={`h-full rounded transition-all ${passwordStrength >= 3 ? 'bg-green-500' : 'bg-red-500'
               }`}
@@ -154,12 +157,12 @@ export const RegisterForm = ({
       </div>
 
       {/* Botón de Registro */}
-      <Button
+      <button
         type="submit"
         className="w-full mt-4 bg-indigo-600 text-white hover:bg-indigo-700"
       >
         Registrarse
-      </Button>
+      </button>
     </>
   );
 };

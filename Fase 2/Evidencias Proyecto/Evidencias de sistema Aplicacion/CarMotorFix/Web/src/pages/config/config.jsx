@@ -7,13 +7,14 @@ import { Button } from '../../components/ui/config/button';
 import { Label } from '../../components/ui/config/label';
 import { Switch } from '../../components/ui/config/Switch';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/config/cards';
-import { User, IdCard, Mail, Lock, Bell, Palette, Eye, EyeOff } from 'lucide-react';
+import { User, IdCard, Mail, Lock, Palette, Eye, EyeOff } from 'lucide-react';
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
 import { fetcher } from '../../lib/strApi';
-import { getTokenFromLocalCookie, getIdFromLocalCookie } from '../../lib/cookies';
+import { getTokenFromLocalCookie, getIdFromLocalCookie, unsetToken } from '../../lib/cookies';
 import { supabase } from '../../lib/supabaseClient';
 import { DarkModeContext } from '../../context/DarkModeContext';
+import { useNavigate } from 'react-router-dom';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
@@ -22,6 +23,8 @@ export default function Config() {
   const [userRole, setUserRole] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userId, setUserID] = useState(null);
+  const navigate = useNavigate();
   const [userData, setUserData] = useState({
     email: "",
     nombre: "",
@@ -52,6 +55,9 @@ export default function Config() {
           },
         });
         setUserRole(response.role.name);
+        setUserID(response.id);
+        // console.log(response);
+        
       } catch (error) {
         console.error("Error fetching user role:", error);
       }
@@ -183,6 +189,50 @@ export default function Config() {
     toggleDarkMode(enabled);
   };
 
+  const blockUser = async () => {
+    const jwt = getTokenFromLocalCookie();
+    try {
+      await logoutUser();
+
+      const response = await fetch(`${STRAPI_URL}/api/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify({
+          blocked: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al bloquear el usuario: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      toast(result.message || 'Usuario bloqueado exitosamente');
+    } catch (error) {
+      console.error('Error en el bloqueo del usuario:', error.message);
+      toast('No se pudo bloquear el usuario. Intenta nuevamente.');
+    }
+  };
+
+  const logoutUser = async () => {
+    try {
+      unsetToken();
+      localStorage.clear();
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      navigate('/');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error.message);
+      toast('Error al cerrar sesión. Intenta nuevamente.');
+    }
+  };
+
+
+
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} closeOnClick pauseOnFocusLoss draggable pauseOnHover />
@@ -196,7 +246,6 @@ export default function Config() {
             <Tabs defaultValue="perfil" className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-6">
                 <TabsTrigger value="perfil">Perfil</TabsTrigger>
-                <TabsTrigger value="notificaciones">Notificaciones</TabsTrigger>
                 <TabsTrigger value="apariencia">Apariencia</TabsTrigger>
               </TabsList>
 
@@ -223,11 +272,10 @@ export default function Config() {
                                 value={value}
                                 onChange={handleChange}
                                 type={key === 'email' ? 'email' : 'text'}
-                                className={`${
-                                  darkMode
+                                className={`${darkMode
                                     ? 'bg-gray-700 border-gray-600 text-white'
                                     : 'bg-white border-gray-300 text-gray-900'
-                                }`}
+                                  }`}
                               />
                             ) : (
                               <div className="p-2 border rounded-md">
@@ -246,12 +294,12 @@ export default function Config() {
                         ) : (
                           <Button onClick={handleEdit}>Editar Información</Button>
                         )}
-                        {/* <button
+                        <button
                           className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-                          onClick=""
-                          >
+                          onClick={blockUser}
+                        >
                           Desactivar Cuenta
-                        </button> */}
+                        </button>
                       </div>
                     </div>
                   </CardContent>
@@ -277,11 +325,10 @@ export default function Config() {
                             type={showPasswords[field] ? 'text' : 'password'}
                             value={passwords[field]}
                             onChange={handlePasswordInputChange}
-                            className={`${
-                              darkMode
+                            className={`${darkMode
                                 ? 'bg-gray-700 border-gray-600 text-white'
                                 : 'bg-white border-gray-300 text-gray-900'
-                            }`}
+                              }`}
                           />
                           <Button
                             type="button"
@@ -304,29 +351,6 @@ export default function Config() {
                   </CardContent>
                 </Card>
 
-              </TabsContent>
-
-              {/* Notificaciones */}
-              <TabsContent value="notificaciones">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Bell className="h-5 w-5" />
-                      Preferencias de Notificaciones
-                    </CardTitle>
-                    <CardDescription>Gestiona cómo y cuándo recibes notificaciones</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="email-notif">Notificaciones por Email</Label>
-                      <Switch id="email-notif" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="sms-notif">Notificaciones por SMS</Label>
-                      <Switch id="sms-notif" />
-                    </div>
-                  </CardContent>
-                </Card>
               </TabsContent>
 
               {/* Apariencia */}

@@ -8,15 +8,16 @@ import { getTokenFromLocalCookie } from "../../lib/cookies";
 import { fetcher } from "../../lib/strApi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { DarkModeContext } from '../../context/DarkModeContext'; // Importar el contexto
+import { DarkModeContext } from '../../context/DarkModeContext';
 import { Button } from "../../components/ui/config/button";
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 const DashboardAutos = () => {
-  const { darkMode } = useContext(DarkModeContext); // Obtener el estado de darkMode
+  const { darkMode } = useContext(DarkModeContext);
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(true);
   const [totalServicios, setTotalServicios] = useState(0);
   const [vehiculos, setVehiculos] = useState([]);
   const [TotalVehiculos, setTotalVehiculos] = useState(0);
@@ -56,6 +57,7 @@ const DashboardAutos = () => {
     const jwt = getTokenFromLocalCookie();
 
     const fetchIDMecanico = async () => {
+      setLoading(true);
       try {
         const response = await fetcher(
           `${STRAPI_URL}/api/users/me?populate[mecanico][populate][vehiculos][filters][estado][$eq]=true&populate[mecanico][populate][vehiculos][fields]=id,anio,documentId,modelo,motor,patente,estado&populate[mecanico][populate][vehiculos][populate][user_id][fields]=id&populate[mecanico][populate][vehiculos][populate][marca_id][fields]=nombre_marca`,
@@ -76,7 +78,7 @@ const DashboardAutos = () => {
           modelo: vehiculo.modelo,
           motor: vehiculo.motor,
           patente: vehiculo.patente,
-          user_id: vehiculo.user_id.id,
+          user_id: vehiculo.user_id?.id,
           marca_id: vehiculo.marca_id.nombre_marca,
           estado: vehiculo.estado,
         }));
@@ -86,12 +88,14 @@ const DashboardAutos = () => {
         const vehiculosUnicos = new Set(vehiculosHabilitados.map(vehiculo => vehiculo.id));
         setTotalVehiculos(vehiculosUnicos.size);
         setVehiculos(vehiculosHabilitados);
-
+        // console.log('Vehiculos:', vehiculosHabilitados);
 
       } catch (error) {
         console.error('Error fetching IDMecanico:', error);
       }
     };
+
+    setLoading(false);
 
     fetchIDMecanico();
   }, []);
@@ -100,19 +104,19 @@ const DashboardAutos = () => {
     if (!idMecanico) return;
 
     const jwt = getTokenFromLocalCookie();
-
+    setLoading(true);
     const fetchOT = async () => {
       try {
-        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&populate[estado_ot_id][fields]=nom_estado&populate[vehiculo][fields]=id,anio,modelo,motor,patente&populate[vehiculo][populate][marca_id][fields]=nombre_marca&populate[vehiculo][populate][user_id][fields]=id&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
+        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=nombre&populate[user][fields]=apellido&populate[estado_ot_id][fields]=nom_estado&populate[vehiculo][fields]=id,anio,modelo,motor,patente&populate[vehiculo][populate][marca_id][fields]=nombre_marca&populate[vehiculo][populate][user_id][fields]=id&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${jwt}`,
           },
         });
-
+        // console.log('Ordenes:', response.data);
         const OT = response.data.map((OT) => ({
           ...OT,
-          user: OT.user.username,
+          user: OT.user?.nombre + ' ' + OT.user?.apellido,
           estado_ot_id: OT.estado_ot_id.nom_estado,
           catalogo_servicios: OT.catalogo_servicios.map(servicio => servicio.tp_servicio),
           costo: OT.costo,
@@ -124,13 +128,13 @@ const DashboardAutos = () => {
             modelo: OT.vehiculo.modelo,
             motor: OT.vehiculo.motor,
             patente: OT.vehiculo.patente,
-            user_id: OT.vehiculo.user_id.id,
+            user_id: OT.vehiculo?.user_id?.id,
             marca_id: OT.vehiculo.marca_id.nombre_marca,
           }
         }));
 
         const Cotizacion = OT.filter(cotizacion => cotizacion.estado_ot_id === 'Cotizando');
-        const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'Cotizando' && Ordenes.estado_ot_id !== 'Finalizado');
+        const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'Cotizando' && Ordenes.estado_ot_id !== 'Finalizado' && Ordenes.estado_ot_id !== 'Rechazado');
 
         setOrdenes(Ordenes);
 
@@ -214,6 +218,8 @@ const DashboardAutos = () => {
       }
     };
 
+    setLoading(false);
+
     fetchUsers();
     fetchMarcas();
     fetchTiposVehiculo();
@@ -222,7 +228,7 @@ const DashboardAutos = () => {
   }, [idMecanico]);
 
   const handleViewVehiculo = (vehiculo) => {
-    navigate(`/vehiculos/detalle-vehiculo/${vehiculo.documentId}`);
+    navigate(`/detalle-vehiculo/${vehiculo.documentId}`);
   };
 
   const handleViewOT = (DetalleOT) => {
@@ -284,16 +290,35 @@ const DashboardAutos = () => {
       render: (ordenes) => ordenes.user || 'Cliente no disponible',
     },
     {
-      header: "Servicio",
+      header: "Cant. Servicio",
       key: "servicio",
       render: (ordenes) => {
-        if (ordenes.catalogo_servicios && ordenes.catalogo_servicios.length > 0) {
-          const firstService = ordenes.catalogo_servicios;
-          const moreServices = ordenes.catalogo_servicios.length > 1;
-          return moreServices ? `${firstService} (+${ordenes.catalogo_servicios.length - 1} más)` : firstService;
+        const servicios = ordenes.catalogo_servicios;
+        if (servicios && servicios.length > 0) {
+          const moreServices = servicios.length > 1;
+      
+          return (
+            <div className="relative flex justify-center items-center group">
+              <span className="text-black">
+                {moreServices && `${servicios.length}`}
+              </span>
+      
+              {moreServices && (
+                <div className="absolute left-6 bottom-[-10px] ml-2 hidden w-60 p-2 bg-white border border-gray-300 rounded shadow-lg text-black group-hover:block z-10">
+                  <ul className="space-y-1">
+                    {servicios.map((servicio, index) => (
+                      <li key={index} className="whitespace-nowrap">
+                        {servicio}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          );
         }
         return 'Servicio no disponible';
-      },
+      }
     },
     {
       header: "Valor",
@@ -317,16 +342,34 @@ const DashboardAutos = () => {
       render: (Cotizaciones) => Cotizaciones.user || 'Cliente no disponible',
     },
     {
-      header: "Servicio",
+      header: "Cant. Servicio",
       key: "servicio",
       render: (Cotizaciones) => {
-        if (Cotizaciones.catalogo_servicios && Cotizaciones.catalogo_servicios.length > 0) {
-          const firstService = Cotizaciones.catalogo_servicios;
-          const moreServices = Cotizaciones.catalogo_servicios.length > 1;
-          return moreServices ? `${firstService} (+${Cotizaciones.catalogo_servicios.length - 1} más)` : firstService;
+        const servicios = Cotizaciones.catalogo_servicios;
+        if (servicios && servicios.length > 0) {
+      
+          return (
+            <div className="relative flex justify-center items-center group">
+              <span className="text-black">
+                {`${servicios.length}`}
+              </span>
+      
+              {servicios && (
+                <div className="absolute left-9 bottom-[-10px] ml-2 hidden w-60 p-2 bg-white border border-gray-300 rounded shadow-lg text-black group-hover:block z-10">
+                  <ul className="space-y-1">
+                    {servicios.map((servicio, index) => (
+                      <li key={index} className="whitespace-nowrap">
+                        {servicio}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          );
         }
         return 'Servicio no disponible';
-      },
+      }
     },
     {
       header: "Valor",
@@ -398,7 +441,7 @@ const DashboardAutos = () => {
           body: JSON.stringify(CotizacionData),
         });
 
-        console.log('Cotización creada:', CotizacionData);
+        // console.log('Cotización creada:', CotizacionData);
 
         if (response && response.data) {
           setCotizaciones((prevOT) => [...prevOT, response.data]);
@@ -514,6 +557,8 @@ const DashboardAutos = () => {
     setNewVehiculo({ ...newVehiculo, [e.target.name]: e.target.value });
   };
 
+  const today = new Date().toISOString().split('T')[0];
+
   return (
     <div className={`flex ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
       <div className="container mx-auto p-4">
@@ -551,7 +596,7 @@ const DashboardAutos = () => {
           <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <CardContent className="overflow-x-auto">
               <Table className="min-w-full">
-                <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} />
+                <Tablas servicio={vehiculos} handleViewTabla={handleViewVehiculo} columns={columns} loading={loading} />
               </Table>
             </CardContent>
           </Card>
@@ -569,7 +614,7 @@ const DashboardAutos = () => {
                       <h4 className="text-xl">No hay ordenes activas.</h4>
                     </div>
                   ) : (
-                    <Tablas servicio={ordenes} handleViewTabla={handleViewOT} columns={columns2} />
+                    <Tablas servicio={ordenes} handleViewTabla={handleViewOT} columns={columns2} loading={loading} />
                   )}
                 </Table>
               </CardContent>
@@ -590,7 +635,7 @@ const DashboardAutos = () => {
             <Card className={`${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
               <CardContent className="overflow-x-auto">
                 <Table className="min-w-full">
-                  <Tablas servicio={Cotizaciones} handleViewTabla={handleViewOT} columns={columns3} />
+                  <Tablas servicio={Cotizaciones} handleViewTabla={handleViewOT} columns={columns3} loading={loading} />
                 </Table>
               </CardContent>
             </Card>
@@ -749,7 +794,7 @@ const DashboardAutos = () => {
             >
               <option value="">Selecciona un vehículo</option>
               {vehiculos.map((vehiculo) => (
-                vehiculo && vehiculo.id && vehiculo.marca_id && vehiculo.marca_id.nombre_marca ? (
+                vehiculo && vehiculo.id ? (
                   <option key={vehiculo.id} value={vehiculo.id}>
                     {vehiculo.marca_id} {vehiculo.modelo} - {vehiculo.patente}
                   </option>
@@ -771,6 +816,7 @@ const DashboardAutos = () => {
               onChange={handleChangeCotizacion}
               className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white border-gray-600' : 'focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 border-gray-300'} rounded-md`}
               required
+              min={today}
             />
           </div>
 
@@ -787,6 +833,7 @@ const DashboardAutos = () => {
               onChange={handleChangeCotizacion}
               className={`mt-1 block w-full shadow-sm ${darkMode ? 'focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white border-gray-600' : 'focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 border-gray-300'} rounded-md`}
               required
+              min={formData.fecharecepcion || new Date().toISOString().split('T')[0]}
             />
           </div>
 

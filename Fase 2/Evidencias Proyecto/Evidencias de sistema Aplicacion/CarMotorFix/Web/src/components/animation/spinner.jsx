@@ -4,7 +4,7 @@ import { useContext } from 'react';
 import { DarkModeContext } from '../../context/DarkModeContext';
 
 const Spinner = ({ size = "medium" }) => {
-  const { darkMode, toggleDarkMode } = useContext(DarkModeContext);
+  const { darkMode } = useContext(DarkModeContext);
   const sizeClasses = {
     small: "w-4 h-4",
     medium: "w-6 h-6",
@@ -14,7 +14,9 @@ const Spinner = ({ size = "medium" }) => {
   const colorClass = darkMode ? 'text-white' : 'text-primary';
 
   return (
-    <div className="flex justify-center items-center">
+    <div
+    data-testid="spinner"
+    className="flex justify-center items-center">
       <Loader2 className={`animate-spin ${sizeClasses[size]} ${colorClass}`} />
     </div>
   );

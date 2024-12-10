@@ -1,24 +1,19 @@
-// components/PrivateRoute.jsx
 import { useEffect } from 'react';
-import { useAuth } from './context/AuthContext'; // Asegúrate de que la ruta sea correcta
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Usamos useNavigate
+import { useAuth } from './context/AuthContext'; 
 import PropTypes from 'prop-types';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
-  const navigate = useNavigate(); // Usa `useNavigate` para redirigir
+  const navigate = useNavigate(); // Hook de navegación para redirigir
 
   useEffect(() => {
     if (!user) {
-      navigate('/'); // Redirige al usuario a la página de login si no está autenticado
+      navigate('/'); // Si el usuario no está autenticado, redirige a '/'
     }
   }, [user, navigate]);
 
-  // Si no hay usuario, no renderiza nada hasta que navegue
-  if (!user) return null;
-
-  // Si hay usuario, renderiza el contenido de la ruta privada
-  return children;
+  return user ? children : null; // Si está autenticado, muestra los hijos (ruta privada)
 };
 
 PrivateRoute.propTypes = {

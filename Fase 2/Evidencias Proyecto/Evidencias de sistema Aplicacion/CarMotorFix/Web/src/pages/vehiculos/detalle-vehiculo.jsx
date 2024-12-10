@@ -36,7 +36,7 @@ function DetalleVehiculo() {
             const jwt = getTokenFromLocalCookie();
             if (jwt) {
                 try {
-                    const response = await fetcher(`${STRAPI_URL}/api/vehiculos/${id}?populate[marca_id][fields]=nombre_marca&populate[tp_vehiculo_id][fields]=nom_tp_vehiculo&populate=ots`, {
+                    const response = await fetcher(`${STRAPI_URL}/api/vehiculos/${id}?populate[marca_id][fields]=nombre_marca&populate[tp_vehiculo_id][fields]=nom_tp_vehiculo&populate[ots][populate][catalogo_servicios][fields]=tp_servicio`, {
                         headers: {
                             'Content-Type': 'application/json',
                             Authorization: `Bearer ${jwt}`,
@@ -46,6 +46,8 @@ function DetalleVehiculo() {
                     setVehiculo(response.data);
                     setEditData(response.data);
                     setOts(response.data.ots || []);
+                    // console.log("Ots", response.data.ots);
+
 
                 } catch (error) {
                     console.error('Error fetching vehicle details:', error);
@@ -80,7 +82,15 @@ function DetalleVehiculo() {
     }, []);
 
     const handleBack = () => {
-        navigate('/dashboard');
+        if (window.history.length > 1) {
+            navigate(-1);
+        } else {
+            if (userRole === 'Authenticated') {
+                navigate('/mis-vehiculos');
+            } else {
+                navigate('/dashboard');
+            }
+        }
     };
 
     const handleEditClick = () => {
@@ -105,7 +115,7 @@ function DetalleVehiculo() {
         }, {});
 
         if (Object.keys(changes).length === 0) {
-            console.log("No hay cambios para guardar.");
+            // console.log("No hay cambios para guardar.");
             setIsEditing(false);
             return;
         }
@@ -260,7 +270,7 @@ function DetalleVehiculo() {
     };
 
     const handleViewOT = (id) => {
-        console.log("Ver OT:", id);
+        navigate(`/detalle_ot/${id.documentId}`);
     };
 
     if (!vehiculo) return <LoadingComponent />;
@@ -283,7 +293,10 @@ function DetalleVehiculo() {
         {
             header: "Tipo de mantención",
             key: "tipo_mantencion",
-            render: (ots) => ots.tipo_mantencion || 'Sin tipo',
+            // render: (ots) => ots.catalogo_servicios?.tp_servicio || 'Sin tipo',
+            render: (ots) =>
+                ots.catalogo_servicios?.map((s) => s.tp_servicio).join(', ') ||
+                'Servicio no disponible',
         },
         {
             header: "Valor",

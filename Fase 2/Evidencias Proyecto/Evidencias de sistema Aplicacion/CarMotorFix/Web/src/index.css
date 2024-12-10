@@ -17,3 +17,12 @@
     -ms-overflow-style: none;
   }
   
+/* Estilos para el modo claro */
+.pdf-light-mode {
+  @apply bg-white text-black !important;
+}
+
+/* Ocultar botones */
+.pdf-hide-buttons .print\:hidden {
+  @apply hidden;
+}

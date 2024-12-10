@@ -506,50 +506,6 @@ export interface PluginUsersPermissionsUser
   };
 }
 
-export interface ApiAdminAdmin extends Struct.CollectionTypeSchema {
-  collectionName: 'admins';
-  info: {
-    singularName: 'admin';
-    pluralName: 'admins';
-    displayName: 'Admin';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    rut: Schema.Attribute.Integer &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMax<
-        {
-          max: 10;
-        },
-        number
-      >;
-    prim_nom: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 30;
-      }>;
-    prim_apell: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 30;
-      }>;
-    correo: Schema.Attribute.Email & Schema.Attribute.Required;
-    clave: Schema.Attribute.Password & Schema.Attribute.Required;
-    createdAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    publishedAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'api::admin.admin'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiCatalogoServicioCatalogoServicio
   extends Struct.CollectionTypeSchema {
   collectionName: 'catalogo_servicios';
@@ -843,7 +799,6 @@ export interface ApiOrdenTrabajoOrdenTrabajo
     fechainicio: Schema.Attribute.Date & Schema.Attribute.Required;
     fecharecepcion: Schema.Attribute.Date;
     fechaentrega: Schema.Attribute.Date;
-    fechasalida: Schema.Attribute.Date;
     costo: Schema.Attribute.Integer & Schema.Attribute.Required;
     estado_ot_id: Schema.Attribute.Relation<
       'manyToOne',
@@ -1485,7 +1440,6 @@ declare module '@strapi/strapi' {
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
-      'api::admin.admin': ApiAdminAdmin;
       'api::catalogo-servicio.catalogo-servicio': ApiCatalogoServicioCatalogoServicio;
       'api::ciudad.ciudad': ApiCiudadCiudad;
       'api::clasificacion-ot.clasificacion-ot': ApiClasificacionOtClasificacionOt;

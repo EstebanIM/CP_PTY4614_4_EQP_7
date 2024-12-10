@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { supabase } from '../lib/supabaseClient';
+import { getUserFromLocalCookie, getTokenFromLocalCookie } from '../lib/cookies';
+import { login as loginService } from '../services/authService';
 
 const AuthContext = createContext();
 
@@ -9,32 +10,41 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getSession = async () => {
-      setLoading(true); // Iniciar carga
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      setLoading(false); // Terminar carga
-    };
+    const checkUser = async () => {
+      const token = getTokenFromLocalCookie();
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
 
-    getSession();
-
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      if (listener && typeof listener.unsubscribe === 'function') {
-        listener.unsubscribe();
+      try {
+        const currentUser = await getUserFromLocalCookie();
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Error al verificar el usuario:', error);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
     };
+
+    checkUser();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>; // Muestra una pantalla de carga mientras se verifica la sesión
-  }
+  const login = async (email, password) => {
+    try {
+      const loggedInUser = await loginService(email, password);
+      setUser(loggedInUser); // Actualiza el estado del usuario
+      return loggedInUser; // Devuelve el usuario si es necesario
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      throw error;
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ user }}>
+    <AuthContext.Provider value={{ user, login, loading }}>
       {children}
     </AuthContext.Provider>
   );

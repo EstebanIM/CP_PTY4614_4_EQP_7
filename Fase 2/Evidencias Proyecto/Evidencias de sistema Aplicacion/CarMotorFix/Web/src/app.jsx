@@ -18,10 +18,12 @@ import Dashboard from './pages/home/dashboard';
 import Catalogo_servicio from './pages/admin/Catalogo_servicio';
 import Detalle_servicio from './pages/admin/detalle-servicio';
 import Detalle_Orden from './pages/home/detalle_ot';
-import AsignarMecanico from './pages/admin/asignar_mecanico';
+import GestionUsuario from './pages/admin/gestion-usuarios';
 import { DarkModeProvider } from './context/DarkModeContext';
 import OrdenDeTrabajo from './pages/mecanico/OrdenDeTrabajo';
 import BoletaTailwind from './pages/Client/Boleta';
+import Client from './pages/Client/Client';
+import Informes from './pages/admin/informes';
 
 function App() {
   return (
@@ -73,10 +75,26 @@ function App() {
               }
             />
             <Route
+              path="/informes"
+              element={
+                <PrivateRoute>
+                  <Informes />
+                </PrivateRoute>
+              }
+            />
+            <Route
               path="/dashboard"
               element={
                 <PrivateRoute>
                   <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/mis-vehiculos"
+              element={
+                <PrivateRoute>
+                  <Client />
                 </PrivateRoute>
               }
             />
@@ -89,7 +107,7 @@ function App() {
               }
             />
             <Route
-              path="/admin/detalle-servicio/:id"
+              path="/detalle-servicio/:id"
               element={
                 <PrivateRoute>
                   <Detalle_servicio />
@@ -105,7 +123,7 @@ function App() {
               }
             />
             <Route
-              path="/vehiculos/detalle-vehiculo/:id"
+              path="/detalle-vehiculo/:id"
               element={
                 <PrivateRoute>
                   <DetalleVehiculo />
@@ -121,10 +139,10 @@ function App() {
               }
             />
             <Route
-              path="/asignar_mecanico"
+              path="/gestion-usuarios"
               element={
                 <PrivateRoute>
-                  <AsignarMecanico />
+                  <GestionUsuario />
                 </PrivateRoute>
               }
             />

@@ -13,7 +13,7 @@ const ConsejoAutoDelDia = () => {
 
     return (
         <div className="flex justify-center">
-            <div className={`max-w-sm p-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} border border-gray-200 rounded-lg shadow-lg`}>
+            <div className={`max-w-sm p-6 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}`}>
                 <h2 className="text-2xl font-bold mb-4">Consejo del Día para el Cuidado del Auto</h2>
                 <p className="text-lg">{consejo}</p>
             </div>

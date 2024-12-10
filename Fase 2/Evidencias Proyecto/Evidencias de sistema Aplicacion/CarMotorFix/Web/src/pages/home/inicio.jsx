@@ -1,21 +1,19 @@
 import { useState, useEffect, useContext } from "react";
 import DashboardHeader from "../../components/menu/DashboardHeader";
 import DashboardSidebar from "../../components/menu/DashboardSidebar";
-import { FaTools, FaUsers, FaFileInvoiceDollar } from "react-icons/fa";
+import { FaTools, FaUsers } from "react-icons/fa";
 import { fetcher } from '../../lib/strApi';
 import { getTokenFromLocalCookie } from '../../lib/cookies';
 import ConsejoAutoDelDia from '../../components/mensaje/mensajedia';
 import { DarkModeContext } from '../../context/DarkModeContext'; // Asegúrate de la ruta correcta
-import Cookies from 'js-cookie';
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
 export default function Inicio() {
-  console.log(Cookies.get('rol'));
-  
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userRole, setUserRole] = useState(null);
-  const { darkMode } = useContext(DarkModeContext); 
+  const { darkMode } = useContext(DarkModeContext);
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -75,26 +73,21 @@ export default function Inicio() {
             <div className={`flex flex-col items-center ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} p-6 rounded-lg shadow-lg`}>
               <FaTools className="text-4xl text-blue-500 mb-4" />
               <h2 className="text-xl font-semibold mb-2">Gestión de Órdenes</h2>
-              <p className="text-gray-600">Administra las órdenes de trabajo de manera eficiente.</p>
+              <p className="text-gray-300">Administra las órdenes de trabajo de manera eficiente.</p>
+            </div>
+
+            <div className={`flex flex-col items-center ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} p-6 rounded-lg shadow-lg`}>
+              <ConsejoAutoDelDia />
             </div>
 
             <div className={`flex flex-col items-center ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} p-6 rounded-lg shadow-lg`}>
               <FaUsers className="text-4xl text-green-500 mb-4" />
               <h2 className="text-xl font-semibold mb-2">Comunicación con Clientes</h2>
-              <p className="text-gray-600">Mejora la comunicación entre los mecánicos y los clientes.</p>
+              <p className="text-gray-300">Mejora la comunicación entre los mecánicos y los clientes.</p>
             </div>
 
-            <div className={`flex flex-col items-center ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'} p-6 rounded-lg shadow-lg`}>
-              <FaFileInvoiceDollar className="text-4xl text-red-500 mb-4" />
-              <h2 className="text-xl font-semibold mb-2">Facturación y Pagos</h2>
-              <p className="text-gray-600">Gestiona las facturas y los pagos de manera sencilla.</p>
-            </div>
           </div>
 
-          {/* Consejo del Día */}
-          <div className="mt-8">
-            <ConsejoAutoDelDia />
-          </div>
         </div>
       </div>
     </div>

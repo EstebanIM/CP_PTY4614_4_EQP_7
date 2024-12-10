@@ -24,10 +24,6 @@
       "type": "date",
       "required": false
     },
-    "fechasalida": {
-      "type": "date",
-      "required": false
-    },
     "costo": {
       "type": "integer",
       "required": true
