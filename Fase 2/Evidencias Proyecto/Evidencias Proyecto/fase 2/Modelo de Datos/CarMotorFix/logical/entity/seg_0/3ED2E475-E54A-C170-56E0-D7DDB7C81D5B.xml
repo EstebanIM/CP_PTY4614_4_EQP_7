@@ -1,0 +1,75 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="3ED2E475-E54A-C170-56E0-D7DDB7C81D5B" name="Marca">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 00:14:08 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="Id_marca" id="119A0836-6D1B-C1F6-E7E0-64C702473744">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 00:14:23 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>50</dataTypePrecision>
+<ownDataTypeParameters>,50,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="nomb_Marca" id="FBA23B56-0550-C317-05A1-8B89FAAB2EB0">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 00:14:23 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>60</dataTypeSize>
+<ownDataTypeParameters>60,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="ID_vehiculo" id="801ADEBB-B01E-DF8B-6A43-F560BFC9557F">
+<createdBy>diego</createdBy>
+<createdTime>2024-12-02 21:03:50 UTC</createdTime>
+<generatorID>0D032822-B19C-E638-0F80-8A529CED4F82</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="true"/>
+</engineerTo>
+<referedAttribute>67CB9B80-FE7A-0222-90CB-0F9BD34B291A</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="7A6191C7-E323-3D24-322D-357DBC1C7CC8" name="Marca PK">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 00:14:45 UTC</createdTime>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<shouldEngineer>false</shouldEngineer>
+<engineerTo>
+<item key="58B6D257-61E5-3D75-9100-A8A21C1D7F70" value="false"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>119A0836-6D1B-C1F6-E7E0-64C702473744</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

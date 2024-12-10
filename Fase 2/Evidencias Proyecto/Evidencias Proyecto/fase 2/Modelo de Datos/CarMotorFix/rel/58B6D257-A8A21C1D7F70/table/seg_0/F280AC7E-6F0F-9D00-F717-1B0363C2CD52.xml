@@ -1,0 +1,76 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="F280AC7E-6F0F-9D00-F717-1B0363C2CD52" name="Ciudad">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>538C74F7-FA53-CE15-5585-8B17340A593C</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="Cod_ciudad" id="AFE06539-DD88-85F6-F11E-90096E3EA937">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>4EBC75F8-156C-94FD-4EF7-5C24819F723C</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>20</dataTypePrecision>
+<ownDataTypeParameters>,20,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Nombre_ciudad" id="1F2FC2F8-C7BC-083B-5520-4ABF03312E88">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>98F5836D-3DF7-D5C7-0D3D-1D331762D440</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Region_Cod_region" id="B951516B-1858-90AB-1E43-7C1030948E48">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>33F1007D-1F37-9433-CCCA-7430432D80CC</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>20</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="C047B644-3B17-752B-9FC2-0F2143F4F102" referredColumn="2E5F8A2D-0297-3EEB-7BC3-06B33545575F"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="87CDAE26-88AE-A53E-A2B4-F5EAB713EBE4" name="Ciudad_PK">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>91AC4A7B-5571-3C18-A021-65EE04A3CB14</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AFE06539-DD88-85F6-F11E-90096E3EA937"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="33A0DBAA-FB8F-423F-F4F7-F11AA68295BA" name="Ciudad_Region_FK">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:10 UTC</createdTime>
+<generatorID>DE284F37-6B3B-4F68-DD12-C51FF99D9D34</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B951516B-1858-90AB-1E43-7C1030948E48"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

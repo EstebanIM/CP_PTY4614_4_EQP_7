@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="CarMotorFix" id="1BDE54E6-007E-5426-0CDA-3BC527C5A5F0" version="3.5">
+<createdBy>paulo</createdBy>
+<createdTime>2024-10-07 01:00:12 UTC</createdTime>
+<ownerDesignName>modelo de datos</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>1BDE54E6-007E-5426-0CDA-3BC527C5A5F0</designId>
+</OSDM_Design>

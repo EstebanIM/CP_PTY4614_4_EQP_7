@@ -1,0 +1,209 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="13F9FC61-5888-5EB8-20FD-44094461A7A8" name="Orden_trabajo">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>DBCECF2A-2E48-1418-8A61-A3D26C926270</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="Id_OT" id="D437B352-3EC4-2EA7-1C5A-077C03285EEB">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>855B76FD-DAC0-0B2F-5FDF-75633C673948</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FechaRecepcion" id="18EC1F09-1DFB-009D-D9ED-2F3F8A0B0774">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>6F4641E6-1A90-505B-7934-F9295BE35DC0</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FechaSalida" id="46B0B296-7CA0-FED4-3DD2-DA1FBBBECAD1">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>750D97DE-C90F-4985-F16C-BFD22713930A</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FechaEntrega" id="6593FF83-12E6-3D54-6DD7-FF6A30048F80">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>A6BF6D0F-9101-713C-2DD9-260D952C5BD9</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Costo" id="CF3B14CE-967F-3EEB-27BB-2E9D1F102FFD">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>1B4FB12C-66B7-6E39-F5BD-2830BD1D8971</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>15</dataTypePrecision>
+<ownDataTypeParameters>,15,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Estado_OT_Cod_estado" id="4B441DBE-982C-5D50-5355-B297EDF907F7">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>6A2580F0-30B1-9762-2000-38F80DE1C381</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>2</dataTypePrecision>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="312F18D2-AB83-8342-D469-192B24A9B786" referredColumn="AE8827E5-0B64-8C15-2977-B6EBFBE0CB94"/>
+</associations>
+</Column>
+<Column name="Vehiculos_ID_vehiculo" id="DD6AF8DB-E12F-BFB2-A13C-CA83567D5C50">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>F3A0FED4-B2ED-9F6F-5065-DEF2FB1288EF</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<ownDataTypeParameters>,10,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="12ECFFE6-6021-EFA6-1017-4DA1ACAC442E" referredColumn="498FA1C8-0931-1F26-8DEE-C9903E0ED70E"/>
+</associations>
+</Column>
+<Column name="Vehiculos_Cliente_ID_Cliente" id="7DCEEF0E-9EC7-FF7F-49AF-193A9F1FB25D">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>8DCAF2F1-5628-E16C-1960-DC8917164DA0</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>30</dataTypePrecision>
+<ownDataTypeParameters>,30,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="12ECFFE6-6021-EFA6-1017-4DA1ACAC442E" referredColumn="EAD57430-4ADA-1E50-FB92-6021E40BFD0B"/>
+</associations>
+</Column>
+<Column name="mecanico_ID_Mecanico" id="2BBF8B81-38DD-7E0F-2202-5A364DD88D19">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>D8E0AEC2-A8FC-9D56-D57D-B95EB80D8949</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>30</dataTypePrecision>
+<ownDataTypeParameters>,30,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Clasificacion_OT_Id_clas" id="5705D628-C612-0B7A-0703-AD04F5D3E613">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>2679D4C0-7A7B-DB07-CD73-CBD61A27CAD5</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>20</dataTypePrecision>
+<ownDataTypeParameters>,20,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E3889874-A448-056A-8BE5-75D9599744C6" referredColumn="06F71FBE-C56D-952A-0ED1-0BC302E22074"/>
+</associations>
+</Column>
+<Column name="FechaInicio" id="33B2E850-864D-45A1-F0BE-974D876CDC45">
+<createdBy>einzu</createdBy>
+<createdTime>2024-11-19 01:40:11 UTC</createdTime>
+<generatorID>0A8E7294-413D-2DD4-FD39-33AD5F04CCD5</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="A23DC5A3-BD10-2A11-2D3C-1E68DCE94DF2" name="Orden_trabajo_PK">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>C69D4060-4AE2-8DFC-CC83-D7169874A53B</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D437B352-3EC4-2EA7-1C5A-077C03285EEB"/>
+<colUsage columnID="DD6AF8DB-E12F-BFB2-A13C-CA83567D5C50"/>
+<colUsage columnID="7DCEEF0E-9EC7-FF7F-49AF-193A9F1FB25D"/>
+<colUsage columnID="2BBF8B81-38DD-7E0F-2202-5A364DD88D19"/>
+<colUsage columnID="5705D628-C612-0B7A-0703-AD04F5D3E613"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="A6A52282-4438-6965-8428-E384C261E412" name="Orden_trabajo_Estado_OT_FK">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>6DF9ADD6-C4AE-6ADA-B6AD-A19D34C77EC4</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4B441DBE-982C-5D50-5355-B297EDF907F7"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="98FE145C-CE90-1AE6-111B-1B29AAB45063" name="Orden_trabajo_Vehiculos_FK">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:09 UTC</createdTime>
+<generatorID>401AFA22-E43A-CFAD-DAEB-90901059AAF0</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DD6AF8DB-E12F-BFB2-A13C-CA83567D5C50"/>
+<colUsage columnID="7DCEEF0E-9EC7-FF7F-49AF-193A9F1FB25D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="95096EFE-3700-4C7E-45B8-55BCEC76E948" name="Orden_trabajo_Clasificacion_OT_FK">
+<createdBy>Paulo</createdBy>
+<createdTime>2024-10-12 01:38:10 UTC</createdTime>
+<generatorID>139C943E-C1EA-F430-B44C-C78F70049F20</generatorID>
+<ownerDesignName>CarMotorFix</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5705D628-C612-0B7A-0703-AD04F5D3E613"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
