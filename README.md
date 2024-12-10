@@ -27,10 +27,14 @@
     <span>&nbsp;✦&nbsp;</span>
     <a href="#🔑-licencia">Licencia</a>
 </div>
+<div align="center">
 ---
 # 🌐 Integrantes
+-Paulo Escobar
+-Esteban Inzunza
+-Diego Lastra
 
-
+</div>
 ---
 
 # 🚗 CarMotorFix
