@@ -114,17 +114,24 @@ const Informes = () => {
         const doc = new jsPDF();
         doc.setFontSize(18);
         doc.text(`Informe de Órdenes de ${mecanico.prim_nom} ${mecanico.prim_apell}`, 14, 22);
-        doc.setFontSize(12);
-        doc.text(`Total de Órdenes Realizadas: ${ordenes.length}`, 14, 32);
 
-        if (ordenes.length === 0) {
+        // Filtrar las órdenes excluyendo "Cotizando" y "Rechazado"
+        const ordenesFiltradas = ordenes.filter(orden => 
+            orden.estado_ot_id?.nom_estado !== "Cotizando" && 
+            orden.estado_ot_id?.nom_estado !== "Rechazado"
+        );
+
+        doc.setFontSize(12);
+        doc.text(`Total de Órdenes Realizadas: ${ordenesFiltradas.length}`, 14, 32);
+
+        if (ordenesFiltradas.length === 0) {
             doc.setFontSize(12);
             doc.text('No hay órdenes de trabajo para este mecánico.', 14, 42);
         } else {
             const tableColumn = ['ID', 'Estado', 'Fecha Inicio', 'Fecha Recepción', 'Fecha Entrega', 'Total Servicios', 'Costo'];
             const tableRows = [];
 
-            ordenes.forEach((orden) => {
+            ordenesFiltradas.forEach((orden) => {
                 const estadoOT = orden.estado_ot_id?.nom_estado || 'No disponible';
                 const totalServicios = orden.catalogo_servicios?.length || 0;
 
