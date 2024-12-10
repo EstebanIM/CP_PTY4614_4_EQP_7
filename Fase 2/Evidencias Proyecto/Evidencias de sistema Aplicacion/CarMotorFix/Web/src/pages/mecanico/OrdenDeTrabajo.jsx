@@ -50,7 +50,7 @@ function OrdenDeTrabajo() {
                 );
                 const ordenes = ordenesResponse.data.orden_trabajos_id || [];
                 const ordenesIds = ordenes.filter(OT => OT.estado_ot_id.nom_estado !== 'Cotizando' && OT.estado_ot_id.nom_estado !== 'Rechazado');
-                
+
                 setOrdenTrabajo(ordenesIds || []);
                 setTotal(ordenesIds.length);
             } else {
@@ -62,7 +62,7 @@ function OrdenDeTrabajo() {
                 });
                 const ordenes2 = ordenesResponse.data || [];
                 const ordenesIds2 = ordenes2.filter(OT => OT.estado_ot_id.nom_estado !== 'Cotizando' && OT.estado_ot_id.nom_estado !== 'Rechazado');
-                
+
                 setOrdenTrabajo(ordenesIds2 || []);
                 setTotal(ordenesIds2.length);
             }
@@ -98,9 +98,32 @@ function OrdenDeTrabajo() {
         {
             header: 'Servicio',
             key: 'servicio',
-            render: (ordenTrabajo) =>
-                ordenTrabajo.catalogo_servicios?.map((s) => s.tp_servicio).join(', ') ||
-                'Servicio no disponible',
+            render: (ordenTrabajo) => {
+                const servicios = ordenTrabajo.catalogo_servicios;
+                if (servicios) {
+
+                    return (
+                        <div className="relative flex justify-center items-center group">
+                            <span className="text-black">
+                                {`${servicios.length}`}
+                            </span>
+
+                            {servicios && (
+                                <div className="absolute left-6 bottom-[-10px] ml-2 hidden w-60 p-2 bg-white border border-gray-300 rounded shadow-lg text-black group-hover:block z-10">
+                                    <ul className="space-y-1">
+                                        {servicios.map((servicio, index) => (
+                                            <li key={index} className="whitespace-nowrap">
+                                                {servicio.tp_servicio}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    );
+                }
+                return 'Servicio no disponible';
+            }
         },
         {
             header: 'Estado',
@@ -120,9 +143,8 @@ function OrdenDeTrabajo() {
 
     return (
         <div
-            className={`flex min-h-screen ${
-                darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'
-            }`}
+            className={`flex min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'
+                }`}
         >
             <DashboardSidebar
                 sidebarOpen={sidebarOpen}
