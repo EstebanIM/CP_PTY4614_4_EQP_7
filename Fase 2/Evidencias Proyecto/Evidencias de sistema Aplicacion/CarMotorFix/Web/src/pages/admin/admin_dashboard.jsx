@@ -67,7 +67,7 @@ const DashboardAdmin = () => {
   const navigate = useNavigate();
   const [Ordenes, setOrdenes] = useState(0);
   const [TotalOrdenes, setTotalOrdenes] = useState(0);
-  const [Pendientes, setPendientes] = useState(0);
+  // const [Pendientes, setPendientes] = useState(0);
   const [currentPageAutos, setCurrentPageAutos] = useState(1);
   const [currentPageCotizaciones, setCurrentPageCotizaciones] = useState(1);
   const [currentPageOrdenes, setCurrentPageOrdenes] = useState(1);
@@ -164,8 +164,8 @@ const DashboardAdmin = () => {
           const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
           const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
 
-          const pendientes = validOtIds.filter(item => item.estado_ot_id.nom_estado === 'Pendiente de aprobación');
-          setPendientes(pendientes.length);
+          // const pendientes = validOtIds.filter(item => item.estado_ot_id.nom_estado === 'Pendiente de aprobación');
+          // setPendientes(pendientes.length);
 
           const ordenesMesActual = validOtIds.filter(ot => {
             const createdAt = new Date(ot.createdAt);
@@ -354,7 +354,6 @@ const DashboardAdmin = () => {
           <DashboardStats
             TotalCotizaciones={TotalCotizaciones}
             TotalOrdenes={TotalOrdenes}
-            Pendientes={Pendientes}
           />
 
 

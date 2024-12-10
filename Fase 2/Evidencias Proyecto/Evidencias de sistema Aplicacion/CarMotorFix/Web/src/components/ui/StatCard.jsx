@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, FileText, Loader2, Clock } from 'lucide-react';
+import { ArrowDown, ArrowUp, FileText, Loader2 } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 function StatCard({ title, value, icon, trend }) {
@@ -63,7 +63,7 @@ DashboardStats.propTypes = {
     })
 };
 
-export default function DashboardStats({ TotalCotizaciones, TotalOrdenes, TotalPendientes }) {
+export default function DashboardStats({ TotalCotizaciones, TotalOrdenes }) {
     const actualQuotes = TotalCotizaciones?.actual;
     const pastQuotes = TotalCotizaciones?.pasado;
 
@@ -78,16 +78,16 @@ export default function DashboardStats({ TotalCotizaciones, TotalOrdenes, TotalP
         ? ((actualOrders - pastOrders) / pastOrders) * 100
         : undefined;
 
-    const actualPending = TotalPendientes?.actual;
-    const pastPending = TotalPendientes?.pasado;
+    // const actualPending = TotalPendientes?.actual;
+    // const pastPending = TotalPendientes?.pasado;
 
-    const pendingTrend = (actualPending !== undefined && pastPending !== undefined && pastPending !== 0)
-        ? ((actualPending - pastPending) / pastPending) * 100
-        : undefined;
+    // const pendingTrend = (actualPending !== undefined && pastPending !== undefined && pastPending !== 0)
+    //     ? ((actualPending - pastPending) / pastPending) * 100
+    //     : undefined;
     // console.log(quotesTrend, ordersTrend, pendingTrend);
     
     return (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 justify-center">
             <StatCard
                 title="Cotizaciones"
                 value={actualQuotes}
@@ -104,15 +104,6 @@ export default function DashboardStats({ TotalCotizaciones, TotalOrdenes, TotalP
                 trend={ordersTrend !== undefined ? {
                     value: Math.round(ordersTrend),
                     isPositive: ordersTrend > 0
-                } : undefined}
-            />
-            <StatCard
-                title="Órdenes Pendientes"
-                value={actualPending}
-                icon={<Clock className="h-6 w-6 text-gray-600 dark:text-gray-400" />}
-                trend={pendingTrend !== undefined ? {
-                    value: Math.round(pendingTrend),
-                    isPositive: pendingTrend > 0
                 } : undefined}
             />
         </div>
