@@ -799,7 +799,6 @@ export interface ApiOrdenTrabajoOrdenTrabajo
     fechainicio: Schema.Attribute.Date & Schema.Attribute.Required;
     fecharecepcion: Schema.Attribute.Date;
     fechaentrega: Schema.Attribute.Date;
-    fechasalida: Schema.Attribute.Date;
     costo: Schema.Attribute.Integer & Schema.Attribute.Required;
     estado_ot_id: Schema.Attribute.Relation<
       'manyToOne',
