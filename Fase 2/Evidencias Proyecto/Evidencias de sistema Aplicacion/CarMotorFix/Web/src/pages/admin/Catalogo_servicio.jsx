@@ -142,13 +142,19 @@ function Servicios() {
                     throw new Error("Error: La respuesta no contiene datos.");
                 }
 
-                setServicios([...servicios, response.data]);
-                setNewServicio({ tp_servicio: '', Estado: false, costserv: '', ordentrabajo_catalogoservicio_id: '' });
+                setServicios(prevServicios => [...prevServicios, response.data]);
+                setNewServicio({ 
+                    tp_servicio: '', 
+                    Estado: false, 
+                    costserv: '', 
+                    ordentrabajo_catalogoservicio_id: '' 
+                });
                 setSelectedCategory('');
+                setIsLoading(false);
                 setIsModalOpen(false);
+
             } catch (error) {
                 console.error('Error adding service:', error);
-            } finally {
                 setIsLoading(false);
             }
         }
