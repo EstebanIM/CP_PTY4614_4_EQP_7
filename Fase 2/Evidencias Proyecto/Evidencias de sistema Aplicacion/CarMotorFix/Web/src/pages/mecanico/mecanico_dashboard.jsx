@@ -78,7 +78,7 @@ const DashboardAutos = () => {
           modelo: vehiculo.modelo,
           motor: vehiculo.motor,
           patente: vehiculo.patente,
-          user_id: vehiculo.user_id.id,
+          user_id: vehiculo.user_id?.id,
           marca_id: vehiculo.marca_id.nombre_marca,
           estado: vehiculo.estado,
         }));
@@ -89,8 +89,6 @@ const DashboardAutos = () => {
         setTotalVehiculos(vehiculosUnicos.size);
         setVehiculos(vehiculosHabilitados);
         // console.log('Vehiculos:', vehiculosHabilitados);
-
-
 
       } catch (error) {
         console.error('Error fetching IDMecanico:', error);
@@ -109,16 +107,16 @@ const DashboardAutos = () => {
     setLoading(true);
     const fetchOT = async () => {
       try {
-        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=username&populate[estado_ot_id][fields]=nom_estado&populate[vehiculo][fields]=id,anio,modelo,motor,patente&populate[vehiculo][populate][marca_id][fields]=nombre_marca&populate[vehiculo][populate][user_id][fields]=id&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
+        const response = await fetcher(`${STRAPI_URL}/api/orden-trabajos?populate[catalogo_servicios][fields]=tp_servicio&populate[user][fields]=nombre&populate[user][fields]=apellido&populate[estado_ot_id][fields]=nom_estado&populate[vehiculo][fields]=id,anio,modelo,motor,patente&populate[vehiculo][populate][marca_id][fields]=nombre_marca&populate[vehiculo][populate][user_id][fields]=id&filters[mecanico_id][documentId][$eq]=${idMecanico}`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${jwt}`,
           },
         });
-
+        // console.log('Ordenes:', response.data);
         const OT = response.data.map((OT) => ({
           ...OT,
-          user: OT.user.username,
+          user: OT.user?.nombre + ' ' + OT.user?.apellido,
           estado_ot_id: OT.estado_ot_id.nom_estado,
           catalogo_servicios: OT.catalogo_servicios.map(servicio => servicio.tp_servicio),
           costo: OT.costo,
@@ -130,13 +128,13 @@ const DashboardAutos = () => {
             modelo: OT.vehiculo.modelo,
             motor: OT.vehiculo.motor,
             patente: OT.vehiculo.patente,
-            user_id: OT.vehiculo.user_id.id,
+            user_id: OT.vehiculo?.user_id?.id,
             marca_id: OT.vehiculo.marca_id.nombre_marca,
           }
         }));
 
         const Cotizacion = OT.filter(cotizacion => cotizacion.estado_ot_id === 'Cotizando');
-        const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'Cotizando' && Ordenes.estado_ot_id !== 'Finalizado');
+        const Ordenes = OT.filter(Ordenes => Ordenes.estado_ot_id !== 'Cotizando' && Ordenes.estado_ot_id !== 'Finalizado' && Ordenes.estado_ot_id !== 'Rechazado');
 
         setOrdenes(Ordenes);
 
@@ -292,16 +290,35 @@ const DashboardAutos = () => {
       render: (ordenes) => ordenes.user || 'Cliente no disponible',
     },
     {
-      header: "Servicio",
+      header: "Cant. Servicio",
       key: "servicio",
       render: (ordenes) => {
-        if (ordenes.catalogo_servicios && ordenes.catalogo_servicios.length > 0) {
-          const firstService = ordenes.catalogo_servicios;
-          const moreServices = ordenes.catalogo_servicios.length > 1;
-          return moreServices ? `${firstService} (+${ordenes.catalogo_servicios.length - 1} más)` : firstService;
+        const servicios = ordenes.catalogo_servicios;
+        if (servicios && servicios.length > 0) {
+          const moreServices = servicios.length > 1;
+      
+          return (
+            <div className="relative flex justify-center items-center group">
+              <span className="text-black">
+                {moreServices && `${servicios.length}`}
+              </span>
+      
+              {moreServices && (
+                <div className="absolute left-6 bottom-[-10px] ml-2 hidden w-60 p-2 bg-white border border-gray-300 rounded shadow-lg text-black group-hover:block z-10">
+                  <ul className="space-y-1">
+                    {servicios.map((servicio, index) => (
+                      <li key={index} className="whitespace-nowrap">
+                        {servicio}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          );
         }
         return 'Servicio no disponible';
-      },
+      }
     },
     {
       header: "Valor",
@@ -325,16 +342,34 @@ const DashboardAutos = () => {
       render: (Cotizaciones) => Cotizaciones.user || 'Cliente no disponible',
     },
     {
-      header: "Servicio",
+      header: "Cant. Servicio",
       key: "servicio",
       render: (Cotizaciones) => {
-        if (Cotizaciones.catalogo_servicios && Cotizaciones.catalogo_servicios.length > 0) {
-          const firstService = Cotizaciones.catalogo_servicios;
-          const moreServices = Cotizaciones.catalogo_servicios.length > 1;
-          return moreServices ? `${firstService} (+${Cotizaciones.catalogo_servicios.length - 1} más)` : firstService;
+        const servicios = Cotizaciones.catalogo_servicios;
+        if (servicios && servicios.length > 0) {
+      
+          return (
+            <div className="relative flex justify-center items-center group">
+              <span className="text-black">
+                {`${servicios.length}`}
+              </span>
+      
+              {servicios && (
+                <div className="absolute left-9 bottom-[-10px] ml-2 hidden w-60 p-2 bg-white border border-gray-300 rounded shadow-lg text-black group-hover:block z-10">
+                  <ul className="space-y-1">
+                    {servicios.map((servicio, index) => (
+                      <li key={index} className="whitespace-nowrap">
+                        {servicio}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          );
         }
         return 'Servicio no disponible';
-      },
+      }
     },
     {
       header: "Valor",

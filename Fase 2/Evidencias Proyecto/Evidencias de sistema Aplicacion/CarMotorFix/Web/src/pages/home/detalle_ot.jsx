@@ -33,6 +33,7 @@ export default function WorkOrderDetails() {
   const [showupdateValorizar, setshowupdateValorizar] = useState(false);
   const [showAddServicio, setshowAddServicio] = useState(false);
   const [catalogoServicios, setCatalogoServicios] = useState([]);
+  const [userID, setUserID] = useState(null);
 
   const [formData, setFormData] = useState({
     descripcion: '',
@@ -54,6 +55,7 @@ export default function WorkOrderDetails() {
 
   const STRAPI_URL = import.meta.env.VITE_STRAPI_URL;
 
+  
   const fetchOrden = async () => {
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
@@ -73,7 +75,7 @@ export default function WorkOrderDetails() {
           return {
             id: nota.id,
             descripcion: nota.descripcion,
-            mecanico: nota.mecanico.prim_nom + ' ' + nota.mecanico.prim_apell,
+            mecanico: nota.mecanico?.prim_nom + ' ' + nota.mecanico?.prim_apell,
             fecha: new Date(nota.createdAt).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }),
           };
         });
@@ -99,6 +101,7 @@ export default function WorkOrderDetails() {
         });
 
         setUserRole(response.role.name);
+        setUserID(response.mecanico.id);
       } catch (error) {
         console.error('Error fetching user role:', error);
       }
@@ -365,20 +368,19 @@ export default function WorkOrderDetails() {
 
   const handleSubmitNota = async (e) => {
     e.preventDefault();
-
+  
     const jwt = getTokenFromLocalCookie();
     if (jwt) {
       try {
-
         setLoading(true);
         const updateNota = {
           data: {
             descripcion: formNota.descripcion,
-            mecanico: Orden.mecanico_id.id,
+            mecanico: userID,
             ot: Orden.id
           },
         };
-
+  
         const response = await fetch(`${STRAPI_URL}/api/notas`, {
           method: 'POST',
           headers: {
@@ -387,16 +389,38 @@ export default function WorkOrderDetails() {
           },
           body: JSON.stringify(updateNota),
         });
-
+  
         if (!response.ok) {
           throw new Error(`Error al agregar nota: ${response.statusText}`);
         }
-
+  
         setFormNota({
           descripcion: ''
         });
-
+  
         setshowNota(false);
+  
+        // Fetch the updated notes
+        const responseOrden = await fetcher(`${STRAPI_URL}/api/orden-trabajos/${id}?pLevel`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+        });
+  
+        const updatedOrden = responseOrden.data;
+        const ViewNotas = updatedOrden.notas?.map((nota) => {
+          return {
+            id: nota.id,
+            descripcion: nota.descripcion,
+            mecanico: nota.mecanico?.prim_nom + ' ' + nota.mecanico?.prim_apell,
+            fecha: new Date(nota.createdAt).toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+          };
+        });
+  
+        setNotas(ViewNotas);
+  
       } catch (error) {
         console.error('Error al agregar nota:', error);
       } finally {
@@ -404,6 +428,7 @@ export default function WorkOrderDetails() {
       }
     }
   };
+  
 
   const handleValorizar = async (e) => {
     e.preventDefault();
