@@ -26,17 +26,17 @@
     <a href="#📝-notas-importantes">Notas Importantes</a>
     <span>&nbsp;✦&nbsp;</span>
     <a href="#🔑-licencia">Licencia</a>
-</div>
+</div>7
+---
 <div align="center">
----
+
 # 🌐 Integrantes
--Paulo Escobar
--Esteban Inzunza
--Diego Lastra
+- Paulo Escobar  
+- Esteban Inzunza  
+- Diego Lastra  
 
 </div>
 ---
-
 # 🚗 CarMotorFix
 
 ## 📄 Descripción  
