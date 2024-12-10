@@ -66,7 +66,7 @@ const Informes = () => {
     // Función para generar informe de órdenes por mes
     const generarInformePorMes = (ordenes) => {
         console.log('Datos de órdenes recibidos:', ordenes);
-        
+
         const doc = new jsPDF();
         doc.setFontSize(18);
         doc.text(`Informe de Órdenes de Trabajo - ${selectedMes}`, 14, 22);
@@ -84,7 +84,7 @@ const Informes = () => {
             ordenes.forEach((orden) => {
                 // Obtener el estado de la OT
                 const estadoOT = orden.estado_ot_id?.nom_estado || 'No disponible';
-                
+
                 // Obtener el total de servicios
                 const totalServicios = orden.catalogo_servicios?.length || 0;
 
@@ -116,8 +116,8 @@ const Informes = () => {
         doc.text(`Informe de Órdenes de ${mecanico.prim_nom} ${mecanico.prim_apell}`, 14, 22);
 
         // Filtrar las órdenes excluyendo "Cotizando" y "Rechazado"
-        const ordenesFiltradas = ordenes.filter(orden => 
-            orden.estado_ot_id?.nom_estado !== "Cotizando" && 
+        const ordenesFiltradas = ordenes.filter(orden =>
+            orden.estado_ot_id?.nom_estado !== "Cotizando" &&
             orden.estado_ot_id?.nom_estado !== "Rechazado"
         );
 
@@ -155,13 +155,12 @@ const Informes = () => {
     // Función para generar informe de incidencias por mes
     const generarInformeIncidencias = (ordenes) => {
         console.log('Datos de órdenes recibidos:', ordenes);
-        
+
         const doc = new jsPDF();
         doc.setFontSize(18);
         doc.text(`Informe de Incidencias - ${selectedMes}`, 14, 22);
 
-        // Filtrar solo las órdenes rechazadas
-        const ordenesRechazadas = ordenes.filter(orden => 
+        const ordenesRechazadas = ordenes.filter(orden =>
             orden.estado_ot_id?.nom_estado === "Rechazado"
         );
 
@@ -172,19 +171,27 @@ const Informes = () => {
             doc.setFontSize(12);
             doc.text(`Total de Incidencias: ${ordenesRechazadas.length}`, 14, 32);
 
-            const tableColumn = ['ID', 'Estado', 'Fecha Inicio', 'Fecha Recepción', 'Fecha Entrega', 'Total Servicios', 'Costo'];
+            const tableColumn = ['ID', 'Estado', 'Fecha Inicio', 'Mecánico', 'Total Servicios', 'Costo'];
             const tableRows = [];
 
             ordenesRechazadas.forEach((orden) => {
+                // Agregamos log para depuración
+                console.log('Orden completa:', orden);
+
                 const estadoOT = orden.estado_ot_id?.nom_estado || 'No disponible';
                 const totalServicios = orden.catalogo_servicios?.length || 0;
+
+                // Accedemos al mecánico directamente desde la orden
+                const mecanicoData = orden.mecanico_id?.[0];
+                const nombreMecanico = mecanicoData ?
+                    `${mecanicoData.prim_nom} ${mecanicoData.prim_apell}` :
+                    'No asignado';
 
                 const ordenData = [
                     orden.id,
                     estadoOT,
                     orden.fechainicio || 'No disponible',
-                    orden.fecharecepcion || 'No disponible',
-                    orden.fechaentrega || 'No disponible',
+                    nombreMecanico,
                     totalServicios,
                     orden.costo ? `$${orden.costo}` : 'No disponible',
                 ];
@@ -207,7 +214,7 @@ const Informes = () => {
                 const fechaFin = new Date(year, month, 0).toISOString().split('T')[0];
 
                 const response = await fetcher(
-                    `${STRAPI_URL}/api/orden-trabajos?filters[fechainicio][$gte]=${fechaInicio}&filters[fechainicio][$lte]=${fechaFin}&populate=estado_ot_id&populate=catalogo_servicios`,
+                    `${STRAPI_URL}/api/orden-trabajos?filters[fechainicio][$gte]=${fechaInicio}&filters[fechainicio][$lte]=${fechaFin}&populate[estado_ot_id][fields][0]=nom_estado&populate[catalogo_servicios][fields][0]=id&populate[mecanico_id][fields][0]=prim_nom&populate[mecanico_id][fields][1]=prim_apell`,
                     {
                         headers: {
                             'Content-Type': 'application/json',
@@ -350,37 +357,48 @@ const Informes = () => {
             />
             <div className="flex-1 flex flex-col">
                 <DashboardHeader toggleSidebar={toggleSidebar} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-                <div className={`p-8 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg mx-6 my-6`}>
-                    <h1 className={`text-3xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-700'}`}>
+                
+                {/* Contenido principal con ajustes responsivos */}
+                <div className={`p-4 md:p-8 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg mx-2 md:mx-6 my-4 md:my-6`}>
+                    <h1 className={`text-2xl md:text-3xl font-bold mb-4 md:mb-6 ${darkMode ? 'text-white' : 'text-gray-700'}`}>
                         Generar Informes
                     </h1>
 
                     {/* Informe por Mes */}
-                    <div className={`p-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg shadow-md mb-6`}>
-                        <h2 className={`text-2xl font-semibold mb-4 ${darkMode ? 'text-blue-300' : 'text-blue-700'}`}>
+                    <div className={`p-4 md:p-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg shadow-md mb-4 md:mb-6`}>
+                        <h2 className={`text-xl md:text-2xl font-semibold mb-3 md:mb-4 ${darkMode ? 'text-blue-300' : 'text-blue-700'}`}>
                             Informe de Órdenes por Mes
                         </h2>
-                        <label className={`block mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Seleccionar Mes:</label>
+                        <label className={`block mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Seleccionar Mes:
+                        </label>
                         <input
                             type="month"
                             value={selectedMes}
                             onChange={(e) => setSelectedMes(e.target.value)}
-                            className={`w-1/4 px-4 py-2 border rounded-lg focus:outline-none ${darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300 text-gray-900'
-                                }`}
+                            className={`w-full md:w-1/4 px-3 py-2 border rounded-lg focus:outline-none mb-4 ${
+                                darkMode 
+                                    ? 'bg-gray-600 border-gray-500 text-white' 
+                                    : 'bg-white border-gray-300 text-gray-900'
+                            }`}
                         />
-                        <div className="flex space-x-4 mt-4">
+                        <div className="flex flex-col md:flex-row gap-3 md:space-x-4">
                             <Button
                                 onClick={fetchAndGenerateInformePorMes}
-                                className={`py-2 px-4 rounded-lg ${
-                                    darkMode ? 'bg-blue-600 hover:bg-gray-900' : 'bg-blue-500 hover:bg-blue-500'
+                                className={`w-full md:w-auto py-2 px-4 rounded-lg ${
+                                    darkMode 
+                                        ? 'bg-blue-600 hover:bg-blue-700' 
+                                        : 'bg-blue-500 hover:bg-blue-600'
                                 } text-white font-semibold`}
                             >
                                 Generar Informe General
                             </Button>
                             <Button
                                 onClick={fetchAndGenerateInformeIncidencias}
-                                className={`py-2 px-4 rounded-lg ${
-                                    darkMode ? 'bg-red-600 hover:bg-red-500' : 'bg-red-500 hover:bg-red-400'
+                                className={`w-full md:w-auto py-2 px-4 rounded-lg ${
+                                    darkMode 
+                                        ? 'bg-red-600 hover:bg-red-700' 
+                                        : 'bg-red-500 hover:bg-red-600'
                                 } text-white font-semibold`}
                             >
                                 Generar Informe de Incidencias
@@ -389,19 +407,21 @@ const Informes = () => {
                     </div>
 
                     {/* Informe por Mecánico */}
-                    <div className={`p-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg shadow-md`}>
-                        <h2 className={`text-2xl font-semibold mb-4 ${darkMode ? 'text-green-300' : 'text-green-700'}`}>
+                    <div className={`p-4 md:p-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} rounded-lg shadow-md`}>
+                        <h2 className={`text-xl md:text-2xl font-semibold mb-3 md:mb-4 ${darkMode ? 'text-green-300' : 'text-green-700'}`}>
                             Informe por Mecánico
                         </h2>
-                        <p className={`mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <p className={`mb-4 text-sm md:text-base ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                             Selecciona un mecánico para generar el informe de órdenes de trabajo que ha realizado.
                         </p>
-                        <Tablas
-                            servicio={mecanicos}
-                            columns={columnsMecanicos}
-                            handleViewTabla={fetchAndGenerateInformePorMecanico}
-                            loading={loadingMecanicos}
-                        />
+                        <div className="overflow-x-auto">
+                            <Tablas
+                                servicio={mecanicos}
+                                columns={columnsMecanicos}
+                                handleViewTabla={fetchAndGenerateInformePorMecanico}
+                                loading={loadingMecanicos}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

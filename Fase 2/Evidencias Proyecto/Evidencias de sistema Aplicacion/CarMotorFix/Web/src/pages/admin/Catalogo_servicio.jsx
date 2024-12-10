@@ -246,73 +246,83 @@ function Servicios() {
                                 </button>
                             </div>
                             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                                <h2 className="text-xl font-bold mb-4">Agregar Servicio</h2>
-                                <form onSubmit={handleAddServicio}>
-                                    <div className="grid gap-4">
-                                        <select
-                                            value={selectedCategory}
-                                            onChange={handleCategoryChange}
-                                            required
-                                            className={`p-2 border rounded w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
-                                        >
-                                            <option value="" className="text-gray-500">Seleccione una categoría</option>
-                                            {opcionesServicios.map((categoria) => (
-                                                <option key={categoria.categoria} value={categoria.categoria}>
-                                                    {categoria.categoria}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {selectedCategory && (
-                                            <select
-                                                name="tp_servicio"
-                                                value={newServicio.tp_servicio}
-                                                onChange={handleOptionChange}
-                                                required
-                                                className={`p-2 border rounded w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
-                                            >
-                                                <option value="" className="text-gray-500">Seleccione un tipo de servicio</option>
-                                                {opcionesServicios.find(cat => cat.categoria === selectedCategory)?.opciones.map((opcion) => (
-                                                    <option key={opcion} value={opcion}>
-                                                        {opcion}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        )}
-                                        <label className={`flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            <span>Activo</span>
-                                            <div className="relative">
-                                                <input
-                                                    type="checkbox"
-                                                    name="Estado"
-                                                    checked={newServicio.Estado}
-                                                    onChange={handleChange}
-                                                    className="sr-only"
-                                                />
-                                                <div
-                                                    className={`w-10 h-6 bg-gray-300 rounded-full transition duration-200 ${newServicio.Estado ? 'bg-green-500' : 'bg-gray-300'}`}
-                                                ></div>
-                                                <div
-                                                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${newServicio.Estado ? 'translate-x-4' : 'translate-x-0'
-                                                        }`}
-                                                ></div>
-                                            </div>
-                                        </label>
-                                        <input
-                                            type="number"
-                                            name="costserv"
-                                            placeholder="Costo"
-                                            value={newServicio.costserv}
-                                            onChange={handleChange}
-                                            required
-                                            className={`p-2 border rounded w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
-                                        />
+                                {isLoading ? (
+                                    <div className="relative">
+                                        <LoadingComponent isModal={true} />
                                     </div>
-                                    {!isLoading && (
-                                        <Button type="submit" className={`mt-4 px-4 py-2 text-white rounded w-full ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'}`}>
-                                            Agregar Servicio
-                                        </Button>
-                                    )}
-                                </form>
+                                ) : (
+                                    <>
+                                        <h2 className="text-xl font-bold mb-4">Agregar Servicio</h2>
+                                        <form onSubmit={handleAddServicio}>
+                                            <div className="grid gap-4">
+                                                <select
+                                                    value={selectedCategory}
+                                                    onChange={handleCategoryChange}
+                                                    required
+                                                    className={`p-2 border rounded w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                                >
+                                                    <option value="" className="text-gray-500">Seleccione una categoría</option>
+                                                    {opcionesServicios.map((categoria) => (
+                                                        <option key={categoria.categoria} value={categoria.categoria}>
+                                                            {categoria.categoria}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                {selectedCategory && (
+                                                    <select
+                                                        name="tp_servicio"
+                                                        value={newServicio.tp_servicio}
+                                                        onChange={handleOptionChange}
+                                                        required
+                                                        className={`p-2 border rounded w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                                    >
+                                                        <option value="" className="text-gray-500">Seleccione un tipo de servicio</option>
+                                                        {opcionesServicios.find(cat => cat.categoria === selectedCategory)?.opciones.map((opcion) => (
+                                                            <option key={opcion} value={opcion}>
+                                                                {opcion}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                )}
+                                                <label className={`flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                    <span>Activo</span>
+                                                    <div className="relative">
+                                                        <input
+                                                            type="checkbox"
+                                                            name="Estado"
+                                                            checked={newServicio.Estado}
+                                                            onChange={handleChange}
+                                                            className="sr-only"
+                                                        />
+                                                        <div
+                                                            className={`w-10 h-6 bg-gray-300 rounded-full transition duration-200 ${newServicio.Estado ? 'bg-green-500' : 'bg-gray-300'}`}
+                                                        ></div>
+                                                        <div
+                                                            className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${newServicio.Estado ? 'translate-x-4' : 'translate-x-0'}`}
+                                                        ></div>
+                                                    </div>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="costserv"
+                                                    placeholder="Costo"
+                                                    value={newServicio.costserv}
+                                                    onChange={handleChange}
+                                                    required
+                                                    className={`p-2 border rounded w-full ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                                                />
+                                            </div>
+                                            <Button 
+                                                type="submit" 
+                                                className={`mt-4 px-4 py-2 text-white rounded w-full ${
+                                                    darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
+                                                }`}
+                                            >
+                                                Agregar Servicio
+                                            </Button>
+                                        </form>
+                                    </>
+                                )}
                             </Modal>
                         </div>
                     </div>
